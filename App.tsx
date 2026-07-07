@@ -1,11 +1,10 @@
-import React from "react"
-import { NavigationContainer } from "@react-navigation/native"
+import RootProvider from "./src/providers/RootProvider"
 import RootNavigator from "./src/routes/RootNavigator"
 
 export default function App() {
 	return (
-		<NavigationContainer>
+		<RootProvider>
 			<RootNavigator />
-		</NavigationContainer>
+		</RootProvider>
 	)
 }

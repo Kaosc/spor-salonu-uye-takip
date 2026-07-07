@@ -1,28 +1,19 @@
-import React from "react"
-import { createStackNavigator } from "@react-navigation/stack"
-import HomeScreen from "../screens/HomeScreen"
-import AboutScreen from "../screens/AboutScreen"
+import { useColorScheme } from "react-native"
+import { NavigationContainer } from "@react-navigation/native"
+import { useSelector } from "react-redux"
 
-export type RootStackParamList = {
-	Home: undefined
-	About: undefined
-}
+import AuthStack from "./stacks/AuthStack"
+import MainStack from "./stacks/MainStack"
 
-const Stack = createStackNavigator<RootStackParamList>()
+import { LightTheme, DarkTheme } from "../utils/theme"
 
 export default function RootNavigator() {
+	const colorScheme = useColorScheme()
+	const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
+
 	return (
-		<Stack.Navigator initialRouteName="Home">
-			<Stack.Screen
-				name="Home"
-				component={HomeScreen}
-				options={{ title: "Home" }}
-			/>
-			<Stack.Screen
-				name="About"
-				component={AboutScreen}
-				options={{ title: "About Us" }}
-			/>
-		</Stack.Navigator>
+		<NavigationContainer theme={colorScheme === "dark" ? DarkTheme : LightTheme}>
+			{isAuthenticated ? <MainStack /> : <AuthStack />}
+		</NavigationContainer>
 	)
 }
