@@ -1,10 +1,11 @@
-import { View, Text } from 'react-native'
+import { View,  } from 'react-native'
 import React from 'react'
+import ThemedText from '../../components/ui/ThemedText'
 
 export default function SettingsStack() {
   return (
     <View>
-      <Text>SettingsStack</Text>
+      <ThemedText>SettingsStack</ThemedText>
     </View>
   )
 }

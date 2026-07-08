@@ -3,9 +3,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons"
 import { useSelector } from "react-redux"
 import { StyleProp, TextStyle } from "react-native"
 
-import { darkTheme, lightTheme } from "../../styles/Theme"
-import { moderateScale } from "../../lib/responsive"
 import { AllIconNames, iconComponents } from "../../types/icon"
+import { moderateScale } from "../../utils/responsive"
 
 interface ThemedIconProps {
 	name: AllIconNames
@@ -23,7 +22,7 @@ function ThemedIcon(props: ThemedIconProps) {
 			{...props}
 			name={props?.name as any}
 			size={moderateScale(props?.size || 24)}
-			style={[props?.style, darkMode ? darkTheme.icon : lightTheme.icon, props?.color && { color: props?.color }]}
+			style={[props?.style, darkMode ? "#fff" : "#000", props?.color && { color: props?.color }]}
 		/>
 	)
 }

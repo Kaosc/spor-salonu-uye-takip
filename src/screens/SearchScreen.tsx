@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View } from 'react-native'
+import ThemedText from '../components/ui/ThemedText'
 
 export default function SearchScreen() {
   return (
     <View>
-      <Text>SearchScreen</Text>
+      <ThemedText>SearchScreen</ThemedText>
     </View>
   )
 }

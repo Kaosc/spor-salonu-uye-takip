@@ -1,10 +1,11 @@
 import React from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
+import ThemedText from "../components/ui/ThemedText"
 
 export default function ProfileScreen() {
   return (
     <View style={styles.container}>
-      <Text>ProfileScreen</Text>
+      <ThemedText>ProfileScreen</ThemedText>
     </View>
   )
 }

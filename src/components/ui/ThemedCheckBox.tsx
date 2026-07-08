@@ -1,10 +1,10 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import React from "react"
-import { Theme } from "@/src/styles/Theme"
-import ThemedIcon from "./ThemedIcon"
 import { useSelector } from "react-redux"
 import { MotiView } from "moti"
-import { moderateScale } from "@/src/lib/responsive"
+
+import ThemedIcon from "./ThemedIcon"
+import { moderateScale } from "../../utils/responsive"
 
 type Props = {
 	value: boolean
@@ -42,7 +42,6 @@ export default function ThemedCheckBox({ value, onChange, size }: Props) {
 }
 
 const createStyles = (darkMode: boolean, size?: number) => {
-	const theme = Theme[darkMode ? "dark" : "light"]
 	return StyleSheet.create({
 		checkboxContainer: {
 			flexDirection: "row",
@@ -57,7 +56,7 @@ const createStyles = (darkMode: boolean, size?: number) => {
 			borderColor: darkMode ? "#5f5f5f" : "#b1b1b1",
 			alignItems: "center",
 			justifyContent: "center",
-			backgroundColor: theme.colors.bg,
+			backgroundColor: "#000"
 		},
 		checkboxChecked: {
 			backgroundColor: darkMode ? "#383838" : "#ffffff",

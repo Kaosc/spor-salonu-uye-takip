@@ -2,7 +2,7 @@ import { memo } from "react"
 import { StyleSheet, Text, TextProps } from "react-native"
 import { useSelector } from "react-redux"
 
-import { moderateFontScale } from "../../lib/responsive"
+import { moderateFontScale } from "../../utils/responsive"
 
 interface ThemedTextProps extends TextProps {
 	color?: string

@@ -3,29 +3,16 @@
     "name": "spor-salonu-uye-takip",
     "slug": "spor-salonu-uye-takip",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+    "runtimeVersion": "0.55.0",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "developmentClient": {
+      "silentLaunch": true
     },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
-      },
-      "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.sporsalonuuyetakip"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "experiments": {
+      "reactCompiler": true
     },
     "plugins": [
       "expo-image",

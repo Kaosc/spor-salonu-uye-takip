@@ -1,7 +1,6 @@
 import { registerRootComponent } from "expo"
 
 import { I18nextProvider } from "react-i18next"
-import { SafeAreaProvider } from "react-native-safe-area-context"
 import { Provider } from "react-redux"
 
 import ToastNotification from "./src/components/ToastNotification"
@@ -15,11 +14,9 @@ const IndexApp = () => {
 			i18n={i18n}
 			defaultNS={"translation"}
 		>
-			<SafeAreaProvider>
-				<Provider store={store}>
-					<App />
-				</Provider>
-			</SafeAreaProvider>
+			<Provider store={store}>
+				<App />
+			</Provider>
 			<ToastNotification />
 		</I18nextProvider>
 	)

@@ -1,10 +1,10 @@
-import React from "react"
-import { View, Text, StyleSheet } from "react-native"
+import { View,  StyleSheet } from "react-native"
+import ThemedText from "../components/ui/ThemedText"
 
 export default function DashboardScreen() {
   return (
     <View style={styles.container}>
-      <Text>DashboardScreen</Text>
+      <ThemedText>DashboardScreen</ThemedText>
     </View>
   )
 }

@@ -1,10 +1,10 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View } from 'react-native'
+import ThemedText from '../components/ui/ThemedText'
 
 export default function RegisterScreen() {
   return (
     <View>
-      <Text>RegisterScreen</Text>
+      <ThemedText>RegisterScreen</ThemedText>
     </View>
   )
 }

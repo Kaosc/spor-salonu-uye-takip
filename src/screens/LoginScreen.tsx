@@ -1,7 +1,8 @@
 import React from "react"
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { useDispatch } from "react-redux"
 import { login } from "../store/features/authSlice"
+import ThemedText from "../components/ui/ThemedText"
 
 export default function LoginScreen() {
 	const dispatch = useDispatch()
@@ -12,12 +13,12 @@ export default function LoginScreen() {
 
 	return (
 		<View style={styles.container}>
-			<Text>LoginScreen</Text>
+			<ThemedText>LoginScreen</ThemedText>
 			<TouchableOpacity
 				style={styles.button}
 				onPress={auth}
 			>
-				<Text style={styles.buttonText}>Login</Text>
+				<ThemedText style={styles.buttonText}>Login</ThemedText>
 			</TouchableOpacity>
 		</View>
 	)
