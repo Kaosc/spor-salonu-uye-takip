@@ -1,33 +1,27 @@
 import { useForm, Controller } from "react-hook-form"
 import { View, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, StyleSheet } from "react-native"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
 import { nanoid } from "@reduxjs/toolkit"
+import { useEffect } from "react"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 
-type FormValues = {
-	firstName: string
-	lastName: string
-	phoneNumber: string
-	email: string
-	lockerNumber: string
-	gender: string
-	birthDate: string
-	bloodType: string
-	emergencyName: string
-	emergencyPhone: string
-}
-
 export default function MemberFormScreen() {
-	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const navigation = useNavigation<any>()
+	const route = useRoute<any>()
+	
 	const styles = createStyles(darkMode)
+
 	const [members, setMembers] = useMMKVObject<Member[]>("members")
 
-	const { control, handleSubmit } = useForm<FormValues>({
+	const memberId = route.params?.memberId
+	const isEditing = !!memberId
+
+	const { control, handleSubmit, reset } = useForm<FormValues>({
 		defaultValues: {
 			firstName: "",
 			lastName: "",
@@ -42,37 +36,83 @@ export default function MemberFormScreen() {
 		},
 	})
 
-	const onSubmit = (data: FormValues) => {
-		const newMember: Member = {
-			uid: nanoid(),
-			firstName: data.firstName,
-			lastName: data.lastName,
-			phoneNumber: data.phoneNumber,
-			email: data.email,
-			lockerNumber: data.lockerNumber || "",
-			gender: (data.gender as Gender) || "UNSPECIFIED",
-			birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
-			bloodType: data.bloodType || undefined,
-			emergencyContact: {
-				name: data.emergencyName || "",
-				phone: data.emergencyPhone || "",
-			},
-			role: "MEMBER",
-			isActive: true,
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			createdBy: undefined,
+	useEffect(() => {
+		if (memberId && members) {
+			const member = members.find((m: any) => m.uid === memberId)
+			if (member) {
+				reset({
+					firstName: member.firstName || "",
+					lastName: member.lastName || "",
+					phoneNumber: member.phoneNumber || "",
+					email: member.email || "",
+					lockerNumber: member.lockerNumber || "",
+					gender: member.gender || "UNSPECIFIED",
+					birthDate: member.birthDate ? new Date(member.birthDate).toISOString().split("T")[0] : "",
+					bloodType: member.bloodType || "",
+					emergencyName: member.emergencyContact?.name || "",
+					emergencyPhone: member.emergencyContact?.phone || "",
+				})
+			}
 		}
+	}, [memberId, members, reset])
 
-		const updatedMembers = members ? [...members, newMember] : [newMember]
-		setMembers(updatedMembers)
+	const onSubmit = (data: FormValues) => {
+		// Update existing member
+		if (isEditing && memberId) {
+			const updatedMembers = members?.map((m: any) => {
+				if (m.uid === memberId) {
+					return {
+						...m,
+						firstName: data.firstName,
+						lastName: data.lastName,
+						phoneNumber: data.phoneNumber,
+						email: data.email,
+						lockerNumber: data.lockerNumber || "",
+						gender: data.gender || "UNSPECIFIED",
+						birthDate: data.birthDate ? new Date(data.birthDate) : m.birthDate,
+						bloodType: data.bloodType || m.bloodType,
+						emergencyContact: {
+							name: data.emergencyName || "",
+							phone: data.emergencyPhone || "",
+						},
+						updatedAt: new Date(),
+					}
+				}
+				return m
+			})
+			setMembers(updatedMembers)
+		} else {
+			// Create a new member
+			const newMember: Member = {
+				uid: nanoid(),
+				firstName: data.firstName,
+				lastName: data.lastName,
+				phoneNumber: data.phoneNumber,
+				email: data.email,
+				lockerNumber: data.lockerNumber || "",
+				gender: data.gender || ("UNSPECIFIED" as Gender),
+				birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
+				bloodType: data.bloodType || undefined,
+				emergencyContact: {
+					name: data.emergencyName || "",
+					phone: data.emergencyPhone || "",
+				},
+				role: "MEMBER",
+				isActive: true,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				createdBy: undefined,
+			}
+			const updatedMembers = members ? [...members, newMember] : [newMember]
+			setMembers(updatedMembers)
+		}
 
 		navigation.goBack()
 	}
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Yeni Üye" />
+			<CustomHeader title={isEditing ? "Üye Düzenle" : "Yeni Üye"} />
 			<KeyboardAvoidingView
 				style={styles.flex}
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -268,7 +308,7 @@ export default function MemberFormScreen() {
 							style={styles.button}
 							onPress={handleSubmit(onSubmit)}
 						>
-							<ThemedText style={styles.buttonText}>Kaydet</ThemedText>
+							<ThemedText style={styles.buttonText}>{isEditing ? "Update Member" : "Save Member"}</ThemedText>
 						</TouchableOpacity>
 					</View>
 				</ScrollView>

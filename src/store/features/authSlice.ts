@@ -1,18 +1,48 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
+import { loginWithEmail } from "../../lib/firebase/auth"
+
+export const loginAction = createAsyncThunk(
+	"auth/loginAction",
+	async ({ email, password }: { email: string; password: string }) => {
+		const result = await loginWithEmail(email, password)
+		return { uid: result.uid, email: result.email, role: result.role }
+	},
+)
 
 export const authSlice = createSlice({
 	name: "auth",
 	initialState: {
 		isAuthenticated: false,
-	},
+		uid: null,
+		email: null,
+		role: null,
+		isLoading: false,
+	} as Auth,
 	reducers: {
-		login(state) {
-			state.isAuthenticated = true
-		},
 		logout(state) {
 			state.isAuthenticated = false
+			state.uid = null
+			state.email = null
+			state.role = null
+			state.isLoading = false
 		},
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(loginAction.pending, (state) => {
+				state.isLoading = true
+			})
+			.addCase(loginAction.fulfilled, (state, action) => {
+				state.isAuthenticated = true
+				state.uid = action.payload.uid
+				state.email = action.payload.email
+				state.role = action.payload.role
+				state.isLoading = false
+			})
+			.addCase(loginAction.rejected, (state) => {
+				state.isLoading = false
+			})
 	},
 })
 
-export const { login, logout } = authSlice.actions
+export const { logout } = authSlice.actions
