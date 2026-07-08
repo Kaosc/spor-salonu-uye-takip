@@ -11,5 +11,7 @@
 	"version": "Sürüm",
 	"reminderTime": "Hatırlatma zamanı",
 	"close": "Kapat",
-	"warning": "Uyarı"
+	"warning": "Uyarı",
+	"consentTitle": "Gizlilik Politikası ve Hizmet Şartları",
+	"consentMessage": "Başlamadan önce Lütfen, <terms>Kullanım Şartları</terms> ve <privacy>Gizlilik Politikası</privacy>'nı kabul ettiğinizi onaylayın."
 }

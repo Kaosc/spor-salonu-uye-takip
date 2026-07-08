@@ -1,21 +1,20 @@
 import NetInfo from "@react-native-community/netinfo"
-import React, { useEffect, useRef } from "react"
-import { useTranslation } from "react-i18next"
+import { useEffect, useRef } from "react"
 import { Appearance } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 import { setSettings } from "../store/features/settingsSlice"
 import { setConfig } from "../store/features/configSlice"
 import { getIsThemeAuto } from "../utils/storage"
 import { setExternalTheme } from "../utils/toggleTheme"
+
 import FirebaseHandler from "../lib/firebase"
 
 export default function RootProvider({ children }: { children: React.ReactNode }) {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const config = useSelector((state: RootState) => state.config)
 	const dispatch = useDispatch()
-	const { t } = useTranslation()
 
 	const firebaseInit = useRef(false)
 
@@ -77,16 +76,14 @@ export default function RootProvider({ children }: { children: React.ReactNode }
 	}, [darkMode, dispatch])
 
 	return (
-		<SafeAreaProvider>
-			<SafeAreaView
-				style={{
-					flex: 1,
-					backgroundColor: darkMode ? "#000" : "#fff",
-				}}
-				edges={["top", "left", "right", "bottom"]}
-			>
-				{children}
-			</SafeAreaView>
-		</SafeAreaProvider>
+		<SafeAreaView
+			style={{
+				flex: 1,
+				backgroundColor: darkMode ? "#000" : "#fff",
+			}}
+			edges={["top", "left", "right", "bottom"]}
+		>
+			{children}
+		</SafeAreaView>
 	)
 }

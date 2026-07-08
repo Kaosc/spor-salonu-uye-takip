@@ -18,7 +18,8 @@
       "expo-image",
       "expo-build-properties",
       "expo-localization",
-      "expo-font"
+      "expo-font",
+      "expo-web-browser"
     ]
   }
 }

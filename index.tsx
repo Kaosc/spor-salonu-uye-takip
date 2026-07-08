@@ -1,3 +1,9 @@
+import { LogBox } from 'react-native';
+
+LogBox.ignoreLogs([
+  "SafeAreaView has been deprecated and will be removed in a future release. Please use 'react-native-safe-area-context' instead. See https://github.com/AppAndFlow/react-native-safe-area-context",
+]);
+
 import { registerRootComponent } from "expo"
 
 import { I18nextProvider } from "react-i18next"

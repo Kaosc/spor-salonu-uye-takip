@@ -20,7 +20,7 @@ export default function TabsNavigator() {
 
 	return (
 		<Tabs.Navigator
-			initialRouteName="HomeStack"
+			initialRouteName="DashboardScreen"
 			backBehavior="initialRoute"
 			screenOptions={{
 				headerStyle: {

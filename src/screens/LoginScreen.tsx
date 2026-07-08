@@ -1,19 +1,23 @@
 import React from "react"
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { useDispatch } from "react-redux"
-import { login } from "../store/features/authSlice"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
+
 import ThemedText from "../components/ui/ThemedText"
+
+import { login } from "../store/features/authSlice"
 
 export default function LoginScreen() {
 	const dispatch = useDispatch()
+	const navigation = useNavigation() as NavigationProp<any>
 
 	const auth = () => {
 		dispatch(login())
+		navigation.navigate("Tabs")
 	}
 
 	return (
 		<View style={styles.container}>
-			<ThemedText>LoginScreen</ThemedText>
 			<TouchableOpacity
 				style={styles.button}
 				onPress={auth}
