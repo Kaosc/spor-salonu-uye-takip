@@ -6,13 +6,14 @@ import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
+import ThemedIcon from "../components/ui/ThemedIcon"
 
 export default function MemberListScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 
 	const [members] = useMMKVObject<Member[]>("members")
-
+	console.log(JSON.stringify(members, null, 2)) // Log the members data for debugging
 	const styles = createStyles(darkMode)
 
 	const renderItem = ({ item }: { item: any }) => (
@@ -48,7 +49,11 @@ export default function MemberListScreen() {
 				style={styles.fab}
 				onPress={() => navigation.navigate("MemberFormScreen")}
 			>
-				<ThemedText style={styles.fabText}>+</ThemedText>
+				<ThemedIcon
+					name="plus"
+					size={25}
+					color={darkMode ? "#000" : "#fff"}
+				/>
 			</TouchableOpacity>
 		</View>
 	)
@@ -98,7 +103,7 @@ const createStyles = (darkMode: boolean) =>
 			width: 56,
 			height: 56,
 			borderRadius: 28,
-			backgroundColor: "#007AFF",
+			backgroundColor: darkMode ? "#ffffff" : "#000000",
 			alignItems: "center",
 			justifyContent: "center",
 			elevation: 4,
@@ -106,11 +111,5 @@ const createStyles = (darkMode: boolean) =>
 			shadowOffset: { width: 0, height: 2 },
 			shadowOpacity: 0.25,
 			shadowRadius: 4,
-		},
-		fabText: {
-			color: "#fff",
-			fontSize: 28,
-			lineHeight: 30,
-			fontWeight: "400",
 		},
 	})

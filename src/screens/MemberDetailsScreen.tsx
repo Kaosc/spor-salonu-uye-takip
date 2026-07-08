@@ -5,6 +5,7 @@ import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
+import ThemedIcon from "../components/ui/ThemedIcon"
 
 export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
@@ -15,6 +16,16 @@ export default function MemberDetailsScreen() {
 
 	const [members] = useMMKVObject<Member[]>("members")
 	const member = members?.find((m) => m.uid === route.params?.memberId)
+
+	const editButton = (
+		<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
+			<ThemedIcon
+				name="pen"
+				size={24}
+				color={darkMode ? "#fff" : "#000"}
+			/>
+		</TouchableOpacity>
+	)
 
 	if (!member) {
 		return (
@@ -37,22 +48,22 @@ export default function MemberDetailsScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Üye Detay" />
+			<CustomHeader
+				title="Üye Detay"
+				rightComponent={editButton}
+			/>
 			<ScrollView contentContainerStyle={styles.scrollContent}>
 				<View style={styles.card}>
+					<ThemedIcon
+						name="account-circle"
+						size={80}
+						color={darkMode ? "#fff" : "#000"}
+						style={{ alignSelf: "center", marginBottom: 20 }}
+					/>
+
 					<ThemedText style={styles.title}>
 						{member.firstName} {member.lastName}
 					</ThemedText>
-
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>UID</ThemedText>
-						<ThemedText style={styles.value}>{member.uid || "-"}</ThemedText>
-					</View>
-
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>Rol</ThemedText>
-						<ThemedText style={styles.value}>{member.role || "-"}</ThemedText>
-					</View>
 
 					<View style={styles.row}>
 						<ThemedText style={styles.label}>Telefon</ThemedText>
@@ -115,13 +126,6 @@ export default function MemberDetailsScreen() {
 					</View>
 				</View>
 			</ScrollView>
-
-			<TouchableOpacity
-				style={styles.button}
-				onPress={() => navigation.goBack()}
-			>
-				<ThemedText style={styles.buttonText}>Geri Dön</ThemedText>
-			</TouchableOpacity>
 		</View>
 	)
 }
@@ -185,5 +189,10 @@ const createStyles = (darkMode: boolean) =>
 			fontWeight: "600",
 			textAlign: "center",
 			paddingVertical: 14,
+		},
+		editButtonText: {
+			color: "#007AFF",
+			fontSize: 16,
+			fontWeight: "600",
 		},
 	})

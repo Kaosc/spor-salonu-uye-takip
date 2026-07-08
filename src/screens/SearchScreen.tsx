@@ -25,7 +25,7 @@ export default function SearchScreen() {
 				keys: ["firstName", "lastName", "phoneNumber"],
 				threshold: 0.3,
 			}),
-		[allMembers]
+		[allMembers],
 	)
 
 	const filtered = useMemo(() => {

@@ -6,7 +6,6 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 
 import MemberStack from "./stacks/MemberStack"
 import DashboardScreen from "../screens/DashboardScreen"
-import MemberFormScreen from "../screens/MemberFormScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
@@ -46,20 +45,6 @@ export default function TabsNavigator() {
 			}}
 		>
 			<Tabs.Screen
-				name="DashboardScreen"
-				component={DashboardScreen}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={v.focused ? "home" : "home-outline"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("dashboard"),
-				}}
-			/>
-			<Tabs.Screen
 				name="MemberStack"
 				component={MemberStack}
 				options={{
@@ -74,19 +59,20 @@ export default function TabsNavigator() {
 				}}
 			/>
 			<Tabs.Screen
-				name="MemberFormScreen"
-				component={MemberFormScreen}
+				name="DashboardScreen"
+				component={DashboardScreen}
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon
-							name={v.focused ? "account-plus" : "account-plus-outline"}
+							name={v.focused ? "home" : "home-outline"}
 							size={31}
 							color={v.color}
 						/>
 					),
-					tabBarLabel: t("memberForm"),
+					tabBarLabel: t("dashboard"),
 				}}
 			/>
+
 			<Tabs.Screen
 				name="ProfileScreen"
 				component={ProfileScreen}

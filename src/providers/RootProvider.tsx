@@ -9,7 +9,7 @@ import { setConfig } from "../store/features/configSlice"
 import { getIsThemeAuto } from "../utils/storage"
 import { setExternalTheme } from "../utils/toggleTheme"
 
-import FirebaseHandler from "../lib/firebase"
+import FirebaseHandler from "../lib/firebase/firebase"
 
 export default function RootProvider({ children }: { children: React.ReactNode }) {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
