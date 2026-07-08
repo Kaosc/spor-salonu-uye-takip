@@ -1,0 +1,7 @@
+x Create boot-splash logos
+
+   yarn react-native generate-bootsplash project/logow.png --platforms=ios \ --background=FFFFFF \ --logo-width=288
+   yarn react-native generate-bootsplash project/logob.png --platforms=ios \ --background=FFFFFF \ --logo-width=288
+
+   yarn react-native generate-bootsplash project/logow.png --platforms=android \ --background=FFFFFF \ --logo-width=288
+   yarn react-native generate-bootsplash project/logob.png --platforms=android \ --background=FFFFFF \ --logo-width=288

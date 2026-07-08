@@ -1,4 +1,5 @@
 <resources>
-  <string name="app_name">spor-salonu-uye-takip</string>
-  <string name="expo_splash_screen_resize_mode" translatable="false">contain</string>
+  <string name="app_name">Gym</string>
+  <string name="expo_runtime_version">0.55.0</string>
+  <string name="expo_system_ui_user_interface_style" translatable="false">automatic</string>
 </resources>

@@ -1,29 +1,27 @@
-import { DefaultTheme, DarkTheme as NavDarkTheme } from "@react-navigation/native"
+import { DarkTheme, DefaultTheme } from "@react-navigation/native"
 
-export const LightTheme = {
+export const NavigatorLight: ReactNavigation.Theme = {
 	...DefaultTheme,
-	colors: {
-		...DefaultTheme.colors,
-		primary: "#835db3",
-		background: "#FFFFFF",
-		card: "#F5F5F5",
-		text: "#000000",
-		border: "#E0E0E0",
-		notification: "#B00020",
-	},
 	dark: false,
+	colors: {
+		primary: "#000000",
+		background: "#ffffff",
+		card: "#ffffff",
+		text: "#000000",
+		border: "#313131",
+		notification: "rgb(144, 110, 238)",
+	},
 }
 
-export const DarkTheme = {
-	...NavDarkTheme,
-	colors: {
-		...NavDarkTheme.colors,
-		primary: "#8f68be",
-		background: "#000000",
-		card: "#111111",
-		text: "#FFFFFF",
-		border: "#272727",
-		notification: "#FF80AB",
-	},
+export const NavigatorDark: ReactNavigation.Theme = {
+	...DarkTheme,
 	dark: true,
+	colors: {
+		primary: "#ffffff",
+		background: "#000000",
+		card: "#000000",
+		text: "#ffffff",
+		border: "#696969",
+		notification: "rgb(144, 110, 238)",
+	},
 }

@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-  <!-- Default app theme (LIGHT) -->
+  <!-- Default app theme (DARK) -->
   <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
     <item name="colorPrimary">@color/colorPrimary</item>
     <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -7,7 +7,7 @@
     <item name="android:editTextBackground">@drawable/rn_edit_text_material</item>
     <item name="android:windowBackground">@color/colorPrimary</item>
     <item name="android:navigationBarColor">@color/colorPrimary</item>
-    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightStatusBar">false</item>
     <item name="android:enforceNavigationBarContrast">false</item>
   </style>
 
@@ -16,10 +16,10 @@
     <item name="android:navigationBarColor">@color/colorPrimary</item>
     <item name="android:statusBarColor">@color/colorPrimary</item>
     <item name="bootSplashBackground">@color/colorPrimary</item>
-    <item name="bootSplashLogo">@drawable/logow</item>
+    <item name="bootSplashLogo">@drawable/logob</item>
     <item name="postBootSplashTheme">@style/AppTheme</item>
-    <item name="android:windowLightStatusBar">true</item>
-    <item name="android:windowLightNavigationBar">true</item>
+    <item name="android:windowLightStatusBar">false</item>
+    <item name="android:windowLightNavigationBar">false</item>
     <item name="android:enforceNavigationBarContrast">false</item>
   </style>
 
@@ -30,7 +30,7 @@
     <item name="android:windowBackground">@android:color/transparent</item>
     <item name="android:statusBarColor">@color/colorPrimary</item>
     <item name="android:navigationBarColor">@color/colorPrimary</item>
-    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightStatusBar">false</item>
     <item name="android:enforceNavigationBarContrast">false</item>
   </style>
 
