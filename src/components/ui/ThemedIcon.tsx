@@ -22,7 +22,13 @@ function ThemedIcon(props: ThemedIconProps) {
 			{...props}
 			name={props?.name as any}
 			size={moderateScale(props?.size || 24)}
-			style={[props?.style, darkMode ? "#fff" : "#000", props?.color && { color: props?.color }]}
+			style={[
+				props?.style,
+				{
+					color: darkMode ? "#fff" : "#000",
+				},
+				props?.color && { color: props?.color },
+			]}
 		/>
 	)
 }

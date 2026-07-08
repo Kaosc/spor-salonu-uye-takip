@@ -4,8 +4,8 @@ import { useSelector } from "react-redux"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 
+import MemberStack from "./stacks/MemberStack"
 import DashboardScreen from "../screens/DashboardScreen"
-import MemberListScreen from "../screens/MemberListScreen"
 import MemberFormScreen from "../screens/MemberFormScreen"
 import ProfileScreen from "../screens/ProfileScreen"
 
@@ -60,8 +60,8 @@ export default function TabsNavigator() {
 				}}
 			/>
 			<Tabs.Screen
-				name="MemberListScreen"
-				component={MemberListScreen}
+				name="MemberStack"
+				component={MemberStack}
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon

@@ -13,17 +13,9 @@ interface CustomHeaderProps {
 	onBackPress?: () => void
 	relative?: boolean
 	fontSize?: number
-	showBackButton?: boolean
 }
 
-export default function CustomHeader({
-	title,
-	rightComponent,
-	onBackPress,
-	relative,
-	fontSize,
-	showBackButton = true,
-}: CustomHeaderProps) {
+export default function CustomHeader({ title, rightComponent, onBackPress, relative = true, fontSize }: CustomHeaderProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const navigation = useNavigation()
 	const styles = createStyles(darkMode, relative)
@@ -40,20 +32,16 @@ export default function CustomHeader({
 		<View style={styles.container}>
 			<View style={styles.content}>
 				{/* Left - Back Button */}
-				{showBackButton ? (
-					<TouchableOpacity
-						onPress={handleBackPress}
-						style={styles.backButton}
-					>
-						<ThemedIcon
-							name="arrow-left"
-							size={27}
-							style={{ marginTop: 2 }}
-						/>
-					</TouchableOpacity>
-				) : (
-					<View style={styles.backButton} />
-				)}
+				<TouchableOpacity
+					onPress={handleBackPress}
+					style={styles.backButton}
+				>
+					<ThemedIcon
+						name="arrow-left"
+						size={26}
+						style={{ marginTop: 2 }}
+					/>
+				</TouchableOpacity>
 
 				{/* Center - Title */}
 				{title ? (
@@ -85,7 +73,7 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			right: 0,
 			height: moderateScale(56),
 			zIndex: 1000,
-			backgroundColor: darkMode ? "#000000" : "#ffffff",
+			backgroundColor: darkMode ? "#000" : "#f5f5f5",
 			borderBottomWidth: 1,
 			borderBottomColor: darkMode ? "#222222" : "#dddddd",
 		},
@@ -111,10 +99,8 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			letterSpacing: 0.5,
 		},
 		rightContainer: {
-			minWidth: moderateScale(86),
-			flexDirection: "row",
-			justifyContent: "flex-end",
+			width: moderateScale(40),
 			alignItems: "center",
-			gap: 8,
+			justifyContent: "center",
 		},
 	})
