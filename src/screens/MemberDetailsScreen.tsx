@@ -2,6 +2,7 @@ import { ScrollView, View, TouchableOpacity, StyleSheet } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
@@ -11,6 +12,7 @@ export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
 	const route = useRoute<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
 
@@ -30,7 +32,7 @@ export default function MemberDetailsScreen() {
 	if (!member) {
 		return (
 			<View style={styles.container}>
-				<CustomHeader title="Üye Detay" />
+				<CustomHeader title={t("memberDetails")} />
 				<View style={styles.card}>
 					<ThemedText style={styles.label}>Üye bulunamadı</ThemedText>
 				</View>
@@ -49,7 +51,7 @@ export default function MemberDetailsScreen() {
 	return (
 		<View style={styles.container}>
 			<CustomHeader
-				title="Üye Detay"
+				title={t("memberDetails")}
 				rightComponent={editButton}
 			/>
 			<ScrollView contentContainerStyle={styles.scrollContent}>
@@ -66,62 +68,62 @@ export default function MemberDetailsScreen() {
 					</ThemedText>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Telefon</ThemedText>
+						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
 						<ThemedText style={styles.value}>{member.phoneNumber || "-"}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>E-posta</ThemedText>
+						<ThemedText style={styles.label}>{t("email")}</ThemedText>
 						<ThemedText style={styles.value}>{member.email || "-"}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Cinsiyet</ThemedText>
+						<ThemedText style={styles.label}>{t("gender")}</ThemedText>
 						<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Doğum Tarihi</ThemedText>
+						<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
 						<ThemedText style={styles.value}>{formatDate(member.birthDate)}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Kan Grubu</ThemedText>
+						<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
 						<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Dolap No</ThemedText>
+						<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
 						<ThemedText style={styles.value}>{member.lockerNumber || "-"}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Aktif</ThemedText>
-						<ThemedText style={styles.value}>{member.isActive ? "Evet" : "Hayır"}</ThemedText>
+						<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
+						<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Kayıt Tarihi</ThemedText>
+						<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
 						<ThemedText style={styles.value}>{formatDate(member.createdAt)}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Güncelleme</ThemedText>
+						<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
 						<ThemedText style={styles.value}>{formatDate(member.updatedAt)}</ThemedText>
 					</View>
 
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Kaydeden</ThemedText>
+						<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
 						<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
 					</View>
 
-					<ThemedText style={styles.sectionTitle}>Acil Durum Kişisi</ThemedText>
+					<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Ad Soyad</ThemedText>
+						<ThemedText style={styles.label}>{t("name")}</ThemedText>
 						<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
 					</View>
 					<View style={styles.row}>
-						<ThemedText style={styles.label}>Telefon</ThemedText>
+						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
 						<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
 					</View>
 				</View>

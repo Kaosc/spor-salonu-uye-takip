@@ -5,6 +5,7 @@ import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
 import { nanoid } from "@reduxjs/toolkit"
 import { useEffect } from "react"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
@@ -12,8 +13,9 @@ import CustomHeader from "../components/CustomHeader"
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const navigation = useNavigation<any>()
+	const { t } = useTranslation()
 	const route = useRoute<any>()
-	
+
 	const styles = createStyles(darkMode)
 
 	const [members, setMembers] = useMMKVObject<Member[]>("members")
@@ -112,7 +114,7 @@ export default function MemberFormScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={isEditing ? "Üye Düzenle" : "Yeni Üye"} />
+			<CustomHeader title={isEditing ? t("memberDetails") : t("newMember")} />
 			<KeyboardAvoidingView
 				style={styles.flex}
 				behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -128,12 +130,12 @@ export default function MemberFormScreen() {
 							rules={{ required: true }}
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Ad</ThemedText>
+									<ThemedText style={styles.label}>{t("firstName")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Ad"
+										placeholder={t("firstName")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
 								</View>
@@ -146,12 +148,12 @@ export default function MemberFormScreen() {
 							rules={{ required: true }}
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Soyad</ThemedText>
+									<ThemedText style={styles.label}>{t("lastName")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Soyad"
+										placeholder={t("lastName")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
 								</View>
@@ -164,12 +166,12 @@ export default function MemberFormScreen() {
 							rules={{ required: true }}
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Telefon</ThemedText>
+									<ThemedText style={styles.label}>{t("phone")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Telefon"
+										placeholder={t("phone")}
 										keyboardType="phone-pad"
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
@@ -183,12 +185,12 @@ export default function MemberFormScreen() {
 							rules={{ required: true }}
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>E-posta</ThemedText>
+									<ThemedText style={styles.label}>{t("email")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="E-posta"
+										placeholder={t("email")}
 										keyboardType="email-address"
 										autoCapitalize="none"
 										placeholderTextColor={darkMode ? "#666" : "#999"}
@@ -202,12 +204,12 @@ export default function MemberFormScreen() {
 							name="gender"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Cinsiyet</ThemedText>
+									<ThemedText style={styles.label}>{t("gender")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="UNSPECIFIED / MALE / FEMALE"
+										placeholder={t("genderPlaceholder")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 										autoCapitalize="characters"
 									/>
@@ -220,12 +222,12 @@ export default function MemberFormScreen() {
 							name="birthDate"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Doğum Tarihi</ThemedText>
+									<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="YYYY-AA-GG"
+										placeholder={t("datePlaceholder")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
 								</View>
@@ -237,12 +239,12 @@ export default function MemberFormScreen() {
 							name="bloodType"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Kan Grubu</ThemedText>
+									<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Örn: A Rh+"
+										placeholder={t("bloodTypePlaceholder")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 										autoCapitalize="characters"
 									/>
@@ -255,31 +257,31 @@ export default function MemberFormScreen() {
 							name="lockerNumber"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Dolap No</ThemedText>
+									<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Dolap No (opsiyonel)"
+										placeholder={t("lockerNumberPlaceholder")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
 								</View>
 							)}
 						/>
 
-						<ThemedText style={styles.sectionTitle}>Acil Durum Kişisi</ThemedText>
+						<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
 
 						<Controller
 							control={control}
 							name="emergencyName"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Ad Soyad</ThemedText>
+									<ThemedText style={styles.label}>{t("emergencyName")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Acil durum kişisi adı"
+										placeholder={t("emergencyNamePlaceholder")}
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
 								</View>
@@ -291,12 +293,12 @@ export default function MemberFormScreen() {
 							name="emergencyPhone"
 							render={({ field: { onChange, value } }) => (
 								<View style={styles.field}>
-									<ThemedText style={styles.label}>Telefon</ThemedText>
+									<ThemedText style={styles.label}>{t("emergencyPhone")}</ThemedText>
 									<TextInput
 										style={styles.input}
 										value={value}
 										onChangeText={onChange}
-										placeholder="Acil durum telefonu"
+										placeholder={t("emergencyPhonePlaceholder")}
 										keyboardType="phone-pad"
 										placeholderTextColor={darkMode ? "#666" : "#999"}
 									/>
@@ -308,7 +310,7 @@ export default function MemberFormScreen() {
 							style={styles.button}
 							onPress={handleSubmit(onSubmit)}
 						>
-							<ThemedText style={styles.buttonText}>{isEditing ? "Update Member" : "Save Member"}</ThemedText>
+							<ThemedText style={styles.buttonText}>{isEditing ? t("updateMember") : t("saveMember")}</ThemedText>
 						</TouchableOpacity>
 					</View>
 				</ScrollView>

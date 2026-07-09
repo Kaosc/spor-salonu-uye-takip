@@ -12,15 +12,11 @@ import {
 
 const db = getFirestore()
 
-const COLLECTIONS = {
-	MEMBERS: "members",
-	SUBSCRIPTIONS: "subscriptions",
-	USERS: "users",
-}
+const COLLECTION = "members"
 
 export const addMember = async (memberData: Omit<Member, "uid">): Promise<string> => {
 	try {
-		const membersRef = collection(db, COLLECTIONS.MEMBERS)
+		const membersRef = collection(db, COLLECTION)
 		const docRef = await addDoc(membersRef, {
 			...memberData,
 			createdAt: serverTimestamp(),
@@ -35,7 +31,7 @@ export const addMember = async (memberData: Omit<Member, "uid">): Promise<string
 
 export const updateMember = async (memberId: string, updateData: Partial<Member>): Promise<void> => {
 	try {
-		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
+		const memberRef = doc(db, COLLECTION, memberId)
 		await updateDoc(memberRef, {
 			...updateData,
 			updatedAt: serverTimestamp(),
@@ -48,7 +44,7 @@ export const updateMember = async (memberId: string, updateData: Partial<Member>
 
 export const deleteMember = async (memberId: string): Promise<void> => {
 	try {
-		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
+		const memberRef = doc(db, COLLECTION, memberId)
 		await deleteDoc(memberRef)
 	} catch (e) {
 		console.error("[FIRESTORE] deleteMember:", e)
@@ -58,7 +54,7 @@ export const deleteMember = async (memberId: string): Promise<void> => {
 
 export const getAllMembers = async (): Promise<Member[]> => {
 	try {
-		const membersRef = collection(db, COLLECTIONS.MEMBERS)
+		const membersRef = collection(db, COLLECTION)
 		const snapshot = await getDocs(membersRef)
 
 		return snapshot.docs.map((docSnap) => ({
@@ -73,7 +69,7 @@ export const getAllMembers = async (): Promise<Member[]> => {
 
 export const getMemberById = async (memberId: string): Promise<Member | null> => {
 	try {
-		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
+		const memberRef = doc(db, COLLECTION, memberId)
 		const docSnap = await getDoc(memberRef)
 
 		if (docSnap.exists()) {

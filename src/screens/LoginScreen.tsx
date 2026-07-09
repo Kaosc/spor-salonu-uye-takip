@@ -1,22 +1,18 @@
 import { useState } from "react"
-import {
-	View,
-	Text,
-	TextInput,
-	TouchableOpacity,
-	StyleSheet,
-	ActivityIndicator,
-	KeyboardAvoidingView,
-	Platform,
-} from "react-native"
+import { View, Text, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useTranslation } from "react-i18next"
+import { Image } from "expo-image"
 
 import { loginAction } from "../store/features/authSlice"
+import ThemedButton from "../components/ui/ThemedButton"
+import ThemedText from "../components/ui/ThemedText"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const { isLoading } = useSelector((state: RootState) => state.auth)
+	const { t } = useTranslation()
 
 	const dispatch = useDispatch<any>()
 	const navigation = useNavigation() as NavigationProp<any>
@@ -26,10 +22,11 @@ export default function LoginScreen() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [error, setError] = useState("")
+	const [loginType, setLoginType] = useState<"STAFF" | "MEMBER">("STAFF")
 
 	const handleLogin = async () => {
 		if (!email.trim() || !password.trim()) {
-			setError("Email ve şifre gerekli")
+			setError(t("emailAndPasswordRequired"))
 			return
 		}
 		setError("")
@@ -37,7 +34,7 @@ export default function LoginScreen() {
 		if (loginAction.fulfilled.match(result)) {
 			navigation.navigate("Tabs")
 		} else {
-			setError("Giriş başarısız. Email veya şifre hatalı.")
+			setError(t("loginFailed"))
 		}
 	}
 
@@ -47,11 +44,16 @@ export default function LoginScreen() {
 			behavior={Platform.OS === "ios" ? "padding" : undefined}
 		>
 			<View style={styles.form}>
-				<Text style={styles.title}>Giriş Yap</Text>
+				<Image
+					source={darkMode ? require("../assets/logow.png") : require("../assets/logob.png")}
+					style={styles.logo}
+				/>
+
+				<ThemedText style={styles.title}>{loginType === "STAFF" ? t("staffLogin") : t("memberLogin")}</ThemedText>
 
 				<TextInput
 					style={styles.input}
-					placeholder="Email"
+					placeholder={t("email")}
 					placeholderTextColor="#888"
 					value={email}
 					onChangeText={setEmail}
@@ -61,7 +63,7 @@ export default function LoginScreen() {
 
 				<TextInput
 					style={styles.input}
-					placeholder="Şifre"
+					placeholder={t("password")}
 					placeholderTextColor="#888"
 					value={password}
 					onChangeText={setPassword}
@@ -70,13 +72,12 @@ export default function LoginScreen() {
 
 				{error ? <Text style={styles.error}>{error}</Text> : null}
 
-				<TouchableOpacity
-					style={styles.button}
+				<ThemedButton
 					onPress={handleLogin}
 					disabled={isLoading}
 				>
-					{isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Giriş Yap</Text>}
-				</TouchableOpacity>
+					{isLoading ? <ActivityIndicator color="#000" /> : <ThemedText style={styles.buttonText}>{t("login")}</ThemedText>}
+				</ThemedButton>
 			</View>
 		</KeyboardAvoidingView>
 	)
@@ -86,10 +87,12 @@ const createStyles = (darkMode: boolean) =>
 	StyleSheet.create({
 		container: {
 			flex: 1,
-			justifyContent: "center",
-			paddingHorizontal: 24,
+			justifyContent: "flex-start",
+			marginTop: 70,
+			paddingHorizontal: 40,
 		},
 		form: {
+			gap: 3,
 			width: "100%",
 		},
 		title: {
@@ -108,21 +111,24 @@ const createStyles = (darkMode: boolean) =>
 			color: darkMode ? "#fff" : "#000",
 			marginBottom: 16,
 		},
-		button: {
-			backgroundColor: "#000",
-			paddingVertical: 14,
-			borderRadius: 8,
-			alignItems: "center",
-			marginTop: 8,
-		},
 		buttonText: {
-			color: "#fff",
+			color: darkMode ? "#000" : "#fff",
 			fontSize: 16,
-			fontWeight: "600",
+			fontWeight: "bold",
 		},
 		error: {
 			color: "red",
 			marginBottom: 8,
 			textAlign: "center",
+		},
+		logo: {
+			width: 140,
+			height: 140,
+			borderRadius: 20,
+			marginBottom: 100,
+			borderWidth: darkMode ? 0 : 1,
+			alignSelf: "center",
+			borderColor: "#ccc",
+			borderBottomWidth: darkMode ? 0 : 2,
 		},
 	})

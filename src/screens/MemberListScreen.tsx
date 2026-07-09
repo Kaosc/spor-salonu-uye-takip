@@ -3,6 +3,7 @@ import { FlashList } from "@shopify/flash-list"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
@@ -11,10 +12,11 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 export default function MemberListScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { t } = useTranslation()
+
+	const styles = createStyles(darkMode)
 
 	const [members] = useMMKVObject<Member[]>("members")
-	console.log(JSON.stringify(members, null, 2)) // Log the members data for debugging
-	const styles = createStyles(darkMode)
 
 	const renderItem = ({ item }: { item: any }) => (
 		<TouchableOpacity
@@ -30,12 +32,12 @@ export default function MemberListScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Üyeler" />
+			<CustomHeader title={t("members")} />
 			<TouchableOpacity
 				style={styles.searchBar}
 				onPress={() => navigation.navigate("SearchScreen")}
 			>
-				<ThemedText style={styles.searchBarText}>Üye ara...</ThemedText>
+				<ThemedText style={styles.searchBarText}>{t("searchMembers")}</ThemedText>
 			</TouchableOpacity>
 
 			<FlashList
