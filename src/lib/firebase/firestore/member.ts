@@ -1,13 +1,13 @@
 import {
 	getFirestore,
 	collection,
-	addDoc,
 	updateDoc,
 	deleteDoc,
 	doc,
 	getDocs,
 	getDoc,
 	serverTimestamp,
+	setDoc,
 } from "@react-native-firebase/firestore"
 import { registerMember } from "../auth"
 
@@ -18,18 +18,19 @@ const COLLECTION = "members"
 export const addMember = async (memberData: Member): Promise<boolean> => {
 	try {
 		// Register Member
-		const uid = await registerMember(memberData.email)
+		const newUID = await registerMember(memberData.email)
+		if (!newUID) return false
 
-		if (!uid) return false
-
-		// Add member data
-		const membersRef = collection(db, COLLECTION)
-		const docRef = await addDoc(membersRef, {
+		// Add member data with the new UID
+		const docRef = doc(db, COLLECTION, newUID)
+		const member: Member = {
 			...memberData,
-			uid,
+			uid: newUID,
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
-		})
+		}
+		await setDoc(docRef, member)
+
 		return !!docRef.id
 	} catch (e) {
 		console.error("[FIRESTORE] addMember:", e)
@@ -37,11 +38,13 @@ export const addMember = async (memberData: Member): Promise<boolean> => {
 	}
 }
 
-export const updateMember = async (memberId: string, updateData: Partial<Member>): Promise<void> => {
+export const updateMember = async (updatedMemberData: Member): Promise<void> => {
 	try {
+		const memberId = updatedMemberData.uid
 		const memberRef = doc(db, COLLECTION, memberId)
+
 		await updateDoc(memberRef, {
-			...updateData,
+			...updatedMemberData,
 			updatedAt: serverTimestamp(),
 		})
 	} catch (e) {
@@ -81,8 +84,9 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 		const docSnap = await getDoc(memberRef)
 
 		if (docSnap.exists()) {
-			return { uid: docSnap.id, ...docSnap.data() } as Member
+			return { ...docSnap.data() } as Member
 		}
+
 		return null
 	} catch (e) {
 		console.error("[FIRESTORE] getMemberById:", e)

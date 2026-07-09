@@ -1,38 +1,68 @@
+import { useCallback, useEffect } from "react"
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
-import { useMMKVObject } from "react-native-mmkv"
 import { useTranslation } from "react-i18next"
+import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 import ThemedIcon from "../components/ui/ThemedIcon"
 
-export default function MemberListScreen() {
+import { getAllMembers } from "../lib/firebase/firestore/member"
+
+export default function MemberListContent() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
 
-	const [members] = useMMKVObject<Member[]>("members")
+	const [members, setMembers] = useMMKVObject<Member[]>("members")
 
-	const renderItem = ({ item }: { item: any }) => (
-		<TouchableOpacity
-			style={styles.item}
-			onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
-		>
-			<ThemedText style={styles.itemName}>
-				{item.firstName} {item.lastName}
-			</ThemedText>
-			<ThemedText style={styles.itemPhone}>{item.phoneNumber}</ThemedText>
-		</TouchableOpacity>
+	// TODO : IMPLEMENT PAGINATION AS SCROLL REACHES TO END OF THE LIST, CURRENTLY IT LOADS ALL MEMBERS AT ONCE
+	// 10 USER AT EVERY SCROLL END
+	const fetchMembers = async () => {
+		try {
+			const membersData = await getAllMembers()
+			setMembers(membersData)
+		} catch (e) {
+			console.error("Error fetching members:", e)
+		}
+	}
+
+	useEffect(() => {
+		fetchMembers()
+	}, [])
+
+	const renderItem = useCallback(
+		({ item }: { item: any }) => (
+			<TouchableOpacity
+				style={styles.item}
+				onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
+			>
+				<ThemedIcon
+					name="account-circle"
+					size={45}
+					color={darkMode ? "#fff" : "#000"}
+					style={{ marginRight: 12 }}
+				/>
+				<View>
+					<ThemedText style={styles.itemName}>
+						{item.firstName} {item.lastName}
+					</ThemedText>
+					<ThemedText style={styles.itemPhone}>{item.phoneNumber}</ThemedText>
+				</View>
+			</TouchableOpacity>
+		),
+		[navigation, styles],
 	)
 
 	return (
 		<View style={styles.container}>
 			<CustomHeader title={t("members")} />
+
 			<TouchableOpacity
 				style={styles.searchBar}
 				onPress={() => navigation.navigate("SearchScreen")}
@@ -45,6 +75,7 @@ export default function MemberListScreen() {
 				renderItem={renderItem}
 				keyExtractor={(item: any, index: number) => item.uid ?? index.toString()}
 				contentContainerStyle={styles.list}
+				onRefresh={fetchMembers}
 			/>
 
 			<TouchableOpacity
@@ -85,6 +116,8 @@ const createStyles = (darkMode: boolean) =>
 			paddingBottom: 80,
 		},
 		item: {
+			flexDirection: "row",
+			alignItems: "center",
 			paddingVertical: 14,
 			borderBottomWidth: 1,
 			borderBottomColor: darkMode ? "#222" : "#eee",

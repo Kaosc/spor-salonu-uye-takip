@@ -93,8 +93,8 @@ interface Member {
 		phone: string
 	}
 	isActive: boolean
-	createdAt: Date
-	updatedAt: Date
+	createdAt?: Date | import("@react-native-firebase/firestore").FieldValue
+	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	createdBy?: string
 }
 

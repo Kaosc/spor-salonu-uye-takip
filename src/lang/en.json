@@ -53,5 +53,6 @@
 	"emailAlreadyInUse": "This email address is already in use by another account.",
 	"invalidEmail": "Invalid email address.",
 	"weakPassword": "Password is too weak. Please choose a stronger password.",
-	"registrationError": "An error occurred while registering. Please try again."
+	"registrationError": "An error occurred while registering. Please try again.",
+	"memberFetchError": "An error occurred while fetching member information. Please try again."
 }
