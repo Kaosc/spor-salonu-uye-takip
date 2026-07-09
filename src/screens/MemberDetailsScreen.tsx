@@ -1,12 +1,16 @@
+import { useEffect, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
-import { useMMKVObject } from "react-native-mmkv"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 import ThemedIcon from "../components/ui/ThemedIcon"
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
+
+import { getMemberById } from "../lib/firebase/firestore/member"
+import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 
 export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
@@ -16,8 +20,20 @@ export default function MemberDetailsScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [members] = useMMKVObject<Member[]>("members")
-	const member = members?.find((m) => m.uid === route.params?.memberId)
+	const [member, setMember] = useState<Member | null>(null)
+	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
+
+	useEffect(() => {
+		const fetchMember = async () => {
+			setTimeout(() => setStatus("loading"), 1000)
+			const member = await getMemberById(route.params?.memberId)
+			console.log(JSON.stringify(member, null, 2))
+			setMember(member)
+			setStatus(member ? "idle" : "error")
+		}
+
+		fetchMember()
+	}, [route.params?.memberId])
 
 	const editButton = (
 		<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
@@ -29,104 +45,108 @@ export default function MemberDetailsScreen() {
 		</TouchableOpacity>
 	)
 
-	if (!member) {
-		return (
-			<View style={styles.container}>
-				<CustomHeader title={t("memberDetails")} />
-				<View style={styles.card}>
-					<ThemedText style={styles.label}>Üye bulunamadı</ThemedText>
-				</View>
-				<TouchableOpacity
-					style={styles.button}
-					onPress={() => navigation.goBack()}
-				>
-					<ThemedText style={styles.buttonText}>Geri Dön</ThemedText>
-				</TouchableOpacity>
-			</View>
-		)
-	}
-
-	const formatDate = (d: any) => (d ? new Date(d).toLocaleDateString("tr-TR") : "-")
-
 	return (
 		<View style={styles.container}>
 			<CustomHeader
 				title={t("memberDetails")}
-				rightComponent={editButton}
+				rightComponent={member ? editButton : undefined}
 			/>
-			<ScrollView contentContainerStyle={styles.scrollContent}>
-				<View style={styles.card}>
-					<ThemedIcon
-						name="account-circle"
-						size={80}
-						color={darkMode ? "#fff" : "#000"}
-						style={{ alignSelf: "center", marginBottom: 20 }}
-					/>
+			<ScrollView
+				style={{ flex: 1 }}
+				contentContainerStyle={styles.scrollContent}
+				showsVerticalScrollIndicator={false}
+			>
+				{!member ? (
+					status === "loading" ? (
+						<ThemedActivityIndicator size={70} />
+					) : (
+						status === "error" && (
+							<View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 5 }}>
+								<ThemedIcon
+									name="account-alert-outline"
+									size={90}
+									style={{ alignSelf: "center", marginLeft: 10, opacity: 0.7 }}
+								/>
+								<ThemedText style={{ textAlign: "center" }}>{t("memberNotFound")}</ThemedText>
+							</View>
+						)
+					)
+				) : (
+					<View style={styles.card}>
+						<ThemedIcon
+							name="account-circle"
+							size={80}
+							color={darkMode ? "#fff" : "#000"}
+							style={{ alignSelf: "center", marginBottom: 20 }}
+						/>
 
-					<ThemedText style={styles.title}>
-						{member.firstName} {member.lastName}
-					</ThemedText>
+						<ThemedText style={styles.title}>
+							{member.firstName} {member.lastName}
+						</ThemedText>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
-						<ThemedText style={styles.value}>{member.phoneNumber || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+							<ThemedText style={styles.value}>{member.phoneNumber || "-"}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("email")}</ThemedText>
-						<ThemedText style={styles.value}>{member.email || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("email")}</ThemedText>
+							<ThemedText style={styles.value}>{member.email || "-"}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("gender")}</ThemedText>
-						<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+							<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
-						<ThemedText style={styles.value}>{formatDate(member.birthDate)}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+							<ThemedText style={styles.value}>
+								{new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
+							</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
-						<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+							<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
-						<ThemedText style={styles.value}>{member.lockerNumber || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
+							<ThemedText style={styles.value}>{member.lockerNumber || "-"}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
-						<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
+							<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
-						<ThemedText style={styles.value}>{formatDate(member.createdAt)}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
+							<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.createdAt)}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
-						<ThemedText style={styles.value}>{formatDate(member.updatedAt)}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
+							<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.updatedAt)}</ThemedText>
+						</View>
 
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
-						<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
-					</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
+							<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
+						</View>
 
-					<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("name")}</ThemedText>
-						<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
+						<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("name")}</ThemedText>
+							<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
+						</View>
+						<View style={styles.row}>
+							<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+							<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
+						</View>
 					</View>
-					<View style={styles.row}>
-						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
-						<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
-					</View>
-				</View>
+				)}
 			</ScrollView>
 		</View>
 	)
@@ -141,6 +161,7 @@ const createStyles = (darkMode: boolean) =>
 		scrollContent: {
 			padding: 20,
 			flexGrow: 1,
+			justifyContent: "center",
 		},
 		card: {
 			backgroundColor: darkMode ? "#1a1a1a" : "#fff",

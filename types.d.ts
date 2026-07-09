@@ -22,9 +22,9 @@ type RootState = {
 
 type Auth = {
 	isAuthenticated: boolean
-	uid: string
-	role: UserRole
-	email: string
+	uid: string | undefined
+	role: UserRole | undefined
+	email: string | undefined
 	isLoading: boolean
 }
 

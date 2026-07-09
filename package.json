@@ -23,6 +23,8 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
+    "@gorhom/bottom-sheet": "^5.2.14",
+    "@react-native-community/datetimepicker": "8.6.0",
     "@react-native-community/netinfo": "11.5.2",
     "@react-native-firebase/app": "^25.1.0",
     "@react-native-firebase/app-check": "^25.1.0",

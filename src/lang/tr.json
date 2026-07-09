@@ -52,5 +52,10 @@
 	"invalidEmail": "Geçersiz e-posta adresi.",
 	"weakPassword": "Şifre çok zayıf. Lütfen daha güçlü bir şifre seçin.",
 	"registrationError": "Üye kaydı sırasında bir hata oluştu. Lütfen tekrar deneyin.",
-	"memberFetchError": "Üye bilgileri alınırken bir hata oluştu. Lütfen tekrar deneyin."
+	"memberFetchError": "Üye bilgileri alınırken bir hata oluştu. Lütfen tekrar deneyin.",
+	"male": "Erkek",
+	"female": "Kadın",
+	"unspecified": "Belirtilmemiş",
+	"memberUpdateSuccess": "Üye başarıyla güncellendi.",
+	"memberAddSuccess": "Üye başarıyla eklendi."
 }

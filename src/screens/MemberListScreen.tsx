@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react"
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { FlashList } from "@shopify/flash-list"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { useMMKVObject } from "react-native-mmkv"
@@ -15,6 +15,8 @@ import { getAllMembers } from "../lib/firebase/firestore/member"
 export default function MemberListContent() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const route = useRoute<any>()
+
 	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
@@ -33,7 +35,10 @@ export default function MemberListContent() {
 	}
 
 	useEffect(() => {
-		fetchMembers()
+		if (route.params?.refresh) {
+			fetchMembers()
+			navigation.setParams({ refresh: false })
+		}
 	}, [])
 
 	const renderItem = useCallback(

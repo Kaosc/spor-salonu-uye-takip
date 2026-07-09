@@ -13,17 +13,17 @@ export const authSlice = createSlice({
 	name: "auth",
 	initialState: {
 		isAuthenticated: false,
-		uid: null,
-		email: null,
-		role: null,
+		uid: undefined,
+		email: undefined,
+		role: undefined,
 		isLoading: false,
 	} as Auth,
 	reducers: {
 		logout(state) {
 			state.isAuthenticated = false
-			state.uid = null
-			state.email = null
-			state.role = null
+			state.uid = undefined
+			state.email = undefined
+			state.role = undefined
 			state.isLoading = false
 		},
 	},

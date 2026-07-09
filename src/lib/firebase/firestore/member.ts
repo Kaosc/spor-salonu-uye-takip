@@ -38,7 +38,7 @@ export const addMember = async (memberData: Member): Promise<boolean> => {
 	}
 }
 
-export const updateMember = async (updatedMemberData: Member): Promise<void> => {
+export const updateMember = async (updatedMemberData: Member): Promise<boolean> => {
 	try {
 		const memberId = updatedMemberData.uid
 		const memberRef = doc(db, COLLECTION, memberId)
@@ -47,9 +47,11 @@ export const updateMember = async (updatedMemberData: Member): Promise<void> => 
 			...updatedMemberData,
 			updatedAt: serverTimestamp(),
 		})
+
+		return true
 	} catch (e) {
 		console.error("[FIRESTORE] updateMember:", e)
-		throw e
+		return false
 	}
 }
 
