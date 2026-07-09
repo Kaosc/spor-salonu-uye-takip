@@ -47,5 +47,9 @@
 	"updateMember": "Üyeyi Güncelle",
 	"saveMember": "Üyeyi Kaydet",
 	"members": "Üyeler",
-	"searchMembers": "Üye Ara"
+	"searchMembers": "Üye Ara",
+	"emailAlreadyInUse": "Bu e-posta adresi zaten başka bir hesap tarafından kullanılıyor.",
+	"invalidEmail": "Geçersiz e-posta adresi.",
+	"weakPassword": "Şifre çok zayıf. Lütfen daha güçlü bir şifre seçin.",
+	"registrationError": "Üye kaydı sırasında bir hata oluştu. Lütfen tekrar deneyin."
 }

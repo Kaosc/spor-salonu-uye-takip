@@ -9,9 +9,11 @@ import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
+import { addMember } from "../lib/firebase/firestore/member"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const staffID = useSelector((state: RootState) => state.auth.uid)
 	const navigation = useNavigation<any>()
 	const { t } = useTranslation()
 	const route = useRoute<any>()
@@ -58,7 +60,9 @@ export default function MemberFormScreen() {
 		}
 	}, [memberId, members, reset])
 
-	const onSubmit = (data: FormValues) => {
+	const onSubmit = async (data: FormValues) => {
+		let success = false
+
 		// Update existing member
 		if (isEditing && memberId) {
 			const updatedMembers = members?.map((m: any) => {
@@ -93,8 +97,8 @@ export default function MemberFormScreen() {
 				email: data.email,
 				lockerNumber: data.lockerNumber || "",
 				gender: data.gender || ("UNSPECIFIED" as Gender),
-				birthDate: data.birthDate ? new Date(data.birthDate) : undefined,
-				bloodType: data.bloodType || undefined,
+				birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
+				bloodType: data.bloodType || "",
 				emergencyContact: {
 					name: data.emergencyName || "",
 					phone: data.emergencyPhone || "",
@@ -103,13 +107,14 @@ export default function MemberFormScreen() {
 				isActive: true,
 				createdAt: new Date(),
 				updatedAt: new Date(),
-				createdBy: undefined,
+				createdBy: staffID,
 			}
-			const updatedMembers = members ? [...members, newMember] : [newMember]
-			setMembers(updatedMembers)
+
+			success = await addMember(newMember)
+			// setMembers(updatedMembers)
 		}
 
-		navigation.goBack()
+		if (success) navigation.goBack()
 	}
 
 	return (

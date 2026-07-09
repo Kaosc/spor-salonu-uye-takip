@@ -22,9 +22,9 @@ type RootState = {
 
 type Auth = {
 	isAuthenticated: boolean
-	uid: string | null
-	role: UserRole | null
-	email: string | null
+	uid: string
+	role: UserRole
+	email: string
 	isLoading: boolean
 }
 
@@ -79,12 +79,12 @@ interface StaffUser {
 
 interface Member {
 	uid: string // Firebase Auth UID (Cames from Auth when the member registers)
-	email: string 
-	role: "MEMBER" 
+	email: string
+	role: "MEMBER"
 	firstName: string
 	lastName: string
 	phoneNumber: string
-	lockerNumber?: string 
+	lockerNumber?: string
 	gender: Gender
 	birthDate?: Date
 	bloodType?: string
@@ -92,7 +92,7 @@ interface Member {
 		name: string
 		phone: string
 	}
-	isActive: boolean 
+	isActive: boolean
 	createdAt: Date
 	updatedAt: Date
 	createdBy?: string

@@ -9,20 +9,28 @@ import {
 	getDoc,
 	serverTimestamp,
 } from "@react-native-firebase/firestore"
+import { registerMember } from "../auth"
 
 const db = getFirestore()
 
 const COLLECTION = "members"
 
-export const addMember = async (memberData: Omit<Member, "uid">): Promise<string> => {
+export const addMember = async (memberData: Member): Promise<boolean> => {
 	try {
+		// Register Member
+		const uid = await registerMember(memberData.email)
+
+		if (!uid) return false
+
+		// Add member data
 		const membersRef = collection(db, COLLECTION)
 		const docRef = await addDoc(membersRef, {
 			...memberData,
+			uid,
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
 		})
-		return docRef.id
+		return !!docRef.id
 	} catch (e) {
 		console.error("[FIRESTORE] addMember:", e)
 		throw e

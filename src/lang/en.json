@@ -49,5 +49,9 @@
 	"updateMember": "Update Member",
 	"saveMember": "Save Member",
 	"members": "Members",
-	"searchMembers": "Search Members"
+	"searchMembers": "Search Members",
+	"emailAlreadyInUse": "This email address is already in use by another account.",
+	"invalidEmail": "Invalid email address.",
+	"weakPassword": "Password is too weak. Please choose a stronger password.",
+	"registrationError": "An error occurred while registering. Please try again."
 }
