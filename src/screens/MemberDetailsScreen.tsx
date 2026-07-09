@@ -74,7 +74,7 @@ export default function MemberDetailsScreen() {
 				) : (
 					<View style={styles.card}>
 						<ThemedIcon
-							name="account-circle"
+							name={member?.gender === "FEMALE" ? "female" : "male"}
 							size={80}
 							color={darkMode ? "#fff" : "#000"}
 							style={{ alignSelf: "center", marginBottom: 20 }}

@@ -7,7 +7,6 @@ import { useTranslation } from "react-i18next"
 import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
-import CustomHeader from "../components/CustomHeader"
 import ThemedIcon from "../components/ui/ThemedIcon"
 
 import { getAllMembers } from "../lib/firebase/firestore/member"
@@ -42,22 +41,22 @@ export default function MemberListContent() {
 	}, [])
 
 	const renderItem = useCallback(
-		({ item }: { item: any }) => (
+		({ item }: { item: Member }) => (
 			<TouchableOpacity
 				style={styles.item}
 				onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
 			>
 				<ThemedIcon
-					name="account-circle"
+					name={item.gender === "FEMALE" ? "female" : "male"}
 					size={45}
 					color={darkMode ? "#fff" : "#000"}
-					style={{ marginRight: 12 }}
+					style={{ marginRight: 12, opacity: 0.9, borderRadius: 22.5 }}
 				/>
 				<View>
 					<ThemedText style={styles.itemName}>
 						{item.firstName} {item.lastName}
 					</ThemedText>
-					<ThemedText style={styles.itemPhone}>{item.phoneNumber}</ThemedText>
+					<ThemedText style={styles.itemPhone}>{item.email}</ThemedText>
 				</View>
 			</TouchableOpacity>
 		),
@@ -66,19 +65,23 @@ export default function MemberListContent() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={t("members")} />
-
 			<TouchableOpacity
 				style={styles.searchBar}
 				onPress={() => navigation.navigate("SearchScreen")}
 			>
+				<ThemedIcon
+					name="magnify"
+					size={22}
+					color={darkMode ? "#666" : "#999"}
+					style={{ marginRight: 8 }}
+				/>
 				<ThemedText style={styles.searchBarText}>{t("searchMembers")}</ThemedText>
 			</TouchableOpacity>
 
 			<FlashList
 				data={members}
 				renderItem={renderItem}
-				keyExtractor={(item: any, index: number) => item.uid ?? index.toString()}
+				keyExtractor={(item: Member, index: number) => item.uid ?? index.toString()}
 				contentContainerStyle={styles.list}
 				onRefresh={fetchMembers}
 			/>
@@ -104,16 +107,18 @@ const createStyles = (darkMode: boolean) =>
 			backgroundColor: darkMode ? "#000" : "#fff",
 		},
 		searchBar: {
-			marginHorizontal: 16,
-			marginTop: 8,
+			flexDirection: "row",
+			alignItems: "center",
+			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			borderRadius: 8,
+			marginHorizontal: 15,
+			marginTop: 10,
 			marginBottom: 8,
 			paddingHorizontal: 16,
 			paddingVertical: 12,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
-			borderRadius: 10,
 		},
 		searchBarText: {
-			fontSize: 15,
+			fontSize: 17,
 			color: darkMode ? "#666" : "#999",
 		},
 		list: {

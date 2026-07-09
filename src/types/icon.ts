@@ -5,6 +5,7 @@ import {
 	FontAwesome5,
 	FontAwesome6,
 	Fontisto,
+	Foundation,
 	Ionicons,
 	MaterialCommunityIcons,
 	MaterialIcons,
@@ -42,6 +43,8 @@ export const iconComponents = {
 	play: Fontisto,
 	stop: Fontisto,
 	donate: FontAwesome5,
+	"male": Fontisto,
+	"female": Fontisto,
 } as const
 
 export type CustomIconNames = keyof typeof iconComponents

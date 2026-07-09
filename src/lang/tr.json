@@ -57,5 +57,8 @@
 	"female": "Kadın",
 	"unspecified": "Belirtilmemiş",
 	"memberUpdateSuccess": "Üye başarıyla güncellendi.",
-	"memberAddSuccess": "Üye başarıyla eklendi."
+	"memberAddSuccess": "Üye başarıyla eklendi.",
+	"memberList": "Üyeler",
+	"dashboard": "Ana Sayfa",
+	"profile": "Profil"
 }

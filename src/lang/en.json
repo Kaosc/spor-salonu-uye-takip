@@ -59,5 +59,8 @@
 	"female": "Female",
 	"unspecified": "Unspecified",
 	"memberUpdateSuccess": "Member updated successfully.",
-	"memberAddSuccess": "Member added successfully."
+	"memberAddSuccess": "Member added successfully.",
+	"memberList": "Members",
+	"dashboard": "Dashboard",
+	"profile": "Profile"
 }
