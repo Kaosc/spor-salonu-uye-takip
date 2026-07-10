@@ -5,9 +5,10 @@ import { useNavigation, NavigationProp, StackActions } from "@react-navigation/n
 import { useTranslation } from "react-i18next"
 import { Image } from "expo-image"
 
-import { loginAction } from "../store/features/authSlice"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
+
+import { loginAction } from "../store/features/authSlice"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
@@ -19,8 +20,8 @@ export default function LoginScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [email, setEmail] = useState("")
-	const [password, setPassword] = useState("")
+	const [email, setEmail] = useState(__DEV__ ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : "")
+	const [password, setPassword] = useState(__DEV__ ? process.env.EXPO_PUBLIC_ADMIN_PASSWORD || "" : "")
 	const [error, setError] = useState("")
 	const [loginType, setLoginType] = useState<"STAFF" | "MEMBER">("STAFF")
 
