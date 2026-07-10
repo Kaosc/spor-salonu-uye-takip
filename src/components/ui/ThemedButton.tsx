@@ -43,6 +43,7 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: darkMode ? "#fff" : "#000",
 			padding: 10,
 			borderRadius: 16,
+			paddingVertical: 14,
 		},
 		buttonText: {
 			color: darkMode ? "#000" : "#fff",

@@ -11,6 +11,8 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { getMemberById } from "../lib/firebase/firestore/member"
 import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
+import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
+import ThemedButton from "../components/ui/ThemedButton"
 
 export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
@@ -20,18 +22,27 @@ export default function MemberDetailsScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [member, setMember] = useState<Member | null>(null)
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
-	useEffect(() => {
-		const fetchMember = async () => {
-			setTimeout(() => setStatus("loading"), 1000)
-			const member = await getMemberById(route.params?.memberId)
-			setMember(member)
-			setStatus(member ? "idle" : "error")
-		}
+	const [member, setMember] = useState<Member | null>(null)
+	const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
 
+	const fetchMember = async () => {
+		setTimeout(() => setStatus("loading"), 1000)
+		const member = await getMemberById(route.params?.memberId)
+		setMember(member)
+		setStatus(member ? "idle" : "error")
+	}
+
+	const fetchSubscriptions = async () => {
+		if (!route.params?.memberId) return
+		const subscriptions = await getSubscriptionsByMemberId(route.params.memberId)
+		setSubscriptions(subscriptions)
+	}
+
+	useEffect(() => {
 		fetchMember()
+		fetchSubscriptions()
 	}, [route.params?.memberId])
 
 	const editButton = (
@@ -71,78 +82,103 @@ export default function MemberDetailsScreen() {
 						)
 					)
 				) : (
-					<View style={styles.card}>
-						<ThemedIcon
-							name={member?.gender === "FEMALE" ? "female" : "male"}
-							size={80}
-							color={darkMode ? "#fff" : "#000"}
-							style={{ alignSelf: "center", marginBottom: 20 }}
-						/>
+					<View style={{ gap: 30 }}>
+						<View style={styles.card}>
+							<ThemedIcon
+								name={member?.gender === "FEMALE" ? "female" : "male"}
+								size={80}
+								color={darkMode ? "#fff" : "#000"}
+								style={{ alignSelf: "center", marginBottom: 20 }}
+							/>
 
-						<ThemedText style={styles.title}>
-							{member.firstName} {member.lastName}
-						</ThemedText>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("phone")}</ThemedText>
-							<ThemedText style={styles.value}>{member.phoneNumber || "-"}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("email")}</ThemedText>
-							<ThemedText style={styles.value}>{member.email || "-"}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("gender")}</ThemedText>
-							<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
-							<ThemedText style={styles.value}>
-								{new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
+							<ThemedText style={styles.title}>
+								{member.firstName} {member.lastName}
 							</ThemedText>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+								<ThemedText style={styles.value}>{member.phoneNumber || "-"}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("email")}</ThemedText>
+								<ThemedText style={styles.value}>{member.email || "-"}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+								<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+								<ThemedText style={styles.value}>
+									{new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
+								</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+								<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
+								<ThemedText style={styles.value}>{member.lockerNumber || "-"}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
+								<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
+								<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.createdAt)}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
+								<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.updatedAt)}</ThemedText>
+							</View>
+
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
+								<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
+							</View>
+
+							<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("name")}</ThemedText>
+								<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
+							</View>
+							<View style={styles.row}>
+								<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+								<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
+							</View>
 						</View>
 
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
-							<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
-						</View>
+						<View style={styles.card}>
+							<ThemedText style={styles.sectionTitle}>{t("subscriptionStatus")}</ThemedText>
+							{subscriptions.length > 0 ? (
+								subscriptions.map((sub) => (
+									<ThemedText
+										style={styles.value}
+										key={sub.id}
+									>
+										{sub.packageType} - {t(sub.status)}
+									</ThemedText>
+								))
+							) : (
+								<ThemedText style={styles.value}>No active subscriptions</ThemedText>
+							)}
 
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
-							<ThemedText style={styles.value}>{member.lockerNumber || "-"}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
-							<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
-							<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.createdAt)}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
-							<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.updatedAt)}</ThemedText>
-						</View>
-
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
-							<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
-						</View>
-
-						<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("name")}</ThemedText>
-							<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
-						</View>
-						<View style={styles.row}>
-							<ThemedText style={styles.label}>{t("phone")}</ThemedText>
-							<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
+							<ThemedButton
+								style={styles.sellPackageButton}
+								onPress={() => navigation.navigate("SubscriptionFormScreen", { memberId: route.params?.memberId })}
+							>
+								<ThemedText style={styles.sellPackageButtonText}>Yeni Paket Sat</ThemedText>
+							</ThemedButton>
 						</View>
 					</View>
 				)}
@@ -161,6 +197,7 @@ const createStyles = (darkMode: boolean) =>
 			padding: 20,
 			flexGrow: 1,
 			justifyContent: "center",
+			paddingBottom: 40,
 		},
 		card: {
 			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
@@ -216,5 +253,15 @@ const createStyles = (darkMode: boolean) =>
 			color: "#007AFF",
 			fontSize: 16,
 			fontWeight: "600",
+		},
+		sellPackageButton: {
+			paddingVertical: 14,
+			alignItems: "center",
+			marginTop: 24,
+		},
+		sellPackageButtonText: {
+			color: darkMode ? "#000" : "#fff",
+			fontSize: 16,
+			fontWeight: "bold",
 		},
 	})

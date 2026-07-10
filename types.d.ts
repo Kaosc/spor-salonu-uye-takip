@@ -101,11 +101,11 @@ interface Member {
 type PackageType = "MONTHLY" | "QUARTERLY" | "YEARLY"
 
 interface Subscription {
-	id: string
+	id?: string
 	memberUid: string // Firebase Auth UID (Cames from Auth when the member registers)
 	packageType: PackageType
-	startDate: Date
-	endDate: Date
+	startDate: Date | import("@react-native-firebase/firestore").Timestamp
+	endDate: Date | import("@react-native-firebase/firestore").Timestamp
 	price: number
 	paymentMethod: PaymentMethod
 	status: SubscriptionStatus

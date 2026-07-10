@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import MemberDetailsScreen from "../../screens/MemberDetailsScreen"
 import MemberListScreen from "../../screens/MemberListScreen"
 import MemberFormScreen from "../../screens/MemberFormScreen"
+import SubscriptionFormScreen from "../../screens/SubscriptionFormScreen"
 import SearchScreen from "../../screens/SearchScreen"
 
 const Stack = createNativeStackNavigator()
@@ -25,6 +26,10 @@ export default function MemberStack() {
 			<Stack.Screen
 				name="SearchScreen"
 				component={SearchScreen}
+			/>
+			<Stack.Screen
+				name="SubscriptionFormScreen"
+				component={SubscriptionFormScreen}
 			/>
 			<Stack.Screen
 				name="MemberDetailsScreen"
