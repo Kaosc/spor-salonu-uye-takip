@@ -114,5 +114,6 @@
 	"memberActivated": "Üye etkin hale getirildi.",
 	"activateMember": "Üyeyi Etkin Hale Getir",
 	"activateMemberConfirmation": "Bu üyeyi etkin hale getirmek istediğinizden emin misiniz?",
-	"activate": "Etkin Hale Getir"
+	"activate": "Etkin Hale Getir",
+	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription."
 }

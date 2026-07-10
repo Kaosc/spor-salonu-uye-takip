@@ -6,8 +6,8 @@ import { FlashList } from "@shopify/flash-list"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
-import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import CustomHeader from "../components/CustomHeader"
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { daysSince, daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
 import { Theme } from "../utils/theme"
@@ -258,11 +258,12 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			fontSize: 13,
 			color: darkMode ? "#aaa" : "#666",
 			textTransform: "uppercase",
+			fontWeight: "bold",
 			letterSpacing: 0.5,
 		},
 		summaryValue: {
 			fontSize: 24,
-			fontWeight: "700",
+			fontWeight: "bold",
 		},
 		// Filter Bar
 		filterBar: {

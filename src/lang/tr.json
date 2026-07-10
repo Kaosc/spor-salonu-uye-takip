@@ -113,5 +113,6 @@
 	"memberActivated": "Üye etkin hale getirildi.",
 	"activateMember": "Üyeyi Etkin Hale Getir",
 	"activateMemberConfirmation": "Bu üyeyi etkin hale getirmek istediğinizden emin misiniz?",
-	"activate": "Etkin Hale Getir"
+	"activate": "Etkin Hale Getir",
+	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek için lütfen üyeyi aktif hale getirin."
 }

@@ -105,18 +105,28 @@ export default function MemberDetailsScreen() {
 								{t("subscription")}: {t("none")}
 							</ThemedText>
 						)}
-
-						<ThemedButton
-							style={styles.sellPackageButton}
-							onPress={() =>
-								navigation.navigate("SubscriptionFormScreen", {
-									memberId: route.params?.memberId,
-									subscriptionId: subscription?.id || false,
-								})
-							}
-						>
-							<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
-						</ThemedButton>
+						{member?.isActive ? (
+							<ThemedButton
+								style={styles.sellPackageButton}
+								onPress={() =>
+									navigation.navigate("SubscriptionFormScreen", {
+										memberId: route.params?.memberId,
+										subscriptionId: subscription?.id || false,
+									})
+								}
+							>
+								<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
+							</ThemedButton>
+						) : (
+							<View style={styles.noSubContainer}>
+								<ThemedIcon
+									name="alert"
+									size={23}
+									color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
+								/>
+								<ThemedText style={styles.noSubscriptionText}>{t("memberIsInactive")}</ThemedText>
+							</View>
+						)}
 					</>
 				)}
 			</View>
@@ -417,7 +427,6 @@ const createStyles = (darkMode: boolean) => {
 		sectionTitle: {
 			fontSize: 17,
 			fontWeight: "700",
-			marginTop: 20,
 			marginBottom: 8,
 		},
 		row: {
@@ -457,7 +466,8 @@ const createStyles = (darkMode: boolean) => {
 			opacity: 0.8,
 		},
 		noSubscriptionText: {
-			fontSize: 15,
+			flex: 1,
+			fontSize: 13,
 			fontWeight: "600",
 			color: theme.red.foreground,
 		},
@@ -470,6 +480,17 @@ const createStyles = (darkMode: boolean) => {
 			color: darkMode ? "#000" : "#fff",
 			fontSize: 16,
 			fontWeight: "bold",
+		},
+		noSubContainer: {
+			flex: 1,
+			flexDirection: "row",
+			gap: 8,
+			marginTop: 20,
+			alignItems: "center",
+			borderWidth: 1,
+			padding: 12,
+			borderRadius: 8,
+			borderColor: theme.red.foreground,
 		},
 	})
 }
