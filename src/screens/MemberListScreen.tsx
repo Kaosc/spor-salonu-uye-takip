@@ -42,25 +42,31 @@ export default function MemberListContent() {
 	}, [])
 
 	const renderItem = useCallback(
-		({ item }: { item: Member }) => (
-			<TouchableOpacity
-				style={styles.item}
-				onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
-			>
-				<ThemedIcon
-					name={item.gender === "FEMALE" ? "female" : "male"}
-					size={45}
-					color={darkMode ? "#fff" : "#000"}
-					style={{ marginRight: 12, opacity: 0.9, borderRadius: 22.5 }}
-				/>
-				<View>
-					<ThemedText style={styles.itemName}>
-						{item.firstName} {item.lastName}
-					</ThemedText>
-					<ThemedText style={styles.itemPhone}>{item.email}</ThemedText>
-				</View>
-			</TouchableOpacity>
-		),
+		({ item }: { item: Member }) => {
+			const statusColor = item.isActive
+				? Theme[darkMode ? "dark" : "light"].green.foreground
+				: Theme[darkMode ? "dark" : "light"].red.foreground
+
+			return (
+				<TouchableOpacity
+					style={styles.item}
+					onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
+				>
+					<ThemedIcon
+						name={item.gender === "FEMALE" ? "female" : "male"}
+						size={37}
+						style={{ marginRight: 12, opacity: 0.9, borderRadius: 22.5 }}
+					/>
+					<View style={{ flex: 1 }}>
+						<ThemedText style={styles.itemName}>
+							{item.firstName} {item.lastName}
+						</ThemedText>
+						<ThemedText style={styles.itemPhone}>{item.email}</ThemedText>
+					</View>
+					<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+				</TouchableOpacity>
+			)
+		},
 		[navigation, styles],
 	)
 
@@ -110,6 +116,8 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			alignItems: "center",
 			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
 			borderRadius: 8,
 			marginHorizontal: 15,
 			marginTop: 10,
@@ -124,13 +132,16 @@ const createStyles = (darkMode: boolean) => {
 		list: {
 			paddingHorizontal: 16,
 			paddingBottom: 80,
+			marginTop: 10,
 		},
 		item: {
 			flexDirection: "row",
 			alignItems: "center",
-			paddingVertical: 14,
-			borderBottomWidth: 1,
-			borderBottomColor: theme.border,
+			paddingVertical: 15,
+			backgroundColor: theme.cardBackground,
+			marginBottom: 10,
+			borderRadius: 12,
+			paddingHorizontal: 15,
 		},
 		itemName: {
 			fontSize: 16,
@@ -151,6 +162,11 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: darkMode ? "#fff" : "#000",
 			alignItems: "center",
 			justifyContent: "center",
+		},
+		statusDot: {
+			width: 10,
+			height: 10,
+			borderRadius: 5,
 		},
 	})
 }

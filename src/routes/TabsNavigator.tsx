@@ -6,7 +6,7 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 
 import MemberStack from "./stacks/MemberStack"
 import DashboardScreen from "../screens/DashboardScreen"
-import ProfileScreen from "../screens/ProfileScreen"
+import SubscriptionStack from "./stacks/SubscriptionStack"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { moderateScale } from "../utils/responsive"
@@ -74,17 +74,17 @@ export default function TabsNavigator() {
 			/>
 
 			<Tabs.Screen
-				name="ProfileScreen"
-				component={ProfileScreen}
+				name="SubscriptionStack"
+				component={SubscriptionStack}
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon
-							name={v.focused ? "account" : "account-outline"}
+							name={v.focused ? "card-account-details" : "card-account-details-outline"}
 							size={31}
 							color={v.color}
 						/>
 					),
-					tabBarLabel: t("profile"),
+					tabBarLabel: t("subscriptions"),
 				}}
 			/>
 		</Tabs.Navigator>

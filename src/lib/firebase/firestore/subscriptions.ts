@@ -32,6 +32,23 @@ export const cancelSubscription = async (subscriptionId: string) => {
 	}
 }
 
+export const getAllSubscriptions = async (): Promise<any[]> => {
+	try {
+		const subRef = collection(db, COLLECTION)
+		const snapshot = await getDocs(subRef)
+
+		const subscriptions: any[] = []
+		snapshot.forEach((doc) => {
+			subscriptions.push({ id: doc.id, ...doc.data() })
+		})
+
+		return subscriptions
+	} catch (e) {
+		console.error("[FIRESTORE] getAllSubscriptions:", e)
+		return []
+	}
+}
+
 export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Subscription[]> => {
 	try {
 		const subRef = collection(db, COLLECTION)

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react"
-import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
+import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { getFirestore, collection, query, where, onSnapshot } from "@react-native-firebase/firestore"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
@@ -11,12 +10,10 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
 
-import { getMemberById } from "../lib/firebase/firestore/member"
+import { activateMember, getMemberById, inactivateMember } from "../lib/firebase/firestore/member"
+import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
 import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 import { Theme } from "../utils/theme"
-import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
-
-const db = getFirestore()
 
 export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
@@ -125,16 +122,77 @@ export default function MemberDetailsScreen() {
 			</View>
 		)
 	}
+	const handleInactivateMember = async () => {
+		const inactivate = async () => {
+			const succes = await inactivateMember(route.params?.memberId)
+			if (succes) {
+				toast.show(t("memberInactivated"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, isActive: false } : prev))
+			}
+		}
+
+		Alert.alert(t("inactivateMember"), t("inactivateMemberConfirmation"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("inactivate"),
+				style: "destructive",
+				onPress: async () => await inactivate(),
+			},
+		])
+	}
+
+	const handleActivateMember = async () => {
+		const activate = async () => {
+			const succes = await activateMember(route.params?.memberId)
+			if (succes) {
+				toast.show(t("memberActivated"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, isActive: true } : prev))
+			}
+		}
+
+		Alert.alert(t("activateMember"), t("activateMemberConfirmation"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("activate"),
+				style: "default",
+				onPress: async () => await activate(),
+			},
+		])
+	}
 
 	const MemberDetails = ({ member }: { member: Member }) => {
 		return (
 			<View style={styles.card}>
 				<View style={styles.actionRow}>
+					<View style={{ flexDirection: "row", gap: 20 }}>
+						{member.isActive ? (
+							<TouchableOpacity onPress={handleInactivateMember}>
+								<ThemedIcon
+									name="account-cancel"
+									size={26}
+									color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
+								/>
+							</TouchableOpacity>
+						) : (
+							<TouchableOpacity onPress={handleActivateMember}>
+								<ThemedIcon
+									name="account-check"
+									size={26}
+									color={darkMode ? Theme.dark.green.foreground : Theme.light.green.foreground}
+								/>
+							</TouchableOpacity>
+						)}
+					</View>
 					<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
 						<ThemedIcon
 							name="pen"
-							size={24}
-							color={darkMode ? "#fff" : "#000"}
+							size={26}
 						/>
 					</TouchableOpacity>
 				</View>
@@ -385,7 +443,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		actionRow: {
 			flexDirection: "row",
-			justifyContent: "flex-end",
+			justifyContent: "space-between",
 			gap: 20,
 			marginBottom: 30,
 		},

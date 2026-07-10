@@ -71,3 +71,29 @@ export const calculateEndDateAsDays = (start: unknown, pkg: "MONTHLY" | "QUARTER
 	}
 	return Math.ceil((end.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
 }
+
+export function toDate(value: any): Date | null {
+	if (!value) return null
+	if (typeof value.toDate === "function") return value.toDate()
+	if (value instanceof Date) return value
+	return null
+}
+
+export function isThisMonth(value: any): boolean {
+	const date = toDate(value)
+	if (!date) return false
+	const now = new Date()
+	return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()
+}
+
+export function daysUntil(date: Date): number {
+	const now = new Date()
+	const diff = date.getTime() - now.getTime()
+	return Math.ceil(diff / (1000 * 60 * 60 * 24))
+}
+
+export function daysSince(date: Date): number {
+	const now = new Date()
+	const diff = now.getTime() - date.getTime()
+	return Math.floor(diff / (1000 * 60 * 60 * 24))
+}

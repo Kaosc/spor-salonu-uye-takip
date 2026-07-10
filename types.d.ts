@@ -63,7 +63,7 @@ type FormValues = {
 
 type UserRole = "ADMIN" | "STAFF" | "MEMBER"
 type Gender = "MALE" | "FEMALE" | "OTHER" | "UNSPECIFIED"
-type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED"
+type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "PAUSED"
 type PaymentMethod = "CASH" | "CREDIT_CARD" | "TRANSFER"
 
 interface StaffUser {

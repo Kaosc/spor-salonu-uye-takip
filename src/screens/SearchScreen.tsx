@@ -22,7 +22,7 @@ export default function SearchScreen() {
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-	
+
 	useEffect(() => {
 		if (timerRef.current) clearTimeout(timerRef.current)
 
@@ -65,7 +65,7 @@ export default function SearchScreen() {
 
 	return (
 		<View style={styles.container}>
-			<View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 10, marginTop: 12 }}>
+			<View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginHorizontal: 10, marginTop: 12 }}>
 				<TouchableOpacity
 					onPress={() => navigation.goBack()}
 					style={styles.backButtonContainer}

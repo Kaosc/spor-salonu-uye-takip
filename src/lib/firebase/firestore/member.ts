@@ -95,3 +95,31 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 		throw e
 	}
 }
+
+export const inactivateMember = async (memberId: string): Promise<boolean> => {
+	try {
+		const memberRef = doc(db, COLLECTION, memberId)
+		await updateDoc(memberRef, {
+			isActive: false,
+			updatedAt: serverTimestamp(),
+		})
+		return true
+	} catch (e) {
+		console.error("[FIRESTORE] inactivateMember:", e)
+		return false
+	}
+}
+
+export const activateMember = async (memberId: string): Promise<boolean> => {
+	try {
+		const memberRef = doc(db, COLLECTION, memberId)
+		await updateDoc(memberRef, {
+			isActive: true,
+			updatedAt: serverTimestamp(),
+		})
+		return true
+	} catch (e) {
+		console.error("[FIRESTORE] activateMember:", e)
+		return false
+	}
+}
