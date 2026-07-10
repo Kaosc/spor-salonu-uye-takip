@@ -1,14 +1,14 @@
 import { useState } from "react"
-import { View, TextInput, TouchableOpacity, StyleSheet, Alert, Platform } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { View, TextInput, TouchableOpacity, StyleSheet, Platform } from "react-native"
+import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker"
-import { getFirestore, collection, addDoc, serverTimestamp, Timestamp } from "@react-native-firebase/firestore"
+import { serverTimestamp, Timestamp } from "@react-native-firebase/firestore"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
-import { addSubscription } from "../lib/firebase/firestore/subscriptions"
+import { addSubscription, cancelSubscription } from "../lib/firebase/firestore/subscriptions"
 
 const PACKAGE_TYPES: PackageType[] = ["MONTHLY", "QUARTERLY", "YEARLY"]
 const PAYMENT_METHODS: PaymentMethod[] = ["CASH", "CREDIT_CARD", "TRANSFER"]
@@ -23,12 +23,14 @@ export default function SubscriptionFormScreen() {
 	const styles = createStyles(darkMode)
 
 	const memberId = route.params?.memberId
+	const activeSubscriptionId = route.params?.activeSubscriptionId || false
 
 	const [packageType, setPackageType] = useState<PackageType>("MONTHLY")
-	const [price, setPrice] = useState("")
 	const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("CASH")
 	const [startDate, setStartDate] = useState(new Date())
+	const [price, setPrice] = useState("")
 	const [notes, setNotes] = useState("")
+
 	const [showDatePicker, setShowDatePicker] = useState(false)
 	const [submitting, setSubmitting] = useState(false)
 
@@ -58,14 +60,25 @@ export default function SubscriptionFormScreen() {
 	}
 
 	const handleSubmit = async () => {
+		let success = false
+
 		if (!price || isNaN(Number(price)) || Number(price) <= 0) {
-			Alert.alert("Error", "Please enter a valid price")
+			toast.show(t("invalidPrice"), { type: "danger" })
 			return
 		}
 
 		setSubmitting(true)
 
 		try {
+			// Before adding a new subscription, we need to cancel the existing active subscription for this member
+			if (activeSubscriptionId) {
+				const canceled = await cancelSubscription(activeSubscriptionId)
+				if (!canceled) {
+					toast.show(t("subscriptionCancelError"), { type: "danger" })
+					return
+				}
+			}
+
 			const endDate = calculateEndDate(startDate, packageType)
 
 			const sub: Subscription = {
@@ -82,20 +95,26 @@ export default function SubscriptionFormScreen() {
 				updatedAt: serverTimestamp(),
 			}
 
-			addSubscription(sub)
+			success = await addSubscription(sub)
 		} catch (e) {
 			console.error("[SubscriptionForm] submit error:", e)
+			toast.show(t("subscriptionAddError"), { type: "danger" })
 		} finally {
 			setSubmitting(false)
+			if (success) {
+				toast.show(t("subscriptionAdded"), { type: "success" })
+				navigation.dispatch(StackActions.popToTop())
+				navigation.dispatch(StackActions.replace("MemberListScreen", { refresh: true }))
+			}
 		}
 	}
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Yeni Paket Sat" />
+			<CustomHeader title={t("sellPackage")} />
 			<View style={styles.content}>
 				{/* Package Type */}
-				<ThemedText style={styles.label}>Package Type</ThemedText>
+				<ThemedText style={styles.label}>{t("packageType")}</ThemedText>
 				<View style={styles.selectionRow}>
 					{PACKAGE_TYPES.map((pkg) => (
 						<TouchableOpacity
@@ -104,14 +123,14 @@ export default function SubscriptionFormScreen() {
 							onPress={() => setPackageType(pkg)}
 						>
 							<ThemedText style={[styles.selectionButtonText, packageType === pkg && styles.selectionButtonTextActive]}>
-								{pkg}
+								{t(pkg)}
 							</ThemedText>
 						</TouchableOpacity>
 					))}
 				</View>
 
 				{/* Price */}
-				<ThemedText style={styles.label}>Price</ThemedText>
+				<ThemedText style={styles.label}>{t("price")}</ThemedText>
 				<TextInput
 					style={styles.input}
 					value={price}
@@ -122,7 +141,7 @@ export default function SubscriptionFormScreen() {
 				/>
 
 				{/* Payment Method */}
-				<ThemedText style={styles.label}>Payment Method</ThemedText>
+				<ThemedText style={styles.label}>{t("paymentMethod")}</ThemedText>
 				<View style={styles.selectionRow}>
 					{PAYMENT_METHODS.map((method) => (
 						<TouchableOpacity
@@ -131,14 +150,14 @@ export default function SubscriptionFormScreen() {
 							onPress={() => setPaymentMethod(method)}
 						>
 							<ThemedText style={[styles.selectionButtonText, paymentMethod === method && styles.selectionButtonTextActive]}>
-								{method}
+								{t(method)}
 							</ThemedText>
 						</TouchableOpacity>
 					))}
 				</View>
 
 				{/* Start Date */}
-				<ThemedText style={styles.label}>Start Date</ThemedText>
+				<ThemedText style={styles.label}>{t("startDate")}</ThemedText>
 				<TouchableOpacity
 					style={styles.dateButton}
 					onPress={() => setShowDatePicker(true)}
@@ -155,12 +174,12 @@ export default function SubscriptionFormScreen() {
 				)}
 
 				{/* Notes */}
-				<ThemedText style={styles.label}>Notes (optional)</ThemedText>
+				<ThemedText style={styles.label}>{t("notes")}</ThemedText>
 				<TextInput
 					style={[styles.input, styles.notesInput]}
 					value={notes}
 					onChangeText={setNotes}
-					placeholder="Optional notes..."
+					placeholder={t("notesPlaceholder")}
 					placeholderTextColor={darkMode ? "#666" : "#999"}
 					multiline
 					numberOfLines={3}
@@ -172,7 +191,7 @@ export default function SubscriptionFormScreen() {
 					onPress={handleSubmit}
 					disabled={submitting}
 				>
-					<ThemedText style={styles.submitButtonText}>{submitting ? "Saving..." : "Save"}</ThemedText>
+					<ThemedText style={styles.submitButtonText}>{submitting ? t("saving") : t("save")}</ThemedText>
 				</TouchableOpacity>
 			</View>
 		</View>
@@ -191,7 +210,7 @@ const createStyles = (darkMode: boolean) =>
 		},
 		label: {
 			fontSize: 15,
-			fontWeight: "600",
+			fontWeight: "bold",
 			marginBottom: 8,
 			marginTop: 16,
 		},
@@ -228,7 +247,7 @@ const createStyles = (darkMode: boolean) =>
 		},
 		selectionButtonText: {
 			fontSize: 12,
-			fontWeight: "600",
+			fontWeight: "bold",
 			color: darkMode ? "#fff" : "#000",
 		},
 		selectionButtonTextActive: {
@@ -258,6 +277,6 @@ const createStyles = (darkMode: boolean) =>
 		submitButtonText: {
 			color: darkMode ? "#000" : "#fff",
 			fontSize: 16,
-			fontWeight: "600",
+			fontWeight: "bold",
 		},
 	})

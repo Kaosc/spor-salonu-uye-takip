@@ -104,8 +104,8 @@ interface Subscription {
 	id?: string
 	memberUid: string // Firebase Auth UID (Cames from Auth when the member registers)
 	packageType: PackageType
-	startDate: Date | import("@react-native-firebase/firestore").Timestamp
-	endDate: Date | import("@react-native-firebase/firestore").Timestamp
+	startDate: Date | FirebaseTimestamp
+	endDate: Date | FirebaseTimestamp
 	price: number
 	paymentMethod: PaymentMethod
 	status: SubscriptionStatus
@@ -115,3 +115,5 @@ interface Subscription {
 	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	notes?: string
 }
+
+type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
