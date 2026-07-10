@@ -1,43 +1,59 @@
-import React, { useState, useMemo } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
-import { createMMKV } from "react-native-mmkv"
+import { useMMKVObject } from "react-native-mmkv"
 import Fuse from "fuse.js"
-import ThemedText from "../components/ui/ThemedText"
-import CustomHeader from "../components/CustomHeader"
 
-const storage = createMMKV()
+import ThemedText from "../components/ui/ThemedText"
+import ThemedIcon from "../components/ui/ThemedIcon"
+
+import { Theme } from "../utils/theme"
 
 export default function SearchScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const [query, setQuery] = useState("")
+
 	const styles = createStyles(darkMode)
 
-	const raw = storage.getString("members")
-	const allMembers: any[] = raw ? JSON.parse(raw) : []
+	const [members] = useMMKVObject<Member[]>("members")
+	const [query, setQuery] = useState("")
+	const [debouncedQuery, setDebouncedQuery] = useState("")
 
-	const fuse = useMemo(
-		() =>
-			new Fuse(allMembers, {
-				keys: ["firstName", "lastName", "phoneNumber"],
+	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	
+	useEffect(() => {
+		if (timerRef.current) clearTimeout(timerRef.current)
+
+		timerRef.current = setTimeout(() => setDebouncedQuery(query), 400)
+
+		return () => {
+			if (timerRef.current) clearTimeout(timerRef.current)
+		}
+	}, [query])
+
+	const fuse = useMemo(() => {
+		if (members) {
+			return new Fuse(members, {
+				keys: ["firstName", "lastName", "phoneNumber", "email"],
 				threshold: 0.3,
-			}),
-		[allMembers],
-	)
+			})
+		} else {
+			return new Fuse([], {})
+		}
+	}, [members])
 
 	const filtered = useMemo(() => {
-		if (!query.trim()) return []
-		return fuse.search(query).map((r) => r.item)
-	}, [query, fuse])
+		if (!debouncedQuery.trim()) return []
+		return fuse.search(debouncedQuery).map((r) => r.item)
+	}, [debouncedQuery, fuse])
 
-	const renderItem = ({ item }: { item: any }) => (
+	const renderItem = ({ item }: { item: Member }) => (
 		<TouchableOpacity
 			style={styles.item}
 			onPress={() => {
-				navigation.navigate("MemberDetailsScreen", { memberId: item.uid })
+				navigation.navigate("MemberDetailsScreen", { memberId: item.uid, prevScreen: "SearchScreen" })
 			}}
 		>
 			<ThemedText style={styles.itemName}>
@@ -49,17 +65,27 @@ export default function SearchScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title="Üye Ara" />
-			<TextInput
-				style={styles.input}
-				placeholder="İsim veya telefon ile ara..."
-				placeholderTextColor={darkMode ? "#666" : "#999"}
-				value={query}
-				onChangeText={setQuery}
-				autoFocus
-				autoCapitalize="none"
-			/>
-
+			<View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginHorizontal: 10, marginTop: 12 }}>
+				<TouchableOpacity
+					onPress={() => navigation.goBack()}
+					style={styles.backButtonContainer}
+				>
+					<ThemedIcon
+						name="arrow-left"
+						size={24}
+						style={{ margin: 15 }}
+					/>
+				</TouchableOpacity>
+				<TextInput
+					style={styles.input}
+					placeholder="İsim veya telefon ile ara..."
+					placeholderTextColor={darkMode ? "#666" : "#999"}
+					value={query}
+					onChangeText={setQuery}
+					autoFocus
+					autoCapitalize="none"
+				/>
+			</View>
 			<FlashList
 				data={filtered}
 				renderItem={renderItem}
@@ -70,20 +96,22 @@ export default function SearchScreen() {
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: darkMode ? "#000" : "#fff",
 		},
 		input: {
-			margin: 16,
+			flex: 1,
 			paddingHorizontal: 16,
 			paddingVertical: 12,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
-			borderRadius: 10,
+			backgroundColor: theme.cardBackground,
+			borderRadius: 12,
 			fontSize: 15,
-			color: darkMode ? "#e9e9e9" : "#000",
+			height: 55,
+			color: darkMode ? "#fff" : "#000",
 		},
 		list: {
 			paddingHorizontal: 16,
@@ -91,7 +119,7 @@ const createStyles = (darkMode: boolean) =>
 		item: {
 			paddingVertical: 14,
 			borderBottomWidth: 1,
-			borderBottomColor: darkMode ? "#222" : "#eee",
+			borderBottomColor: theme.border,
 		},
 		itemName: {
 			fontSize: 16,
@@ -102,4 +130,11 @@ const createStyles = (darkMode: boolean) =>
 			color: darkMode ? "#aaa" : "#666",
 			marginTop: 2,
 		},
+		backButtonContainer: {
+			justifyContent: "center",
+			alignItems: "center",
+			backgroundColor: theme.cardBackground,
+			borderRadius: 12,
+		},
 	})
+}

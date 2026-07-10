@@ -91,5 +91,9 @@
 	"yes": "Evet",
 	"no": "Hayır",
 	"notes": "Notlar",
-	"subscriptionCancelError": "Abonelik iptal edilirken bir hata oluştu. Daha sonra tekrar deneyin."
+	"subscriptionCancelError": "Abonelik iptal edilirken bir hata oluştu. Daha sonra tekrar deneyin.",
+	"inactive": "Pasif",
+	"membershipCard": "Üyelik Kartı",
+	"scanMembership": "Üyelik Tara",
+	"subscription": "Abonelik"
 }

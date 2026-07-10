@@ -10,6 +10,7 @@ import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 
 import { getAllMembers } from "../lib/firebase/firestore/member"
+import { Theme } from "../utils/theme"
 
 export default function MemberListContent() {
 	const navigation = useNavigation<any>()
@@ -34,7 +35,7 @@ export default function MemberListContent() {
 	}
 
 	useEffect(() => {
-		if (route.params?.refresh) {
+		if (route.params?.refresh || members?.length === 0) {
 			fetchMembers()
 			navigation.setParams({ refresh: false })
 		}
@@ -71,9 +72,7 @@ export default function MemberListContent() {
 			>
 				<ThemedIcon
 					name="magnify"
-					size={22}
-					color={darkMode ? "#666" : "#999"}
-					style={{ marginRight: 8 }}
+					size={23}
 				/>
 				<ThemedText style={styles.searchBarText}>{t("searchMembers")}</ThemedText>
 			</TouchableOpacity>
@@ -100,26 +99,27 @@ export default function MemberListContent() {
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: darkMode ? "#000" : "#fff",
 		},
 		searchBar: {
 			flexDirection: "row",
 			alignItems: "center",
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			backgroundColor: theme.cardBackground,
 			borderRadius: 8,
 			marginHorizontal: 15,
 			marginTop: 10,
 			marginBottom: 8,
 			paddingHorizontal: 16,
-			paddingVertical: 12,
+			paddingVertical: 16,
+			gap: 15,
 		},
 		searchBarText: {
 			fontSize: 17,
-			color: darkMode ? "#666" : "#999",
 		},
 		list: {
 			paddingHorizontal: 16,
@@ -130,7 +130,7 @@ const createStyles = (darkMode: boolean) =>
 			alignItems: "center",
 			paddingVertical: 14,
 			borderBottomWidth: 1,
-			borderBottomColor: darkMode ? "#222" : "#eee",
+			borderBottomColor: theme.border,
 		},
 		itemName: {
 			fontSize: 16,
@@ -138,8 +138,8 @@ const createStyles = (darkMode: boolean) =>
 		},
 		itemPhone: {
 			fontSize: 14,
-			color: darkMode ? "#aaa" : "#666",
 			marginTop: 2,
+			opacity: 0.7,
 		},
 		fab: {
 			position: "absolute",
@@ -148,13 +148,9 @@ const createStyles = (darkMode: boolean) =>
 			width: 56,
 			height: 56,
 			borderRadius: 28,
-			backgroundColor: darkMode ? "#ffffff" : "#000000",
+			backgroundColor: darkMode ? "#fff" : "#000",
 			alignItems: "center",
 			justifyContent: "center",
-			elevation: 4,
-			shadowColor: "#000",
-			shadowOffset: { width: 0, height: 2 },
-			shadowOpacity: 0.25,
-			shadowRadius: 4,
 		},
 	})
+}

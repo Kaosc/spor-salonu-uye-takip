@@ -24,16 +24,16 @@ export default function MemberStack() {
 				component={MemberFormScreen}
 			/>
 			<Stack.Screen
+				name="MemberDetailsScreen"
+				component={MemberDetailsScreen}
+			/>
+			<Stack.Screen
 				name="SearchScreen"
 				component={SearchScreen}
 			/>
 			<Stack.Screen
 				name="SubscriptionFormScreen"
 				component={SubscriptionFormScreen}
-			/>
-			<Stack.Screen
-				name="MemberDetailsScreen"
-				component={MemberDetailsScreen}
 			/>
 		</Stack.Navigator>
 	)

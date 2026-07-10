@@ -47,6 +47,6 @@ export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Sub
 		return subscriptions
 	} catch (e) {
 		console.error("[FIRESTORE] getSubscriptionsByMemberId:", e)
-		throw e
+		return []
 	}
 }

@@ -22,7 +22,7 @@ export default function ConsentScreen({ navigation }: { navigation: any }) {
 
 	const handleOnAccept = () => {
 		setIsPoliciesAccepted(true)
-		navigation.dispatch(StackActions.replace("LoginScreen"))
+		navigation.dispatch(StackActions.replace("AuthStack"))
 	}
 
 	return (

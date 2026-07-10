@@ -1,24 +1,35 @@
 import { useEffect, useState } from "react"
-import { View, StyleSheet, ScrollView } from "react-native"
+import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from "react-native"
 import { useSelector } from "react-redux"
 import QRCode from "react-native-qrcode-svg"
+import { useTranslation } from "react-i18next"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
+import CameraViewModal from "../components/QRScannerView"
 
 import { getStaffUserById } from "../lib/firebase/firestore/users"
 import { moderateScale } from "../utils/responsive"
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
+import CustomHeader from "../components/CustomHeader"
+import { Theme } from "../utils/theme"
+import QRScannerView from "../components/QRScannerView"
 
 export default function DashboardScreen() {
+	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const uid = useSelector((state: RootState) => state.auth.uid)
+	const theme = Theme[darkMode ? "dark" : "light"]
+	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
 
 	const [staffUser, setStaffUser] = useState<StaffUser | null>(null)
 	const [loading, setLoading] = useState(true)
+	const [qrModalVisible, setQrModalVisible] = useState(false)
+	const [scannerModalVisible, setScannerModalVisible] = useState(false)
 
 	useEffect(() => {
 		if (!uid) return
@@ -29,6 +40,18 @@ export default function DashboardScreen() {
 			.catch(() => {})
 			.finally(() => setLoading(false))
 	}, [uid])
+
+	const SettingsButton = () => (
+		<TouchableOpacity
+			style={{ marginRight: 15 }}
+			onPress={() => navigation.navigate("SettingsStack", { screen: "SettingsScreen" })}
+		>
+			<ThemedIcon
+				name="cog-outline"
+				size={28}
+			/>
+		</TouchableOpacity>
+	)
 
 	if (loading) {
 		return (
@@ -47,85 +70,153 @@ export default function DashboardScreen() {
 	}
 
 	return (
-		<ScrollView
-			style={{ flex: 1 }}
-			contentContainerStyle={styles.container}
-		>
-			<View style={styles.profileSection}>
-				<View style={styles.avatar}>
-					<ThemedIcon
-						name="account"
-						size={48}
+		<>
+			<Modal
+				visible={qrModalVisible}
+				transparent
+				animationType="fade"
+				onRequestClose={() => setQrModalVisible(false)}
+			>
+				<TouchableOpacity
+					style={styles.modalOverlay}
+					activeOpacity={1}
+					onPress={() => setQrModalVisible(false)}
+				>
+					<QRCode
+						value={staffUser.uid}
+						size={moderateScale(Dimensions.get("window").width * 0.85)}
 					/>
-				</View>
-				<ThemedText style={styles.name}>
-					{staffUser.firstName} {staffUser.lastName}
-				</ThemedText>
-				<View style={[styles.roleBadge, { backgroundColor: darkMode ? "#fff" : "#000" }]}>
-					<ThemedText style={[styles.roleText, { color: darkMode ? "#000" : "#fff" }]}>{staffUser.role}</ThemedText>
-				</View>
-			</View>
+				</TouchableOpacity>
+			</Modal>
 
-			<View style={styles.infoCard}>
-				<View style={styles.infoRow}>
-					<ThemedIcon
-						name="email-outline"
-						size={20}
-					/>
-					<ThemedText style={styles.infoText}>{staffUser.email}</ThemedText>
-				</View>
-
-				<View style={styles.divider} />
-
-				<View style={styles.infoRow}>
-					<ThemedIcon
-						name="badge-account-outline"
-						size={20}
-					/>
-					<ThemedText style={styles.infoText}>
-						{staffUser.firstName} {staffUser.lastName}
-					</ThemedText>
-				</View>
-
-				<View style={styles.divider} />
-
-				<View style={styles.infoRow}>
-					<ThemedIcon
-						name="shield-account-outline"
-						size={20}
-					/>
-					<ThemedText style={styles.infoText}>{staffUser.role}</ThemedText>
-				</View>
-
-				<View style={styles.divider} />
-
-				<View style={styles.infoRow}>
-					<ThemedIcon
-						name={staffUser.isActive ? "check-circle-outline" : "close-circle-outline"}
-						size={20}
-					/>
-					<ThemedText style={styles.infoText}>{staffUser.isActive ? "Active" : "Inactive"}</ThemedText>
-				</View>
-			</View>
-
-			<View style={{ alignItems: "center" }}>
-				<QRCode
-					value={staffUser.uid}
-					size={moderateScale(200)}
+			<QRScannerView
+				visible={scannerModalVisible}
+				onClose={() => setScannerModalVisible(false)}
+			/>
+			<ScrollView
+				style={{ flex: 1 }}
+				contentContainerStyle={styles.container}
+				showsVerticalScrollIndicator={false}
+				stickyHeaderIndices={[0]}
+			>
+				<CustomHeader
+					title={t("dashboard")}
+					rightComponent={<SettingsButton />}
+					showBackButton={false}
 				/>
-			</View>
-		</ScrollView>
+
+				<View style={styles.profileSection}>
+					<View style={styles.avatar}>
+						<ThemedIcon
+							name="account"
+							size={45}
+						/>
+					</View>
+					<View style={{ flex: 1 }}>
+						<ThemedText style={styles.name}>
+							{staffUser.firstName} {staffUser.lastName}
+						</ThemedText>
+						<View style={styles.roleBadge}>
+							<ThemedText style={styles.roleText}>{staffUser.role}</ThemedText>
+						</View>
+					</View>
+				</View>
+
+				<View style={styles.infoCard}>
+					<View style={styles.infoRow}>
+						<ThemedIcon
+							name="email-outline"
+							size={20}
+						/>
+						<ThemedText style={styles.infoText}>{staffUser.email}</ThemedText>
+					</View>
+
+					<View style={styles.divider} />
+
+					<View style={styles.infoRow}>
+						<ThemedIcon
+							name="badge-account-outline"
+							size={20}
+						/>
+						<ThemedText style={styles.infoText}>
+							{staffUser.firstName} {staffUser.lastName}
+						</ThemedText>
+					</View>
+
+					<View style={styles.divider} />
+
+					<View style={styles.infoRow}>
+						<ThemedIcon
+							name="shield-account-outline"
+							size={20}
+						/>
+						<ThemedText style={styles.infoText}>{staffUser.role}</ThemedText>
+					</View>
+
+					<View style={styles.divider} />
+
+					<View style={styles.infoRow}>
+						<ThemedIcon
+							name={staffUser.isActive ? "check-circle-outline" : "close-circle-outline"}
+							size={20}
+							color={staffUser.isActive ? theme.green.foreground : theme.red.foreground}
+						/>
+						<ThemedText
+							style={[
+								styles.infoText,
+								{
+									color: staffUser.isActive ? theme.green.foreground : theme.red.foreground,
+								},
+							]}
+						>
+							{staffUser.isActive ? t("active") : t("inactive")}
+						</ThemedText>
+					</View>
+				</View>
+
+				<TouchableOpacity
+					style={styles.qrCard}
+					activeOpacity={0.7}
+					onPress={() => setQrModalVisible(true)}
+				>
+					<View style={styles.qrCardContent}>
+						<View style={styles.qrCardTextContainer}>
+							<ThemedText style={styles.qrCardTitle}>{t("membershipCard")}</ThemedText>
+						</View>
+						<QRCode
+							value={staffUser.uid}
+							size={moderateScale(70)}
+						/>
+					</View>
+				</TouchableOpacity>
+
+				<TouchableOpacity
+					style={styles.qrCard}
+					activeOpacity={0.7}
+					onPress={() => setScannerModalVisible(true)}
+				>
+					<View style={styles.qrCardContent}>
+						<View style={styles.qrCardTextContainer}>
+							<ThemedText style={styles.qrCardTitle}>{t("scanMembership")}</ThemedText>
+						</View>
+						<ThemedIcon
+							name="camera"
+							size={moderateScale(40)}
+						/>
+					</View>
+				</TouchableOpacity>
+			</ScrollView>
+		</>
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+	return StyleSheet.create({
 		container: {
 			flexGrow: 1,
-			paddingHorizontal: 24,
-			paddingTop: 40,
-			gap: 50,
-			paddingBottom: BOTTOM_TAB_HEIGHT
+			gap: 25,
+			paddingBottom: BOTTOM_TAB_HEIGHT,
 		},
 		centered: {
 			flex: 1,
@@ -133,40 +224,47 @@ const createStyles = (darkMode: boolean) =>
 			justifyContent: "center",
 		},
 		profileSection: {
+			flexDirection: "row",
+			marginHorizontal: 20,
 			alignItems: "center",
+			justifyContent: "flex-start",
+			gap: 14,
 		},
 		avatar: {
-			width: 96,
-			height: 96,
+			width: moderateScale(85),
+			height: moderateScale(85),
 			borderRadius: 48,
 			alignItems: "center",
 			justifyContent: "center",
-			marginBottom: 16,
 			borderWidth: 2,
-			borderColor: "#888",
+			borderColor: theme.border,
 		},
 		name: {
-			fontSize: 28,
+			fontSize: 24,
 			fontWeight: "700",
 			marginBottom: 8,
-			textAlign: "center",
 		},
 		roleBadge: {
 			paddingHorizontal: 16,
 			paddingVertical: 4,
 			borderRadius: 12,
+			alignSelf: "flex-start",
+			backgroundColor: darkMode ? "#fff" : "#000",
 		},
 		roleText: {
 			fontSize: 13,
-			fontWeight: "600",
+			fontWeight: "bold",
 			letterSpacing: 0.5,
 			textTransform: "uppercase",
+			color: darkMode ? "#000" : "#fff",
 		},
 		infoCard: {
 			borderRadius: 16,
 			padding: 20,
 			borderWidth: 1,
-			borderColor: "#444",
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+			marginHorizontal: 20,
 		},
 		infoRow: {
 			flexDirection: "row",
@@ -180,6 +278,34 @@ const createStyles = (darkMode: boolean) =>
 		},
 		divider: {
 			height: 1,
-			backgroundColor: "#333",
+			backgroundColor: theme.border,
+		},
+		qrCard: {
+			borderRadius: 16,
+			padding: 20,
+			borderWidth: 1,
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+			marginHorizontal: 20,
+		},
+		qrCardContent: {
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+		},
+		qrCardTextContainer: {
+			flex: 1,
+			marginRight: 16,
+		},
+		qrCardTitle: {
+			fontSize: 18,
+			fontWeight: "700",
+		},
+		modalOverlay: {
+			flex: 1,
+			backgroundColor: theme.background,
+			alignItems: "center",
+			justifyContent: "center",
 		},
 	})
+}

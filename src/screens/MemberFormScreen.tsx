@@ -9,6 +9,7 @@ import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/dat
 import BottomSheet from "@gorhom/bottom-sheet"
 
 import ThemedText from "../components/ui/ThemedText"
+import ThemedIcon from "../components/ui/ThemedIcon"
 import CustomHeader from "../components/CustomHeader"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
@@ -159,7 +160,13 @@ export default function MemberFormScreen() {
 										rules={{ required: true }}
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("firstName")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("firstName")}</ThemedText>
+													<ThemedIcon
+														name="account-outline"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -177,7 +184,13 @@ export default function MemberFormScreen() {
 										rules={{ required: true }}
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("lastName")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("lastName")}</ThemedText>
+													<ThemedIcon
+														name="account-outline"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -195,7 +208,13 @@ export default function MemberFormScreen() {
 										rules={{ required: true }}
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+													<ThemedIcon
+														name="phone"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -214,7 +233,13 @@ export default function MemberFormScreen() {
 										rules={{ required: true }}
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("email")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("email")}</ThemedText>
+													<ThemedIcon
+														name="mail"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -239,7 +264,13 @@ export default function MemberFormScreen() {
 											}
 											return (
 												<View style={styles.field}>
-													<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+													<View style={styles.labelRow}>
+														<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+														<ThemedIcon
+															name="gender-male-female"
+															size={18}
+														/>
+													</View>
 													<TouchableOpacity
 														style={styles.selectButton}
 														onPress={() => genderSheetRef.current?.snapToIndex(0)}
@@ -264,7 +295,13 @@ export default function MemberFormScreen() {
 
 											return (
 												<View style={styles.field}>
-													<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+													<View style={styles.labelRow}>
+														<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+														<ThemedIcon
+															name="calendar"
+															size={18}
+														/>
+													</View>
 													<TouchableOpacity
 														style={styles.selectButton}
 														onPress={() => setShowDatePicker(true)}
@@ -298,7 +335,13 @@ export default function MemberFormScreen() {
 										name="bloodType"
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+													<ThemedIcon
+														name="water"
+														size={18}
+													/>
+												</View>
 												<TouchableOpacity
 													style={styles.selectButton}
 													onPress={() => bloodTypeSheetRef.current?.snapToIndex(0)}
@@ -317,7 +360,13 @@ export default function MemberFormScreen() {
 										name="lockerNumber"
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
+													<ThemedIcon
+														name="lock"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -336,7 +385,13 @@ export default function MemberFormScreen() {
 										name="emergencyName"
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("emergencyName")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("emergencyName")}</ThemedText>
+													<ThemedIcon
+														name="account-star-outline"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -353,7 +408,13 @@ export default function MemberFormScreen() {
 										name="emergencyPhone"
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
-												<ThemedText style={styles.label}>{t("emergencyPhone")}</ThemedText>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("emergencyPhone")}</ThemedText>
+													<ThemedIcon
+														name="phone-forward"
+														size={18}
+													/>
+												</View>
 												<TextInput
 													style={styles.input}
 													value={value}
@@ -498,10 +559,16 @@ const createStyles = (darkMode: boolean) =>
 		field: {
 			marginBottom: 16,
 		},
+		labelRow: {
+			flexDirection: "row",
+			justifyContent: "space-between",
+			alignItems: "center",
+			marginBottom: 6,
+			paddingHorizontal: 5,
+		},
 		label: {
 			fontSize: 14,
 			fontWeight: "600",
-			marginBottom: 6,
 		},
 		input: {
 			borderWidth: 1,

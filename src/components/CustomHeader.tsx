@@ -13,9 +13,10 @@ interface CustomHeaderProps {
 	onBackPress?: () => void
 	relative?: boolean
 	fontSize?: number
+	showBackButton?: boolean
 }
 
-export default function CustomHeader({ title, rightComponent, onBackPress, relative = true, fontSize }: CustomHeaderProps) {
+export default function CustomHeader({ title, rightComponent, onBackPress, relative = true, fontSize, showBackButton = true }: CustomHeaderProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const navigation = useNavigation()
 	const styles = createStyles(darkMode, relative)
@@ -32,16 +33,18 @@ export default function CustomHeader({ title, rightComponent, onBackPress, relat
 		<View style={styles.container}>
 			<View style={styles.content}>
 				{/* Left - Back Button */}
-				<TouchableOpacity
-					onPress={handleBackPress}
-					style={styles.backButton}
-				>
-					<ThemedIcon
-						name="arrow-left"
-						size={26}
-						style={{ marginTop: 2 }}
-					/>
-				</TouchableOpacity>
+				{showBackButton && (
+					<TouchableOpacity
+						onPress={handleBackPress}
+						style={styles.backButton}
+					>
+						<ThemedIcon
+							name="arrow-left"
+							size={26}
+							style={{ marginTop: 2 }}
+						/>
+					</TouchableOpacity>
+				)}
 
 				{/* Center - Title */}
 				{title ? (
@@ -73,7 +76,7 @@ const createStyles = (darkMode: boolean, relative?: boolean) =>
 			right: 0,
 			height: moderateScale(56),
 			zIndex: 1000,
-			backgroundColor: darkMode ? "#000" : "#f5f5f5",
+			backgroundColor: darkMode ? "#000" : "#fff",
 			borderBottomWidth: 1,
 			borderBottomColor: darkMode ? "#222222" : "#dddddd",
 		},

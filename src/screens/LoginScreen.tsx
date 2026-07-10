@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { View, Text, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
-import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 import { Image } from "expo-image"
 
@@ -32,7 +32,7 @@ export default function LoginScreen() {
 		setError("")
 		const result = await dispatch(loginAction({ email, password }))
 		if (loginAction.fulfilled.match(result)) {
-			navigation.navigate("Tabs")
+			navigation.dispatch(StackActions.replace("Tabs"))
 		} else {
 			setError(t("loginFailed"))
 		}

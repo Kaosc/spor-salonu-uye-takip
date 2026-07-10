@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { ScrollView, View, TouchableOpacity, StyleSheet } from "react-native"
+import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -13,6 +13,8 @@ import ThemedButton from "../components/ui/ThemedButton"
 
 import { getMemberById } from "../lib/firebase/firestore/member"
 import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
+import { Theme } from "../utils/theme"
+import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
 
 const db = getFirestore()
 
@@ -24,39 +26,55 @@ export default function MemberDetailsScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
+	const [memberStatus, setMemberStatus] = useState<"idle" | "loading" | "error">("idle")
+	const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "loading" | "error">("idle")
+
 	const [member, setMember] = useState<Member | null>(null)
-	const [activeSubscription, setActiveSubscription] = useState<Subscription | null>(null)
+	const [subscription, setsubscription] = useState<Subscription | null>(null)
+
+	useEffect(() => {
+		const backAction = () => {
+			goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+
+	const goBack = () => {
+		if (route.params?.prevScreen === "SearchScreen") {
+			navigation.goBack()
+			return
+		}
+		navigation.navigate("MemberStack", { screen: "MemberListScreen" })
+	}
 
 	const fetchMember = async () => {
-		setTimeout(() => setStatus("loading"), 1000)
+		if (!route.params?.memberId) return
+		const t = setTimeout(() => setMemberStatus("loading"), 1000)
 		const member = await getMemberById(route.params?.memberId)
+
+		clearTimeout(t)
 		setMember(member)
-		setStatus(member ? "idle" : "error")
+		setMemberStatus(member ? "idle" : "error")
+	}
+
+	const fetchSubscription = async () => {
+		if (!route.params?.memberId) return
+		let t = setTimeout(() => setSubscriptionStatus("loading"), 1000)
+		const subscription = await getSubscriptionsByMemberId(route.params?.memberId)
+
+		if (subscription.length > 0) {
+			setsubscription(subscription[0])
+		}
+
+		clearTimeout(t)
+		setSubscriptionStatus(subscription.length > 0 ? "idle" : "error")
 	}
 
 	useEffect(() => {
 		fetchMember()
-	}, [route.params?.memberId])
-
-	useEffect(() => {
-		const memberId = route.params?.memberId
-		if (!memberId) return
-
-		const subRef = collection(db, "subscriptions")
-		const q = query(subRef, where("memberUid", "==", memberId), where("status", "==", "ACTIVE"))
-
-		const unsubscribe = onSnapshot(q, (snapshot) => {
-			if (snapshot.empty) {
-				setActiveSubscription(null)
-			} else {
-				const doc = snapshot.docs[0]
-				const data = doc.data() as Subscription
-				setActiveSubscription({ ...data, id: doc.id })
-			}
-		})
-
-		return unsubscribe
+		fetchSubscription()
 	}, [route.params?.memberId])
 
 	const formatEndDate = (date: unknown) => {
@@ -67,35 +85,43 @@ export default function MemberDetailsScreen() {
 
 	const SubscriptionDetails = () => {
 		return (
-			<View style={[styles.card, activeSubscription ? styles.subscriptionCardActive : styles.subscriptionCardInactive]}>
+			<View style={[styles.card, subscription ? styles.subscriptionCardActive : styles.subscriptionCardInactive]}>
 				<ThemedText style={styles.sectionTitle}>{t("subscriptionStatus")}</ThemedText>
-				{activeSubscription ? (
+				{subscriptionStatus === "loading" ? (
 					<View>
-						<ThemedText style={styles.subscriptionPackage}>{t(activeSubscription.packageType)}</ThemedText>
-						<ThemedText style={styles.subscriptionDate}>
-							{t("endDate")}: {formatEndDate(activeSubscription.endDate)}
-						</ThemedText>
-						<ThemedText style={styles.subscriptionDate}>
-							{t("daysLeft")}: {calculateEndDateAsDays(activeSubscription.startDate, activeSubscription.packageType)}
-						</ThemedText>
+						<ThemedActivityIndicator size={50} />
 					</View>
 				) : (
-					<ThemedText style={styles.noSubscriptionText}>
-						{t("activeSubscription")}: {t("none")}
-					</ThemedText>
-				)}
+					<>
+						{subscription ? (
+							<View>
+								<ThemedText style={styles.subscriptionPackage}>{t(subscription.packageType)}</ThemedText>
+								<ThemedText style={styles.subscriptionDate}>
+									{t("endDate")}: {formatEndDate(subscription.endDate)}
+								</ThemedText>
+								<ThemedText style={styles.subscriptionDate}>
+									{t("daysLeft")}: {calculateEndDateAsDays(subscription.startDate, subscription.packageType)}
+								</ThemedText>
+							</View>
+						) : (
+							<ThemedText style={styles.noSubscriptionText}>
+								{t("subscription")}: {t("none")}
+							</ThemedText>
+						)}
 
-				<ThemedButton
-					style={styles.sellPackageButton}
-					onPress={() =>
-						navigation.navigate("SubscriptionFormScreen", {
-							memberId: route.params?.memberId,
-							activeSubscriptionId: activeSubscription?.id || false,
-						})
-					}
-				>
-					<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
-				</ThemedButton>
+						<ThemedButton
+							style={styles.sellPackageButton}
+							onPress={() =>
+								navigation.navigate("SubscriptionFormScreen", {
+									memberId: route.params?.memberId,
+									subscriptionId: subscription?.id || false,
+								})
+							}
+						>
+							<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
+						</ThemedButton>
+					</>
+				)}
 			</View>
 		)
 	}
@@ -128,7 +154,6 @@ export default function MemberDetailsScreen() {
 						<ThemedIcon
 							name="phone"
 							size={18}
-							color={darkMode ? "#aaa" : "#666"}
 						/>
 						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
 					</View>
@@ -140,7 +165,6 @@ export default function MemberDetailsScreen() {
 						<ThemedIcon
 							name="mail"
 							size={18}
-							color={darkMode ? "#aaa" : "#666"}
 						/>
 						<ThemedText style={styles.label}>{t("email")}</ThemedText>
 					</View>
@@ -148,19 +172,37 @@ export default function MemberDetailsScreen() {
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="gender-male-female"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("gender")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.gender || "-"}</ThemedText>
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="calendar"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("birthDate")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>
 						{new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
 					</ThemedText>
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="water"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("bloodType")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.bloodType || "-"}</ThemedText>
 				</View>
 
@@ -169,7 +211,6 @@ export default function MemberDetailsScreen() {
 						<ThemedIcon
 							name="lock"
 							size={18}
-							color={darkMode ? "#aaa" : "#666"}
 						/>
 						<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
 					</View>
@@ -177,32 +218,69 @@ export default function MemberDetailsScreen() {
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="check-circle-outline"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("isActive")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.isActive ? t("yes") : t("no")}</ThemedText>
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="clock-outline"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("createdAt")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.createdAt)}</ThemedText>
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="calendar-sync"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("updatedAt")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{safeTimestampToDateTimeString(member.updatedAt)}</ThemedText>
 				</View>
 
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="account-plus-outline"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("createdBy")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.createdBy || "-"}</ThemedText>
 				</View>
 
 				<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("name")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="account-star-outline"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("name")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.emergencyContact?.name || "-"}</ThemedText>
 				</View>
 				<View style={styles.row}>
-					<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+					<View style={styles.rowLabel}>
+						<ThemedIcon
+							name="phone-forward"
+							size={18}
+						/>
+						<ThemedText style={styles.label}>{t("phone")}</ThemedText>
+					</View>
 					<ThemedText style={styles.value}>{member.emergencyContact?.phone || "-"}</ThemedText>
 				</View>
 			</View>
@@ -211,17 +289,20 @@ export default function MemberDetailsScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={t("memberDetails")} />
+			<CustomHeader
+				title={t("memberDetails")}
+				onBackPress={goBack}
+			/>
 			<ScrollView
 				style={{ flex: 1 }}
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}
 			>
 				{!member ? (
-					status === "loading" ? (
+					memberStatus === "loading" ? (
 						<ThemedActivityIndicator size={70} />
 					) : (
-						status === "error" && (
+						memberStatus === "error" && (
 							<View style={{ flex: 1, justifyContent: "center", alignItems: "center", gap: 5 }}>
 								<ThemedIcon
 									name="account-alert-outline"
@@ -233,7 +314,7 @@ export default function MemberDetailsScreen() {
 						)
 					)
 				) : (
-					<View style={{ gap: 30 }}>
+					<View style={{ gap: 10 }}>
 						<SubscriptionDetails />
 						<MemberDetails member={member} />
 					</View>
@@ -243,33 +324,31 @@ export default function MemberDetailsScreen() {
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: darkMode ? "#000" : "#f5f5f5",
 		},
 		scrollContent: {
-			padding: 20,
+			padding: 10,
 			flexGrow: 1,
 			justifyContent: "center",
-			paddingBottom: 40,
+			paddingBottom: 10,
 		},
 		card: {
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
 			borderRadius: 12,
 			padding: 20,
-			shadowColor: "#000",
-			shadowOffset: { width: 0, height: 2 },
-			shadowOpacity: 0.1,
-			shadowRadius: 4,
-			elevation: 3,
 		},
 		subscriptionCardActive: {
-			backgroundColor: darkMode ? "#1a3a1a" : "#e8f5e9",
+			backgroundColor: theme.green.background,
 		},
 		subscriptionCardInactive: {
-			backgroundColor: darkMode ? "#3a1a1a" : "#ffebee",
+			backgroundColor: theme.red.background,
 		},
 		title: {
 			fontSize: 22,
@@ -278,17 +357,17 @@ const createStyles = (darkMode: boolean) =>
 			textAlign: "center",
 		},
 		sectionTitle: {
-			fontSize: 16,
+			fontSize: 17,
 			fontWeight: "700",
-			marginTop: 16,
+			marginTop: 20,
 			marginBottom: 8,
 		},
 		row: {
 			flexDirection: "row",
 			justifyContent: "space-between",
 			paddingVertical: 12,
-			borderBottomWidth: 1,
-			borderBottomColor: darkMode ? "#333" : "#eee",
+			borderBottomWidth: StyleSheet.hairlineWidth,
+			borderBottomColor: theme.border,
 		},
 		rowLabel: {
 			flexDirection: "row",
@@ -296,9 +375,9 @@ const createStyles = (darkMode: boolean) =>
 			gap: 8,
 		},
 		label: {
-			fontSize: 15,
-			color: darkMode ? "#aaa" : "#666",
-			fontWeight: "500",
+			fontSize: 14,
+			opacity: 0.8,
+			fontWeight: "bold",
 		},
 		value: {
 			fontSize: 15,
@@ -317,12 +396,12 @@ const createStyles = (darkMode: boolean) =>
 		},
 		subscriptionDate: {
 			fontSize: 14,
-			color: darkMode ? "#aaa" : "#666",
+			opacity: 0.8,
 		},
 		noSubscriptionText: {
 			fontSize: 15,
 			fontWeight: "600",
-			color: darkMode ? "#ff6b6b" : "#c62828",
+			color: theme.red.foreground,
 		},
 		sellPackageButton: {
 			paddingVertical: 14,
@@ -335,3 +414,4 @@ const createStyles = (darkMode: boolean) =>
 			fontWeight: "bold",
 		},
 	})
+}

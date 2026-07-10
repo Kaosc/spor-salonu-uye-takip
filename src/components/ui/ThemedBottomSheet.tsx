@@ -1,12 +1,13 @@
-import { forwardRef, useMemo } from "react"
-import { TouchableOpacity, ScrollView, StyleSheet } from "react-native"
-import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet"
+import { useCallback, useEffect, useMemo, useState } from "react"
+import { TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native"
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useSelector } from "react-redux"
 
 import ThemedText from "./ThemedText"
 import ThemedIcon from "./ThemedIcon"
 
 import { AllIconNames } from "../../types/icon"
+import { Theme } from "../../utils/theme"
 
 interface BottomSheetListItem {
 	text: string
@@ -17,13 +18,41 @@ interface BottomSheetListItem {
 interface ThemedBottomSheetProps {
 	items: BottomSheetListItem[]
 	snapPoints?: string[]
+	ref?: React.RefObject<BottomSheet | null>
 }
 
-const ThemedBottomSheet = forwardRef<BottomSheet, ThemedBottomSheetProps>(({ items, snapPoints }, ref) => {
+export default function ThemedBottomSheet({ items, snapPoints, ref }: ThemedBottomSheetProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 
+	const [isOpen, setIsOpen] = useState(false)
 	const points = useMemo(() => snapPoints || ["50%"], [snapPoints])
+
+	useEffect(() => {
+		const backAction = () => {
+			if (isOpen) {
+				ref?.current?.close()
+				return true
+			}
+			return false
+		}
+
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+
+		return () => backHandler.remove()
+	}, [isOpen])
+
+	const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => {
+		return (
+			<BottomSheetBackdrop
+				{...props}
+				appearsOnIndex={0}
+				disappearsOnIndex={-1}
+				opacity={0.5}
+				pressBehavior={"close"}
+			/>
+		)
+	}, [])
 
 	return (
 		<BottomSheet
@@ -31,8 +60,10 @@ const ThemedBottomSheet = forwardRef<BottomSheet, ThemedBottomSheetProps>(({ ite
 			snapPoints={points}
 			enablePanDownToClose
 			index={-1}
+			onChange={(index) => setIsOpen(index !== -1)}
 			backgroundStyle={styles.sheet}
 			handleIndicatorStyle={styles.indicator}
+			backdropComponent={renderBackdrop}
 		>
 			<BottomSheetView style={styles.content}>
 				<ScrollView
@@ -42,7 +73,7 @@ const ThemedBottomSheet = forwardRef<BottomSheet, ThemedBottomSheetProps>(({ ite
 					{items.map((item, index) => (
 						<TouchableOpacity
 							key={index}
-							style={styles.item}
+							style={[styles.item, index === items.length - 1 && { borderBottomWidth: 0 }]}
 							onPress={item.onPress}
 							activeOpacity={0.6}
 						>
@@ -60,19 +91,17 @@ const ThemedBottomSheet = forwardRef<BottomSheet, ThemedBottomSheetProps>(({ ite
 			</BottomSheetView>
 		</BottomSheet>
 	)
-})
+}
 
-ThemedBottomSheet.displayName = "ThemedBottomSheet"
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
 
-export default ThemedBottomSheet
-
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+	return StyleSheet.create({
 		sheet: {
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground,
 		},
 		indicator: {
-			backgroundColor: darkMode ? "#555" : "#ccc",
+			backgroundColor: theme.text,
 		},
 		content: {
 			flex: 1,
@@ -86,12 +115,21 @@ const createStyles = (darkMode: boolean) =>
 			alignItems: "center",
 			paddingVertical: 14,
 			borderBottomWidth: StyleSheet.hairlineWidth,
-			borderBottomColor: darkMode ? "#333" : "#e0e0e0",
+			borderBottomColor: darkMode ? "#757575" : "#bdbdbd",
 		},
 		icon: {
 			marginRight: 14,
 		},
 		itemText: {
-			fontSize: 16,
+			fontSize: 17,
+			fontWeight: "bold",
+		},
+		backdrop: {
+			position: "absolute",
+			top: 0,
+			left: 0,
+			right: 0,
+			bottom: 0,
 		},
 	})
+}

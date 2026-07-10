@@ -92,5 +92,9 @@
 	"yes": "Yes",
 	"no": "No",
 	"notes": "Notes",
-	"subscriptionCancelError": "An error occurred while canceling the subscription. Please try again later."
+	"subscriptionCancelError": "An error occurred while canceling the subscription. Please try again later.",
+	"inactive": "Inactive",
+	"membershipCard": "Membership Card",
+	"scanMembership": "Scan Membership",
+	"subscription": "Subscription"
 }

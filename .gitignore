@@ -39,3 +39,4 @@ yarn-error.*
 # Google Services (Firebase, etc.)
 google-services.json
 .logininfo.txt
+.env

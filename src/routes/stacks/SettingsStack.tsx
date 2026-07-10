@@ -1,11 +1,19 @@
-import { View } from "react-native"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-import ThemedText from "../../components/ui/ThemedText"
+import SettingsScreen from "../../screens/SettingsScreen"
+
+const stack = createNativeStackNavigator()
 
 export default function SettingsStack() {
 	return (
-		<View>
-			<ThemedText>SettingsStack</ThemedText>
-		</View>
+		<stack.Navigator initialRouteName="SettingsScreen">
+			<stack.Screen
+				name="SettingsScreen"
+				component={SettingsScreen}
+				options={{
+					headerShown: false,
+				}}
+			/>
+		</stack.Navigator>
 	)
 }
