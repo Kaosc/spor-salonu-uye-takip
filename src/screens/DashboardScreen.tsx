@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react"
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, ScrollView } from "react-native"
 import { useSelector } from "react-redux"
+import QRCode from "react-native-qrcode-svg"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { getStaffUserById } from "../lib/firebase/firestore/users"
+import { moderateScale } from "../utils/responsive"
+import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 
 export default function DashboardScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -44,7 +47,10 @@ export default function DashboardScreen() {
 	}
 
 	return (
-		<View style={styles.container}>
+		<ScrollView
+			style={{ flex: 1 }}
+			contentContainerStyle={styles.container}
+		>
 			<View style={styles.profileSection}>
 				<View style={styles.avatar}>
 					<ThemedIcon
@@ -101,16 +107,25 @@ export default function DashboardScreen() {
 					<ThemedText style={styles.infoText}>{staffUser.isActive ? "Active" : "Inactive"}</ThemedText>
 				</View>
 			</View>
-		</View>
+
+			<View style={{ alignItems: "center" }}>
+				<QRCode
+					value={staffUser.uid}
+					size={moderateScale(200)}
+				/>
+			</View>
+		</ScrollView>
 	)
 }
 
 const createStyles = (darkMode: boolean) =>
 	StyleSheet.create({
 		container: {
-			flex: 1,
+			flexGrow: 1,
 			paddingHorizontal: 24,
 			paddingTop: 40,
+			gap: 50,
+			paddingBottom: BOTTOM_TAB_HEIGHT
 		},
 		centered: {
 			flex: 1,
@@ -119,7 +134,6 @@ const createStyles = (darkMode: boolean) =>
 		},
 		profileSection: {
 			alignItems: "center",
-			marginBottom: 40,
 		},
 		avatar: {
 			width: 96,

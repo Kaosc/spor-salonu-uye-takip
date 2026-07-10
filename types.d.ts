@@ -98,10 +98,12 @@ interface Member {
 	createdBy?: string
 }
 
+type PackageType = "MONTHLY" | "QUARTERLY" | "YEARLY"
+
 interface Subscription {
 	id: string
 	memberUid: string // Firebase Auth UID (Cames from Auth when the member registers)
-	packageType: string // e.g. "Monthly", "Quarterly", "Yearly" will be added later
+	packageType: PackageType
 	startDate: Date
 	endDate: Date
 	price: number
@@ -109,5 +111,7 @@ interface Subscription {
 	status: SubscriptionStatus
 	createdAt: Date
 	createdBy: string
+	updatedAt?: Date
+	updatedBy?: string
 	notes?: string
 }

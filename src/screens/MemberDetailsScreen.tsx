@@ -27,7 +27,6 @@ export default function MemberDetailsScreen() {
 		const fetchMember = async () => {
 			setTimeout(() => setStatus("loading"), 1000)
 			const member = await getMemberById(route.params?.memberId)
-			console.log(JSON.stringify(member, null, 2))
 			setMember(member)
 			setStatus(member ? "idle" : "error")
 		}
