@@ -109,9 +109,9 @@ interface Subscription {
 	price: number
 	paymentMethod: PaymentMethod
 	status: SubscriptionStatus
-	createdAt: Date
 	createdBy: string
-	updatedAt?: Date
 	updatedBy?: string
+	createdAt: Date | import("@react-native-firebase/firestore").FieldValue
+	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	notes?: string
 }
