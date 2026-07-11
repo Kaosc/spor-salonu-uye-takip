@@ -12,7 +12,7 @@ import {
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useSelector } from "react-redux"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useMemo } from "react"
 import { useTranslation } from "react-i18next"
 
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker"
@@ -25,7 +25,7 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 
-import { addMember, getMemberById, updateMember } from "../lib/firebase/firestore/member"
+import { addMember, getAllMembers, getMemberById, updateMember } from "../lib/firebase/firestore/member"
 import { safeTimestampToDateString } from "../utils/date"
 import { Theme } from "../utils/theme"
 
@@ -46,8 +46,16 @@ export default function MemberFormScreen() {
 
 	const genderSheetRef = useRef<BottomSheet>(null)
 	const bloodTypeSheetRef = useRef<BottomSheet>(null)
+	const lockerSheetRef = useRef<BottomSheet>(null)
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
+	const [members, setMembers] = useState<Member[]>([])
+
+	useEffect(() => {
+		getAllMembers()
+			.then(setMembers)
+			.catch((e) => console.error("[MemberFormScreen] fetch members:", e))
+	}, [])
 
 	useEffect(() => {
 		const backAction = () => {
@@ -68,7 +76,7 @@ export default function MemberFormScreen() {
 		navigation.goBack()
 	}
 
-	const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
+	const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>({
 		defaultValues: {
 			firstName: "",
 			lastName: "",
@@ -82,6 +90,42 @@ export default function MemberFormScreen() {
 			emergencyPhone: "",
 		},
 	})
+
+	const currentLockerNumber = watch("lockerNumber")
+
+	const lockerSheetItems = useMemo(() => {
+		const occupiedNumbers: number[] = []
+		members.forEach((m) => {
+			if (m.lockerNumber && m.lockerNumber !== currentLockerNumber) {
+				const n = parseInt(m.lockerNumber, 10)
+				if (!isNaN(n)) occupiedNumbers.push(n)
+			}
+		})
+
+		const items: { text: string; onPress: () => void }[] = [
+			{
+				text: t("cancel"),
+				onPress: () => {
+					setValue("lockerNumber", "")
+					lockerSheetRef.current?.close()
+				},
+			},
+		]
+
+		for (let i = 1; i <= 100; i++) {
+			if (!occupiedNumbers.includes(i)) {
+				const num = i
+				items.push({
+					text: `Locker ${num}`,
+					onPress: () => {
+						setValue("lockerNumber", num.toString())
+						lockerSheetRef.current?.close()
+					},
+				})
+			}
+		}
+		return items
+	}, [members, currentLockerNumber, t, setValue])
 
 	// If there is a memberId, set loading state to true and fetch the member
 	useEffect(() => {
@@ -390,7 +434,7 @@ export default function MemberFormScreen() {
 									<Controller
 										control={control}
 										name="lockerNumber"
-										render={({ field: { onChange, value } }) => (
+										render={({ field: { value } }) => (
 											<View style={styles.field}>
 												<View style={styles.labelRow}>
 													<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
@@ -399,14 +443,15 @@ export default function MemberFormScreen() {
 														size={18}
 													/>
 												</View>
-												<TextInput
-													editable={!route.params?.prefilledLockerNumber}
-													style={[styles.input, route.params?.prefilledLockerNumber && styles.inputDisabled]}
-													value={value}
-													onChangeText={onChange}
-													placeholder={t("lockerNumberPlaceholder")}
-													placeholderTextColor={darkMode ? "#666" : "#999"}
-												/>
+												<TouchableOpacity
+													style={[styles.selectButton, route.params?.prefilledLockerNumber && styles.inputDisabled]}
+													onPress={() => lockerSheetRef.current?.snapToIndex(0)}
+													activeOpacity={0.6}
+												>
+													<ThemedText style={[styles.selectButtonText, !value ? styles.placeholder : null]}>
+														{value || t("selectLocker")}
+													</ThemedText>
+												</TouchableOpacity>
 											</View>
 										)}
 									/>
@@ -476,6 +521,7 @@ export default function MemberFormScreen() {
 							items={[
 								{
 									text: t("male"),
+									icon: "gender-male",
 									onPress: () => {
 										setValue("gender", "MALE")
 										genderSheetRef.current?.close()
@@ -483,6 +529,7 @@ export default function MemberFormScreen() {
 								},
 								{
 									text: t("female"),
+									icon: "gender-female",
 									onPress: () => {
 										setValue("gender", "FEMALE")
 										genderSheetRef.current?.close()
@@ -490,6 +537,7 @@ export default function MemberFormScreen() {
 								},
 								{
 									text: t("unspecified"),
+									icon: "gender-male-female-variant",
 									onPress: () => {
 										setValue("gender", "UNSPECIFIED")
 										genderSheetRef.current?.close()
@@ -501,6 +549,7 @@ export default function MemberFormScreen() {
 						<ThemedBottomSheet
 							ref={bloodTypeSheetRef}
 							snapPoints={["40%"]}
+							icon="water"
 							items={[
 								{
 									text: "A Rh+",
@@ -560,6 +609,13 @@ export default function MemberFormScreen() {
 								},
 							]}
 						/>
+
+						<ThemedBottomSheet
+							ref={lockerSheetRef}
+							snapPoints={["50%"]}
+							items={lockerSheetItems}
+							icon="locker"
+						/>
 					</>
 				)}
 			</View>
@@ -613,7 +669,7 @@ const createStyles = (darkMode: boolean) => {
 			paddingVertical: 10,
 			fontSize: 16,
 			color: darkMode ? "#fff" : "#000",
-			backgroundColor: theme.cardBackground
+			backgroundColor: theme.cardBackground,
 		},
 		inputDisabled: {
 			backgroundColor: theme.green.background,
@@ -626,13 +682,13 @@ const createStyles = (darkMode: boolean) => {
 			borderRadius: 8,
 			paddingHorizontal: 12,
 			paddingVertical: 10,
-			backgroundColor: theme.cardBackground
+			backgroundColor: theme.cardBackground,
 		},
 		selectButtonText: {
 			fontSize: 16,
 		},
 		placeholder: {
-			opacity: 0.5
+			opacity: 0.5,
 		},
 		button: {
 			borderRadius: 8,

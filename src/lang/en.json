@@ -120,5 +120,6 @@
 	"noActiveSubscription": "No Active Subscription",
 	"sellPackagePrompt": "Sell a package to get started",
 	"runtimeVersion": "Runtime Version",
-	"lockers": "Dolaplar"
+	"lockers": "Lockers",
+	"selectLocker": "Select Locker"
 }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native"
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from "@gorhom/bottom-sheet"
+import { TouchableOpacity, StyleSheet, BackHandler } from "react-native"
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetScrollView } from "@gorhom/bottom-sheet"
 import { useSelector } from "react-redux"
 
 import ThemedText from "./ThemedText"
@@ -19,9 +19,10 @@ interface ThemedBottomSheetProps {
 	items: BottomSheetListItem[]
 	snapPoints?: string[]
 	ref?: React.RefObject<BottomSheet | null>
+	icon?: AllIconNames
 }
 
-export default function ThemedBottomSheet({ items, snapPoints, ref }: ThemedBottomSheetProps) {
+export default function ThemedBottomSheet({ items, icon, snapPoints, ref }: ThemedBottomSheetProps) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 
@@ -65,30 +66,26 @@ export default function ThemedBottomSheet({ items, snapPoints, ref }: ThemedBott
 			handleIndicatorStyle={styles.indicator}
 			backdropComponent={renderBackdrop}
 		>
-			<BottomSheetView style={styles.content}>
-				<ScrollView
-					contentContainerStyle={styles.scrollContent}
-					keyboardShouldPersistTaps="handled"
-				>
-					{items.map((item, index) => (
-						<TouchableOpacity
-							key={index}
-							style={[styles.item, index === items.length - 1 && { borderBottomWidth: 0 }]}
-							onPress={item.onPress}
-							activeOpacity={0.6}
-						>
-							{item.icon && (
-								<ThemedIcon
-									name={item.icon}
-									size={22}
-									style={styles.icon}
-								/>
-							)}
-							<ThemedText style={styles.itemText}>{item.text}</ThemedText>
-						</TouchableOpacity>
-					))}
-				</ScrollView>
-			</BottomSheetView>
+			<BottomSheetScrollView
+				style={styles.scrollView}
+				contentContainerStyle={styles.scrollContent}
+			>
+				{items.map((item, index) => (
+					<TouchableOpacity
+						key={index}
+						style={[styles.item, index === items.length - 1 && { borderBottomWidth: 0 }]}
+						onPress={item.onPress}
+						activeOpacity={0.6}
+					>
+						<ThemedIcon
+							name={item.icon || icon || "chevron-right"}
+							size={22}
+							style={styles.icon}
+						/>
+						<ThemedText style={styles.itemText}>{item.text}</ThemedText>
+					</TouchableOpacity>
+				))}
+			</BottomSheetScrollView>
 		</BottomSheet>
 	)
 }
@@ -104,6 +101,9 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.text,
 		},
 		content: {
+			flex: 1,
+		},
+		scrollView: {
 			flex: 1,
 		},
 		scrollContent: {
