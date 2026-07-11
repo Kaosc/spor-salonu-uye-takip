@@ -35,6 +35,7 @@
 	"name": "Name",
 	"phone": "Phone",
 	"memberDetails": "Member Details",
+	"subscriptionInfo": "Subscription Info",
 	"newMember": "New Member",
 	"firstName": "First Name",
 	"lastName": "Last Name",
@@ -115,5 +116,8 @@
 	"activateMember": "Üyeyi Etkin Hale Getir",
 	"activateMemberConfirmation": "Bu üyeyi etkin hale getirmek istediğinizden emin misiniz?",
 	"activate": "Etkin Hale Getir",
-	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription."
+	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription.",
+	"noActiveSubscription": "No Active Subscription",
+	"sellPackagePrompt": "Sell a package to get started",
+	"runtimeVersion": "Runtime Version"
 }

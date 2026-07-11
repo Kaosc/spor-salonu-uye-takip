@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from "react"
+import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation } from "@react-navigation/native"
@@ -6,8 +6,8 @@ import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
 import Fuse from "fuse.js"
 
-import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
+import MemberListCard from "../components/MemberListCard"
 
 import { Theme } from "../utils/theme"
 
@@ -49,19 +49,11 @@ export default function SearchScreen() {
 		return fuse.search(debouncedQuery).map((r) => r.item)
 	}, [debouncedQuery, fuse])
 
-	const renderItem = ({ item }: { item: Member }) => (
-		<TouchableOpacity
-			style={styles.item}
-			onPress={() => {
-				navigation.navigate("MemberDetailsScreen", { memberId: item.uid, prevScreen: "SearchScreen" })
-			}}
-		>
-			<ThemedText style={styles.itemName}>
-				{item.firstName} {item.lastName}
-			</ThemedText>
-			<ThemedText style={styles.itemPhone}>{item.phoneNumber}</ThemedText>
-		</TouchableOpacity>
-	)
+	const renderItem = useCallback(({ item }: { item: Member }) => {
+		return <MemberListCard member={item} />
+	}, [])
+
+	const keyExtractor = useCallback((item: Member) => item.uid, [])
 
 	return (
 		<View style={styles.container}>
@@ -89,7 +81,7 @@ export default function SearchScreen() {
 			<FlashList
 				data={filtered}
 				renderItem={renderItem}
-				keyExtractor={(item: any, index: number) => item.uid ?? index.toString()}
+				keyExtractor={keyExtractor}
 				contentContainerStyle={styles.list}
 			/>
 		</View>
@@ -115,6 +107,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		list: {
 			paddingHorizontal: 16,
+			marginTop: 10,
 		},
 		item: {
 			paddingVertical: 14,

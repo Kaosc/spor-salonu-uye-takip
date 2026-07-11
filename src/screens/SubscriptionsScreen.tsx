@@ -257,7 +257,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 		summaryLabel: {
 			fontSize: 13,
 			color: darkMode ? "#aaa" : "#666",
-			textTransform: "uppercase",
 			fontWeight: "bold",
 			letterSpacing: 0.5,
 		},

@@ -8,6 +8,7 @@ import { useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
+import MemberListCard from "../components/MemberListCard"
 
 import { getAllMembers } from "../lib/firebase/firestore/member"
 import { Theme } from "../utils/theme"
@@ -41,34 +42,11 @@ export default function MemberListContent() {
 		}
 	}, [])
 
-	const renderItem = useCallback(
-		({ item }: { item: Member }) => {
-			const statusColor = item.isActive
-				? Theme[darkMode ? "dark" : "light"].green.foreground
-				: Theme[darkMode ? "dark" : "light"].red.foreground
+	const renderItem = useCallback(({ item }: { item: Member }) => {
+		return <MemberListCard member={item} />
+	}, [])
 
-			return (
-				<TouchableOpacity
-					style={styles.item}
-					onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: item.uid })}
-				>
-					<ThemedIcon
-						name={item.gender === "FEMALE" ? "female" : "male"}
-						size={37}
-						style={{ marginRight: 12, opacity: 0.9, borderRadius: 22.5 }}
-					/>
-					<View style={{ flex: 1 }}>
-						<ThemedText style={styles.itemName}>
-							{item.firstName} {item.lastName}
-						</ThemedText>
-						<ThemedText style={styles.itemPhone}>{item.email}</ThemedText>
-					</View>
-					<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-				</TouchableOpacity>
-			)
-		},
-		[navigation, styles],
-	)
+	const keyExtractor = useCallback((item: Member) => item.uid, [])
 
 	return (
 		<View style={styles.container}>
@@ -86,7 +64,7 @@ export default function MemberListContent() {
 			<FlashList
 				data={members}
 				renderItem={renderItem}
-				keyExtractor={(item: Member, index: number) => item.uid ?? index.toString()}
+				keyExtractor={keyExtractor}
 				contentContainerStyle={styles.list}
 				onRefresh={fetchMembers}
 			/>
@@ -134,24 +112,6 @@ const createStyles = (darkMode: boolean) => {
 			paddingBottom: 80,
 			marginTop: 10,
 		},
-		item: {
-			flexDirection: "row",
-			alignItems: "center",
-			paddingVertical: 15,
-			backgroundColor: theme.cardBackground,
-			marginBottom: 10,
-			borderRadius: 12,
-			paddingHorizontal: 15,
-		},
-		itemName: {
-			fontSize: 16,
-			fontWeight: "600",
-		},
-		itemPhone: {
-			fontSize: 14,
-			marginTop: 2,
-			opacity: 0.7,
-		},
 		fab: {
 			position: "absolute",
 			bottom: 24,
@@ -162,11 +122,6 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: darkMode ? "#fff" : "#000",
 			alignItems: "center",
 			justifyContent: "center",
-		},
-		statusDot: {
-			width: 10,
-			height: 10,
-			borderRadius: 5,
 		},
 	})
 }

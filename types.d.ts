@@ -84,6 +84,7 @@ interface Member {
 	firstName: string
 	lastName: string
 	phoneNumber: string
+	address?: string
 	lockerNumber?: string
 	gender: Gender
 	birthDate?: Date

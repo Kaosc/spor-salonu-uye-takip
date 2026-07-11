@@ -1,6 +1,7 @@
 import { useForm, Controller } from "react-hook-form"
 import { View, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity } from "react-native"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useSelector } from "react-redux"
 import { useEffect, useState, useRef } from "react"
 import { useTranslation } from "react-i18next"
@@ -17,7 +18,6 @@ import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 
 import { addMember, getMemberById, updateMember } from "../lib/firebase/firestore/member"
 import { safeTimestampToDateString } from "../utils/date"
-import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -147,7 +147,7 @@ export default function MemberFormScreen() {
 					<>
 						<KeyboardAvoidingView
 							style={styles.flex}
-							behavior={Platform.OS === "ios" ? "padding" : undefined}
+							behavior={"padding"}
 						>
 							<ScrollView
 								contentContainerStyle={styles.scrollContent}

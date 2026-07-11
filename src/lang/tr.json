@@ -33,6 +33,7 @@
 	"name": "Ad Soyad",
 	"phone": "Telefon",
 	"memberDetails": "Üye Detayları",
+	"subscriptionInfo": "Abonelik Bilgisi",
 	"newMember": "Yeni Üye",
 	"firstName": "İsim",
 	"lastName": "Soyisim",
@@ -56,8 +57,8 @@
 	"male": "Erkek",
 	"female": "Kadın",
 	"unspecified": "Belirtilmemiş",
-	"memberUpdateSuccess": "Üye başarıyla güncellendi.",
-	"memberAddSuccess": "Üye başarıyla eklendi.",
+	"memberUpdateSuccess": "Üye başarıyla güncellendi",
+	"memberAddSuccess": "Üye başarıyla kaydedildi",
 	"memberList": "Üyeler",
 	"dashboard": "Ana Sayfa",
 	"profile": "Profil",
@@ -114,5 +115,8 @@
 	"activateMember": "Üyeyi Etkin Hale Getir",
 	"activateMemberConfirmation": "Bu üyeyi etkin hale getirmek istediğinizden emin misiniz?",
 	"activate": "Etkin Hale Getir",
-	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek için lütfen üyeyi aktif hale getirin."
+	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek için lütfen üyeyi aktif hale getirin.",
+	"noActiveSubscription": "Aktif Abonelik Yok",
+	"sellPackagePrompt": "Başlamak için bir paket satın alın",
+	"runtimeVersion": "Runtime Sürümü"
 }

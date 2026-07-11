@@ -29,7 +29,7 @@ export const NavigatorDark: ReactNavigation.Theme = {
 export const Theme = {
 	dark: {
 		background: "#000000",
-		cardBackground: "#111111",
+		cardBackground: __DEV__ ? "#111111" : "#0c0c0c",
 		text: "#ffffff",
 		border: "#333333",
 		green: {
@@ -43,7 +43,7 @@ export const Theme = {
 	},
 	light: {
 		background: "#ffffff",
-		cardBackground: "#f5f5f5",
+		cardBackground: "#f1f1f1",
 		text: "#000000",
 		border: "#c9c9c9",
 		green: {
