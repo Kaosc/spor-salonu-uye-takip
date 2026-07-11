@@ -11,15 +11,23 @@ export default function MemberListCard({ member }: { member: Member }) {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
+	const isScearchScreen = navigation.getState().routes.some((route: any) => route.name === "SearchScreen")
 
 	const statusColor = member.isActive
 		? Theme[darkMode ? "dark" : "light"].green.foreground
 		: Theme[darkMode ? "dark" : "light"].red.foreground
 
+	const handleNavigate = () => {
+		navigation.navigate("MemberDetailsScreen", {
+			memberId: member.uid,
+			prevScreen: isScearchScreen ? "SearchScreen" : undefined,
+		})
+	}
+
 	return (
 		<TouchableOpacity
 			style={styles.member}
-			onPress={() => navigation.navigate("MemberDetailsScreen", { memberId: member.uid })}
+			onPress={handleNavigate}
 		>
 			<ThemedIcon
 				name={member.gender === "FEMALE" ? "female" : "male"}

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
-import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TextInput, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
@@ -18,20 +18,33 @@ export default function SearchScreen() {
 	const styles = createStyles(darkMode)
 
 	const [members] = useMMKVObject<Member[]>("members")
-	const [query, setQuery] = useState("")
+	const [search, setSearch] = useState("")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
 	useEffect(() => {
+		const backAction = () => {
+			goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+
+	const goBack = () => {
+		navigation.navigate("Tabs", { screen: "MemberStack" })
+	}
+
+	useEffect(() => {
 		if (timerRef.current) clearTimeout(timerRef.current)
 
-		timerRef.current = setTimeout(() => setDebouncedQuery(query), 400)
+		timerRef.current = setTimeout(() => setDebouncedQuery(search), 400)
 
 		return () => {
 			if (timerRef.current) clearTimeout(timerRef.current)
 		}
-	}, [query])
+	}, [search])
 
 	const fuse = useMemo(() => {
 		if (members) {
@@ -59,7 +72,7 @@ export default function SearchScreen() {
 		<View style={styles.container}>
 			<View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginHorizontal: 10, marginTop: 12 }}>
 				<TouchableOpacity
-					onPress={() => navigation.goBack()}
+					onPress={goBack}
 					style={styles.backButtonContainer}
 				>
 					<ThemedIcon
@@ -72,8 +85,8 @@ export default function SearchScreen() {
 					style={styles.input}
 					placeholder="İsim veya telefon ile ara..."
 					placeholderTextColor={darkMode ? "#666" : "#999"}
-					value={query}
-					onChangeText={setQuery}
+					value={search}
+					onChangeText={setSearch}
 					autoFocus
 					autoCapitalize="none"
 				/>

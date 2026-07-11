@@ -8,6 +8,7 @@ import SettingsStack from "./stacks/SettingsStack"
 
 import SearchScreen from "../screens/SearchScreen"
 import ConsentScreen from "../screens/ConsentScreen"
+import MemberDetailsScreen from "../screens/MemberDetailsScreen"
 
 import { getConsentAccepted } from "../utils/storage"
 
@@ -28,6 +29,10 @@ export default function RootNavigator() {
 				component={TabsNavigator}
 			/>
 			<Stack.Screen
+				name="MemberDetailsScreen"
+				component={MemberDetailsScreen}
+			/>
+						<Stack.Screen
 				name="SearchScreen"
 				component={SearchScreen}
 			/>

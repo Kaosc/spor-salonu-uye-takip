@@ -6,9 +6,9 @@ const stack = createNativeStackNavigator()
 
 export default function SubscriptionStack() {
 	return (
-		<stack.Navigator initialRouteName="SettingsScreen">
+		<stack.Navigator initialRouteName="SubscriptionScreen">
 			<stack.Screen
-				name="SettingsScreen"
+				name="SubscriptionScreen"
 				component={SubscriptionsScreen}
 				options={{
 					headerShown: false,

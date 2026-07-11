@@ -15,6 +15,7 @@ import { activateMember, getMemberById, inactivateMember } from "../lib/firebase
 import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
 import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 import { Theme } from "../utils/theme"
+
 import { AllIconNames } from "../types/icon"
 
 export default function MemberDetailsScreen() {
@@ -45,11 +46,18 @@ export default function MemberDetailsScreen() {
 	}, [])
 
 	const goBack = () => {
-		if (route.params?.prevScreen === "SearchScreen") {
-			navigation.goBack()
+		const prevScreen = route.params?.prevScreen
+		if (prevScreen === "SearchScreen") {
+			navigation.navigate("SearchScreen")
 			return
 		}
-		navigation.navigate("MemberStack", { screen: "MemberListScreen" })
+
+		if (prevScreen === "SubscriptionsScreen") {
+			navigation.navigate("Tabs", { screen: "SubscriptionStack" })
+			return
+		}
+
+		navigation.navigate("Tabs", { screen: "MemberStack" })
 	}
 
 	const fetchMember = async () => {

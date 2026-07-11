@@ -112,9 +112,9 @@ export default function SubscriptionsScreen() {
 				style={styles.listItem}
 				activeOpacity={0.7}
 				onPress={() =>
-					navigation.navigate("MemberStack", {
-						screen: "MemberDetailsScreen",
-						params: { memberId: item.memberUid },
+					navigation.navigate("MemberDetailsScreen", {
+						memberId: item.memberUid,
+						prevScreen: "SubscriptionsScreen",
 					})
 				}
 			>
@@ -287,11 +287,11 @@ const createStyles = (darkMode: boolean, theme: any) => {
 		},
 		filterButtonText: {
 			fontSize: 13,
-			fontWeight: "500",
+			fontWeight: "bold",
 		},
 		filterButtonTextActive: {
 			color: darkMode ? "#000" : "#fff",
-			fontWeight: "600",
+			fontWeight: "bold",
 		},
 		// List
 		listContainer: {
@@ -341,8 +341,9 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			borderRadius: 8,
 		},
 		statusBadgeText: {
-			fontSize: 11,
-			fontWeight: "600",
+			fontSize: 12,
+			fontWeight: "bold",
+			letterSpacing: 0.5,
 		},
 		emptyState: {
 			flex: 1,

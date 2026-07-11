@@ -1,0 +1,17 @@
+# Staff Tab
+- when users registered by staff, allow staff to determine a temp password for user. So user can login with that password and change it later.??
+- Dynamic price selection and changing the price of a subscription is now possible.
+- LockersScreen to view lockers that which one is  pasive and which one is available.
+   - fetch available lockers from db and show in sheet before apply to a user on registiration.
+- new db: check-ins:
+   - qr code check-in for members. This will increase the check-in count of the member and also add a new/last check-in date to the db.
+- pausing subscriptions: staff can pause the user's current subscription with saving the date of pause. So when user wants to resume the subscription, the remaining days will be calculated by between  start date and pause date. so the end date of the subscription will be updated with the remaining days.
+   - Paused user will be shown with orange status color in subscription list
+   - Pausing and unpausing operations will be controlled from memberdetailsscreen's subscription view,
+
+
+!! Create new tab for members and separate it from staff tab.
+
+# User Tab
+   - start with registiration and login screen
+       - !! if user already registered by the staff it will have a auth saved to firebase so user either needs to reset its password or login with the email and password that staff has created for the user. 
