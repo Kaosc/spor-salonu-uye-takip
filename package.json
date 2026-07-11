@@ -1,9 +1,9 @@
 {
-  "name": "spor-salonu-uye-takip",
+  "name": "gymtrack",
   "version": "1.0.0",
   "main": "index.tsx",
   "scripts": {
-    "start": "expo start --dev-client",
+    "start": "expo start --dev-client --scheme gymtrack",
     "android": "npx expo run:android",
     "ios": "npx expo run:ios",
     "web": "npx expo start --web",

@@ -1,7 +1,8 @@
 {
   "expo": {
-    "name": "spor-salonu-uye-takip",
-    "slug": "spor-salonu-uye-takip",
+    "name": "Spor Salonu Üye Takip",
+    "slug": "gymtrack",
+    "scheme": "gymtrack",
     "version": "1.0.0",
     "runtimeVersion": "0.55.0",
     "platforms": [
@@ -23,7 +24,10 @@
       "@react-native-community/datetimepicker"
     ],
     "ios": {
-      "bundleIdentifier": "com.Kaosc.oneword"
+      "bundleIdentifier": "com.Kaosc.gymtrack"
+    },
+    "android": {
+      "package": "com.Kaosc.gymtrack"
     }
   }
 }
