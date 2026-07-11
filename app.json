@@ -21,6 +21,9 @@
       "expo-font",
       "expo-web-browser",
       "@react-native-community/datetimepicker"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.Kaosc.oneword"
+    }
   }
 }
