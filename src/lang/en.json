@@ -119,5 +119,6 @@
 	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription.",
 	"noActiveSubscription": "No Active Subscription",
 	"sellPackagePrompt": "Sell a package to get started",
-	"runtimeVersion": "Runtime Version"
+	"runtimeVersion": "Runtime Version",
+	"lockers": "Dolaplar"
 }

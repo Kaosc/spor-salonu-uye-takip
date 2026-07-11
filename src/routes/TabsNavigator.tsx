@@ -10,6 +10,7 @@ import SubscriptionStack from "./stacks/SubscriptionStack"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { moderateScale } from "../utils/responsive"
+import LockerScreen from "../screens/LockerScreen"
 
 const Tabs = createBottomTabNavigator()
 
@@ -72,7 +73,20 @@ export default function TabsNavigator() {
 					tabBarLabel: t("dashboard"),
 				}}
 			/>
-
+			<Tabs.Screen
+				name="LockerScreen"
+				component={LockerScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={"locker"}
+							size={31}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: t("lockers"),
+				}}
+			/>
 			<Tabs.Screen
 				name="SubscriptionStack"
 				component={SubscriptionStack}

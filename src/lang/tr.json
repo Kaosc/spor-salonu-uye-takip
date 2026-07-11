@@ -118,5 +118,6 @@
 	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek için lütfen üyeyi aktif hale getirin.",
 	"noActiveSubscription": "Aktif Abonelik Yok",
 	"sellPackagePrompt": "Başlamak için bir paket satın alın",
-	"runtimeVersion": "Runtime Sürümü"
+	"runtimeVersion": "Runtime Sürümü",
+	"lockers": "Dolaplar"
 }

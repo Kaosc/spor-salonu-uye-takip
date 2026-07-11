@@ -1,5 +1,14 @@
 import { useForm, Controller } from "react-hook-form"
-import { View, TextInput, ScrollView, KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity } from "react-native"
+import {
+	View,
+	TextInput,
+	ScrollView,
+	KeyboardAvoidingView,
+	Platform,
+	StyleSheet,
+	TouchableOpacity,
+	BackHandler,
+} from "react-native"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useSelector } from "react-redux"
@@ -18,6 +27,7 @@ import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
 
 import { addMember, getMemberById, updateMember } from "../lib/firebase/firestore/member"
 import { safeTimestampToDateString } from "../utils/date"
+import { Theme } from "../utils/theme"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
@@ -39,13 +49,32 @@ export default function MemberFormScreen() {
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
 
+	useEffect(() => {
+		const backAction = () => {
+			goBackNoForce()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+
+	const goBackNoForce = () => {
+		if (route?.params?.prevScreen === "LockerScreen") {
+			reset()
+			navigation.dispatch(StackActions.replace("Tabs", { screen: "LockerScreen" }))
+			return
+		}
+
+		navigation.goBack()
+	}
+
 	const { control, handleSubmit, reset, setValue } = useForm<FormValues>({
 		defaultValues: {
 			firstName: "",
 			lastName: "",
 			phoneNumber: "",
 			email: "",
-			lockerNumber: "",
+			lockerNumber: route.params?.prefilledLockerNumber || "",
 			gender: "UNSPECIFIED",
 			birthDate: "",
 			bloodType: "",
@@ -137,7 +166,10 @@ export default function MemberFormScreen() {
 	return (
 		<GestureHandlerRootView style={{ flex: 1 }}>
 			<View style={styles.container}>
-				<CustomHeader title={isEditing ? t("memberDetails") : t("newMember")} />
+				<CustomHeader
+					title={isEditing ? t("memberDetails") : t("newMember")}
+					onBackPress={goBackNoForce}
+				/>
 
 				{loading ? (
 					<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -368,7 +400,8 @@ export default function MemberFormScreen() {
 													/>
 												</View>
 												<TextInput
-													style={styles.input}
+													editable={!route.params?.prefilledLockerNumber}
+													style={[styles.input, route.params?.prefilledLockerNumber && styles.inputDisabled]}
 													value={value}
 													onChangeText={onChange}
 													placeholder={t("lockerNumberPlaceholder")}
@@ -534,11 +567,12 @@ export default function MemberFormScreen() {
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: darkMode ? "#000" : "#fff",
 		},
 		flex: {
 			flex: 1,
@@ -551,10 +585,11 @@ const createStyles = (darkMode: boolean) =>
 			flex: 1,
 		},
 		sectionTitle: {
-			fontSize: 16,
-			fontWeight: "700",
-			marginTop: 8,
+			fontSize: 21,
+			fontWeight: "bold",
+			marginTop: 10,
 			marginBottom: 12,
+			paddingVertical: 5,
 		},
 		field: {
 			marginBottom: 16,
@@ -572,28 +607,32 @@ const createStyles = (darkMode: boolean) =>
 		},
 		input: {
 			borderWidth: 1,
-			borderColor: darkMode ? "#333" : "#ccc",
+			borderColor: theme.border,
 			borderRadius: 8,
 			paddingHorizontal: 12,
 			paddingVertical: 10,
 			fontSize: 16,
-			color: darkMode ? "#e9e9e9" : "#000",
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			color: darkMode ? "#fff" : "#000",
+			backgroundColor: theme.cardBackground
+		},
+		inputDisabled: {
+			backgroundColor: theme.green.background,
+			color: theme.green.foreground,
+			borderColor: theme.green.foreground,
 		},
 		selectButton: {
 			borderWidth: 1,
-			borderColor: darkMode ? "#333" : "#ccc",
+			borderColor: theme.border,
 			borderRadius: 8,
 			paddingHorizontal: 12,
 			paddingVertical: 10,
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground
 		},
 		selectButtonText: {
 			fontSize: 16,
-			color: darkMode ? "#e9e9e9" : "#000",
 		},
 		placeholder: {
-			color: darkMode ? "#666" : "#999",
+			opacity: 0.5
 		},
 		button: {
 			borderRadius: 8,
@@ -607,3 +646,4 @@ const createStyles = (darkMode: boolean) =>
 			fontWeight: "bold",
 		},
 	})
+}

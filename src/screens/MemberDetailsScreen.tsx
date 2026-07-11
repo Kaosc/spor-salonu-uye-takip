@@ -57,6 +57,11 @@ export default function MemberDetailsScreen() {
 			return
 		}
 
+		if (prevScreen === "LockerScreen") {
+			navigation.navigate("Tabs", { screen: "LockerScreen" })
+			return
+		}
+
 		navigation.navigate("Tabs", { screen: "MemberStack" })
 	}
 
@@ -593,7 +598,7 @@ const createStyles = (darkMode: boolean) => {
 		pageContent: {
 			flexGrow: 1,
 			paddingBottom: 20,
-			paddingHorizontal: 5,
+			paddingHorizontal: 9,
 		},
 		card: {
 			backgroundColor: theme.cardBackground,
