@@ -248,9 +248,15 @@ export default function MemberDetailsScreen() {
 				<ThemedButton
 					style={styles.sellPackageButton}
 					onPress={() => {
-						navigation.navigate("SubscriptionFormScreen", {
-							memberId: route.params?.memberId,
-							activeSubscriptionId: subscription?.id || false,
+						navigation.navigate("Tabs", {
+							screen: "MemberStack",
+							params : {
+								screen: "SubscriptionFormScreen",
+								params: {
+									member: member,
+									activeSubscriptionId: subscription?.id || false,
+								}
+							}
 						})
 					}}
 				>
@@ -791,9 +797,10 @@ const createStyles = (darkMode: boolean) => {
 			textAlign: "center",
 		},
 		sectionTitle: {
-			fontSize: 17,
-			fontWeight: "700",
+			fontSize: 20,
+			fontWeight: "bold",
 			marginBottom: 8,
+			marginTop: 13,
 		},
 		row: {
 			flexDirection: "row",

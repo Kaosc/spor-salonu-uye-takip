@@ -20,7 +20,7 @@ function ThemedText(props: ThemedTextProps) {
 		<Text
 			{...props}
 			style={[
-				{ fontFamily: "InterDisplay-Regular", color: props?.color || darkMode ? "#e9e9e9" : "#000000" },
+				{ fontFamily: "InterDisplay-Regular", color: props?.color || darkMode ? "#ffffff" : "#000000" },
 				props?.style,
 				props?.color && { color: props?.color },
 				{

@@ -93,6 +93,7 @@ export default function DashboardScreen() {
 				visible={scannerModalVisible}
 				onClose={() => setScannerModalVisible(false)}
 			/>
+
 			<ScrollView
 				style={{ flex: 1 }}
 				contentContainerStyle={styles.container}
@@ -108,7 +109,7 @@ export default function DashboardScreen() {
 				<View style={styles.profileSection}>
 					<View style={styles.avatar}>
 						<ThemedIcon
-							name="account"
+							name="account-badge"
 							size={45}
 						/>
 					</View>
@@ -238,6 +239,8 @@ const createStyles = (darkMode: boolean) => {
 			justifyContent: "center",
 			borderWidth: 2,
 			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+			borderBottomWidth: 4,
 		},
 		name: {
 			fontSize: 24,

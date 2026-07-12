@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { View, TextInput, TouchableOpacity, StyleSheet, Platform, BackHandler } from "react-native"
+import { View, TextInput, TouchableOpacity, StyleSheet, Platform, BackHandler, ScrollView } from "react-native"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -8,7 +8,11 @@ import { serverTimestamp, Timestamp } from "@react-native-firebase/firestore"
 
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
+import ThemedIcon from "../components/ui/ThemedIcon"
+import ThemedButton from "../components/ui/ThemedButton"
+
 import { addSubscription, cancelSubscription } from "../lib/firebase/firestore/subscriptions"
+import { Theme } from "../utils/theme"
 
 const PACKAGE_TYPES: PackageType[] = ["MONTHLY", "QUARTERLY", "YEARLY"]
 const PAYMENT_METHODS: PaymentMethod[] = ["CASH", "CREDIT_CARD", "TRANSFER"]
@@ -22,7 +26,7 @@ export default function SubscriptionFormScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const memberId = route.params?.memberId
+	const member: Member = route.params?.member
 	const activeSubscriptionId = route.params?.activeSubscriptionId || false
 
 	const [packageType, setPackageType] = useState<PackageType>("MONTHLY")
@@ -56,7 +60,7 @@ export default function SubscriptionFormScreen() {
 		navigation.dispatch(StackActions.popToTop())
 		navigation.dispatch(
 			StackActions.replace("MemberDetailsScreen", {
-				memberId: memberId,
+				memberId: member?.uid,
 				refresh: true,
 				initialPage: 1,
 			}),
@@ -102,7 +106,7 @@ export default function SubscriptionFormScreen() {
 			const endDate = calculateEndDate(startDate, packageType)
 
 			const sub: Subscription = {
-				memberUid: memberId,
+				memberUid: member?.uid,
 				packageType,
 				startDate: Timestamp.fromDate(startDate),
 				endDate: Timestamp.fromDate(endDate),
@@ -128,13 +132,49 @@ export default function SubscriptionFormScreen() {
 		}
 	}
 
+	const UserInfoView = () => {
+		return (
+			<View style={styles.userInfoContainer}>
+				<View style={styles.row}>
+					<ThemedIcon
+						name="account"
+						size={20}
+						color={darkMode ? "#fff" : "#000"}
+					/>
+					<ThemedText style={styles.userInfoText}>
+						{member.firstName} {member.lastName}
+					</ThemedText>
+				</View>
+				<View style={styles.row}>
+					<ThemedIcon
+						name="email-outline"
+						size={19}
+						color={darkMode ? "#fff" : "#000"}
+					/>
+					<ThemedText style={styles.userInfoText}>{member.email}</ThemedText>
+				</View>
+				<View style={styles.row}>
+					<ThemedIcon
+						name="phone"
+						size={20}
+						color={darkMode ? "#fff" : "#000"}
+					/>
+					<ThemedText style={styles.userInfoText}>{member.phoneNumber}</ThemedText>
+				</View>
+			</View>
+		)
+	}
+
 	return (
-		<View style={styles.container}>
+		<>
 			<CustomHeader
 				title={t("sellPackage")}
 				onBackPress={goBack}
 			/>
-			<View style={styles.content}>
+			<ScrollView style={styles.content}>
+				{/* Basic User Info */}
+				<UserInfoView />
+
 				{/* Package Type */}
 				<ThemedText style={styles.label}>{t("packageType")}</ThemedText>
 				<View style={styles.selectionRow}>
@@ -208,27 +248,34 @@ export default function SubscriptionFormScreen() {
 				/>
 
 				{/* Submit */}
-				<TouchableOpacity
+				<ThemedButton
 					style={[styles.submitButton, submitting && styles.submitButtonDisabled]}
 					onPress={handleSubmit}
 					disabled={submitting}
 				>
+					<ThemedIcon
+						name={submitting ? "loading" : "content-save"}
+						size={20}
+						color={darkMode ? "#000" : "#fff"}
+						style={{ marginRight: 8 }}
+					/>
 					<ThemedText style={styles.submitButtonText}>{submitting ? t("saving") : t("save")}</ThemedText>
-				</TouchableOpacity>
-			</View>
-		</View>
+				</ThemedButton>
+			</ScrollView>
+		</>
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
-			backgroundColor: darkMode ? "#000" : "#f5f5f5",
 		},
 		content: {
 			flex: 1,
-			padding: 20,
+			paddingHorizontal: 15,
 		},
 		label: {
 			fontSize: 15,
@@ -237,13 +284,13 @@ const createStyles = (darkMode: boolean) =>
 			marginTop: 16,
 		},
 		input: {
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground,
 			borderRadius: 8,
 			padding: 12,
 			fontSize: 16,
 			color: darkMode ? "#fff" : "#000",
 			borderWidth: 1,
-			borderColor: darkMode ? "#333" : "#ddd",
+			borderColor: theme.border,
 		},
 		notesInput: {
 			minHeight: 80,
@@ -259,9 +306,9 @@ const createStyles = (darkMode: boolean) =>
 			paddingHorizontal: 8,
 			borderRadius: 8,
 			borderWidth: 1,
-			borderColor: darkMode ? "#333" : "#ddd",
+			borderColor: theme.border,
 			alignItems: "center",
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground,
 		},
 		selectionButtonActive: {
 			backgroundColor: darkMode ? "#fff" : "#000",
@@ -276,29 +323,45 @@ const createStyles = (darkMode: boolean) =>
 			color: darkMode ? "#000" : "#fff",
 		},
 		dateButton: {
-			backgroundColor: darkMode ? "#1a1a1a" : "#fff",
+			backgroundColor: theme.cardBackground,
 			borderRadius: 8,
 			padding: 12,
 			borderWidth: 1,
-			borderColor: darkMode ? "#333" : "#ddd",
+			borderColor: theme.border,
 		},
 		dateButtonText: {
 			fontSize: 16,
-			color: darkMode ? "#fff" : "#000",
 		},
 		submitButton: {
-			backgroundColor: darkMode ? "#fff" : "#000",
 			borderRadius: 8,
 			paddingVertical: 14,
 			alignItems: "center",
 			marginTop: 24,
+			flexDirection: "row",
+			justifyContent: "center",
 		},
 		submitButtonDisabled: {
 			opacity: 0.5,
 		},
 		submitButtonText: {
 			color: darkMode ? "#000" : "#fff",
-			fontSize: 16,
+			fontSize: 18,
 			fontWeight: "bold",
 		},
+		userInfoContainer: {
+			marginTop: 16,
+			backgroundColor: theme.cardBackground,
+			padding: 12,
+			borderRadius: 8,
+			gap: 4,
+		},
+		userInfoText: {
+			fontSize: 16,
+		},
+		row: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 8,
+		},
 	})
+}
