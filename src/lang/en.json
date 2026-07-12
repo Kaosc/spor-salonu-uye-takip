@@ -121,5 +121,9 @@
 	"sellPackagePrompt": "Sell a package to get started",
 	"runtimeVersion": "Runtime Version",
 	"lockers": "Lockers",
-	"selectLocker": "Select Locker"
+	"selectLocker": "Select Locker",
+	"subscriptionCancelled": "Subscription cancelled successfully.",
+	"cancelSubscription": "Cancel Subscription",
+	"cancelSubscriptionConfirmation": "Are you sure you want to cancel this subscription?",
+	"inactivateMemberWithActiveSubscriptionConfirmation": "This member has an active subscription. Are you sure you want to deactivate the member? This will cancel the active subscription."
 }

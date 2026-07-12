@@ -89,6 +89,8 @@ interface Member {
 	gender: Gender
 	birthDate?: Date
 	bloodType?: string
+	weight?: number // Kilo as KG
+	height?: number // Boy as CM
 	emergencyContact?: {
 		name: string
 		phone: string
@@ -97,6 +99,10 @@ interface Member {
 	createdAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	createdBy?: string
+}
+
+interface MemberCard extends Member {
+	hasActiveSubscription: boolean
 }
 
 type PackageType = "MONTHLY" | "QUARTERLY" | "YEARLY"

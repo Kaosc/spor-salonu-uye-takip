@@ -11,6 +11,8 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import MemberListCard from "../components/MemberListCard"
 
 import { getAllMembers } from "../lib/firebase/firestore/member"
+import { getAllSubscriptions } from "../lib/firebase/firestore/subscriptions"
+
 import { Theme } from "../utils/theme"
 
 export default function MemberListContent() {
@@ -22,14 +24,23 @@ export default function MemberListContent() {
 
 	const styles = createStyles(darkMode)
 
-	const [members, setMembers] = useMMKVObject<Member[]>("members")
+	const [members, setMembers] = useMMKVObject<MemberCard[]>("members")
 
 	// TODO : IMPLEMENT PAGINATION AS SCROLL REACHES TO END OF THE LIST, CURRENTLY IT LOADS ALL MEMBERS AT ONCE
 	// 10 USER AT EVERY SCROLL END
 	const fetchMembers = async () => {
 		try {
 			const membersData = await getAllMembers()
-			setMembers(membersData)
+			const subscriptionsData = await getAllSubscriptions()
+
+			const membersWithSubscription = membersData.map((member) => {
+				const hasActiveSubscription = subscriptionsData.some(
+					(sub: Subscription) => sub.memberUid === member.uid && sub.status === "ACTIVE",
+				)
+				return { ...member, hasActiveSubscription }
+			})
+
+			setMembers(membersWithSubscription)
 		} catch (e) {
 			console.error("Error fetching members:", e)
 		}
@@ -42,11 +53,11 @@ export default function MemberListContent() {
 		}
 	}, [])
 
-	const renderItem = useCallback(({ item }: { item: Member }) => {
+	const renderItem = useCallback(({ item }: { item: MemberCard }) => {
 		return <MemberListCard member={item} />
 	}, [])
 
-	const keyExtractor = useCallback((item: Member) => item.uid, [])
+	const keyExtractor = useCallback((item: MemberCard) => item.uid, [])
 
 	return (
 		<View style={styles.container}>

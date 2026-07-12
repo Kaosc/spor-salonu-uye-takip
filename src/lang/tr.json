@@ -120,5 +120,9 @@
 	"sellPackagePrompt": "Başlamak için bir paket satın alın",
 	"runtimeVersion": "Runtime Sürümü",
 	"lockers": "Dolaplar",
-	"selectLocker": "Dolap Numarası Seçin"
+	"selectLocker": "Dolap Numarası Seçin",
+	"subscriptionCancelled": "Abonelik başarıyla iptal edildi.",
+	"cancelSubscription": "Aboneliği İptal Et",
+	"cancelSubscriptionConfirmation": "Bu aboneliği iptal etmek istediğinizden emin misiniz?",
+	"inactivateMemberWithActiveSubscriptionConfirmation": "Bu üye aktif bir aboneliğe sahip. Üyeyi pasif hale getirmek istediğinizden emin misiniz? Bu işlem, aktif aboneliği iptal edecektir."
 }

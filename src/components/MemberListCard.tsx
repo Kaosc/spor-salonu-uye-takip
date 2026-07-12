@@ -6,14 +6,21 @@ import ThemedText from "./ui/ThemedText"
 import ThemedIcon from "./ui/ThemedIcon"
 
 import { Theme } from "../utils/theme"
+import { useTranslation } from "react-i18next"
 
-export default function MemberListCard({ member }: { member: Member }) {
+export default function MemberListCard({ member }: { member: MemberCard }) {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const styles = createStyles(darkMode)
 	const isScearchScreen = navigation.getState().routes.some((route: any) => route.name === "SearchScreen")
+	const { t } = useTranslation()
 
-	const statusColor = member.isActive
+	const styles = createStyles(darkMode)
+
+	const memberStatusColor = member.isActive
+		? Theme[darkMode ? "dark" : "light"].green.foreground
+		: Theme[darkMode ? "dark" : "light"].red.foreground
+
+	const subStatusColor = member.hasActiveSubscription
 		? Theme[darkMode ? "dark" : "light"].green.foreground
 		: Theme[darkMode ? "dark" : "light"].red.foreground
 
@@ -31,7 +38,7 @@ export default function MemberListCard({ member }: { member: Member }) {
 		>
 			<ThemedIcon
 				name={member.gender === "FEMALE" ? "female" : "male"}
-				size={37}
+				size={45}
 				style={styles.avatarIcon}
 			/>
 			<View style={{ flex: 1 }}>
@@ -39,8 +46,14 @@ export default function MemberListCard({ member }: { member: Member }) {
 					{member.firstName} {member.lastName}
 				</ThemedText>
 				<ThemedText style={styles.itemPhone}>{member.email}</ThemedText>
+				<View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
+					<ThemedText style={styles.itemSubscriptionLabel}>{t("subscription") + ": "}</ThemedText>
+					<ThemedText style={[styles.itemSubscription, { color: subStatusColor }]}>
+						{member.hasActiveSubscription ? t("active") : t("none")}
+					</ThemedText>
+				</View>
 			</View>
-			<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+			<View style={[styles.statusDot, { backgroundColor: memberStatusColor }]} />
 		</TouchableOpacity>
 	)
 }
@@ -78,6 +91,15 @@ const createStyles = (darkMode: boolean) => {
 			marginRight: 12,
 			opacity: 0.75,
 			borderRadius: 22.5,
+		},
+		itemSubscriptionLabel: {
+			fontSize: 13,
+			fontWeight: "600",
+		},
+		itemSubscription: {
+			fontSize: 13,
+			fontWeight: "600",
+			marginTop: 1.5,
 		},
 	})
 }

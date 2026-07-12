@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import PagerView from "react-native-pager-view"
@@ -12,15 +12,23 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
 
 import { activateMember, getMemberById, inactivateMember } from "../lib/firebase/firestore/member"
-import { getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
+import { cancelSubscription, getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
 import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 import { Theme } from "../utils/theme"
 
 import { AllIconNames } from "../types/icon"
 
+interface RouteParams extends RouteProp<ParamListBase> {
+	params: {
+		memberId: string
+		initialPage?: number
+		prevScreen: "SearchScreen" | "SubscriptionsScreen" | "LockerScreen" | undefined
+	}
+}
+
 export default function MemberDetailsScreen() {
 	const navigation = useNavigation<any>()
-	const route = useRoute<any>()
+	const route = useRoute<RouteParams>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { t } = useTranslation()
 
@@ -83,7 +91,12 @@ export default function MemberDetailsScreen() {
 		if (subscription.length > 0) {
 			// find active subscription and set it to state
 			const activeSubscription = subscription.find((sub) => sub.status === "ACTIVE")
-			setsubscription(activeSubscription || subscription[0])
+
+			if (activeSubscription) {
+				setsubscription(activeSubscription)
+			} else {
+				setsubscription(null)
+			}
 		}
 
 		clearTimeout(t)
@@ -120,9 +133,148 @@ export default function MemberDetailsScreen() {
 		return `${price.toFixed(2)} ₺`
 	}
 
+	const handleSubCancel = async (alert = true) => {
+		const cancelSub = async () => {
+			if (!subscription?.id) return
+			const canceled = await cancelSubscription(subscription.id)
+
+			if (canceled) {
+				toast.show(t("subscriptionCancelled"), { type: "success" })
+				fetchSubscription()
+			} else {
+				toast.show(t("subscriptionCancelError"), { type: "danger" })
+			}
+		}
+
+		if (alert) {
+			Alert.alert(t("cancelSubscription"), t("cancelSubscriptionConfirmation"), [
+				{
+					text: t("cancel"),
+					style: "cancel",
+				},
+				{
+					text: t("cancelSubscription"),
+					style: "destructive",
+					onPress: async () => await cancelSub(),
+				},
+			])
+		} else {
+			await cancelSub()
+		}
+	}
+
+	const handleInactivateMember = async () => {
+		const inactivate = async () => {
+			const succes = await inactivateMember(route.params?.memberId)
+			if (succes) {
+				toast.show(t("memberInactivated"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, isActive: false } : prev))
+			}
+		}
+
+		// If the member has an active subscription, show a warning alert to the user that the subscription will be cancelled if they inactivate the member.
+		if (subscription && subscription.status === "ACTIVE") {
+			Alert.alert(t("inactivateMember"), t("inactivateMemberWithActiveSubscriptionConfirmation"), [
+				{
+					text: t("cancel"),
+					style: "cancel",
+				},
+				{
+					text: t("inactivate"),
+					style: "destructive",
+					onPress: async () => {
+						await handleSubCancel(false)
+						await inactivate()
+					},
+				},
+			])
+		} else {
+			Alert.alert(t("inactivateMember"), t("inactivateMemberConfirmation"), [
+				{
+					text: t("cancel"),
+					style: "cancel",
+				},
+				{
+					text: t("inactivate"),
+					style: "destructive",
+					onPress: async () => await inactivate(),
+				},
+			])
+		}
+	}
+
+	const handleActivateMember = async () => {
+		const activate = async () => {
+			const succes = await activateMember(route.params?.memberId)
+			if (succes) {
+				toast.show(t("memberActivated"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, isActive: true } : prev))
+			}
+		}
+
+		Alert.alert(t("activateMember"), t("activateMemberConfirmation"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("activate"),
+				style: "default",
+				onPress: async () => await activate(),
+			},
+		])
+	}
+
 	const SubscriptionDetails = () => {
 		const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
 		const daysLeft = subscription ? calculateEndDateAsDays(subscription.startDate, subscription.packageType) : null
+
+		const CancelSubscriptionButton = () => {
+			if (!subscription || subscription.status !== "ACTIVE") return <></>
+
+			return (
+				<ThemedButton
+					style={styles.cancelSubscriptionButton}
+					onPress={() => handleSubCancel()}
+				>
+					<ThemedText style={styles.cancelSubscriptionButtonText}>{t("cancelSubscription")}</ThemedText>
+				</ThemedButton>
+			)
+		}
+
+		const SellPackageButton = () => {
+			return (
+				<ThemedButton
+					style={styles.sellPackageButton}
+					onPress={() => {
+						navigation.navigate("SubscriptionFormScreen", {
+							memberId: route.params?.memberId,
+							activeSubscriptionId: subscription?.id || false,
+						})
+					}}
+				>
+					<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
+				</ThemedButton>
+			)
+		}
+
+		const SellPackageContainer = () => {
+			return member?.isActive ? (
+				<View style={styles.subButtonsContainer}>
+					<CancelSubscriptionButton />
+					<SellPackageButton />
+				</View>
+			) : (
+				<View style={styles.noSubContainer}>
+					<ThemedIcon
+						name="alert"
+						size={23}
+						color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
+					/>
+					<ThemedText style={styles.noSubscriptionText}>{t("memberIsInactive")}</ThemedText>
+				</View>
+			)
+		}
 
 		return (
 			<View style={styles.card}>
@@ -158,107 +310,48 @@ export default function MemberDetailsScreen() {
 						<View style={styles.divider} />
 
 						{/* Info Rows */}
-						<View style={styles.infoRow}>
-							<View style={styles.infoRowLabel}>
-								<ThemedIcon
-									name="calendar-start"
-									size={16}
-								/>
-								<ThemedText style={styles.infoLabel}>{t("startDate")}</ThemedText>
-							</View>
-							<ThemedText style={styles.infoValue}>{formatEndDate(subscription.startDate)}</ThemedText>
-						</View>
+						<DetailsRow
+							label={t("startDate")}
+							value={formatEndDate(subscription.startDate)}
+							iconName="calendar-start"
+						/>
 
-						<View style={styles.infoRow}>
-							<View style={styles.infoRowLabel}>
-								<ThemedIcon
-									name="calendar-end"
-									size={16}
-								/>
-								<ThemedText style={styles.infoLabel}>{t("endDate")}</ThemedText>
-							</View>
-							<ThemedText style={styles.infoValue}>{formatEndDate(subscription.endDate)}</ThemedText>
-						</View>
-
-						<View style={styles.infoRow}>
-							<View style={styles.infoRowLabel}>
-								<ThemedIcon
-									name="credit-card-outline"
-									size={16}
-								/>
-								<ThemedText style={styles.infoLabel}>{t("paymentMethod")}</ThemedText>
-							</View>
-							<ThemedText style={styles.infoValue}>{t(subscription.paymentMethod)}</ThemedText>
-						</View>
+						<DetailsRow
+							label={t("endDate")}
+							value={formatEndDate(subscription.endDate)}
+							iconName="calendar-end"
+						/>
+						<DetailsRow
+							label={t("paymentMethod")}
+							value={t(subscription.paymentMethod)}
+							iconName="credit-card-outline"
+						/>
 
 						{subscription.notes ? (
-							<View style={styles.notesSection}>
-								<View style={styles.infoRowLabel}>
-									<ThemedIcon
-										name="note-text-outline"
-										size={16}
-									/>
-									<ThemedText style={styles.infoLabel}>{t("notes")}</ThemedText>
-								</View>
-								<ThemedText style={styles.notesText}>{subscription.notes}</ThemedText>
-							</View>
+							<DetailsRow
+								label={t("notes")}
+								value={subscription.notes}
+								iconName="note-text-outline"
+							/>
 						) : null}
 
 						<View style={styles.divider} />
 
-						<View style={styles.infoRow}>
-							<View style={styles.infoRowLabel}>
-								<ThemedIcon
-									name="account-plus-outline"
-									size={16}
-								/>
-								<ThemedText style={styles.infoLabel}>{t("createdBy")}</ThemedText>
-							</View>
-							<ThemedText style={styles.infoValue}>{subscription.createdBy || "-"}</ThemedText>
-						</View>
+						<DetailsRow
+							label={t("createdBy")}
+							value={subscription.createdBy || "-"}
+							iconName="account-plus-outline"
+						/>
 
 						{subscription.createdAt && (
-							<View style={styles.infoRow}>
-								<View style={styles.infoRowLabel}>
-									<ThemedIcon
-										name="clock-outline"
-										size={16}
-									/>
-									<ThemedText style={styles.infoLabel}>{t("createdAt")}</ThemedText>
-								</View>
-								<ThemedText style={styles.infoValue}>{safeTimestampToDateTimeString(subscription.createdAt)}</ThemedText>
-							</View>
+							<DetailsRow
+								label={t("createdAt")}
+								value={safeTimestampToDateTimeString(subscription.createdAt)}
+								iconName="clock-outline"
+							/>
 						)}
 
-						{/* Sell Package Button */}
-						{member?.isActive ? (
-							<ThemedButton
-								style={styles.sellPackageButton}
-								onPress={() => {
-									navigation.navigate("Tabs", {
-										screen: "MemberStack",
-										params: {
-											screen: "SubscriptionFormScreen",
-											params: {
-												memberId: route.params?.memberId,
-												activeSubscriptionId: subscription?.id || false,
-											},
-										},
-									})
-								}}
-							>
-								<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
-							</ThemedButton>
-						) : (
-							<View style={styles.noSubContainer}>
-								<ThemedIcon
-									name="alert"
-									size={23}
-									color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
-								/>
-								<ThemedText style={styles.noSubscriptionText}>{t("memberIsInactive")}</ThemedText>
-							</View>
-						)}
+						<SellPackageContainer />
 					</>
 				) : (
 					<>
@@ -273,82 +366,11 @@ export default function MemberDetailsScreen() {
 							<ThemedText style={styles.noSubscriptionSubtitle}>{t("sellPackagePrompt")}</ThemedText>
 						</View>
 
-						{member?.isActive ? (
-							<ThemedButton
-								style={styles.sellPackageButton}
-								onPress={() =>
-									navigation.navigate("Tabs", {
-										screen: "MemberStack",
-										params: {
-											screen: "SubscriptionFormScreen",
-											params: {
-												memberId: route.params?.memberId,
-												activeSubscriptionId: false,
-											},
-										},
-									})
-								}
-							>
-								<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
-							</ThemedButton>
-						) : (
-							<View style={styles.noSubContainer}>
-								<ThemedIcon
-									name="alert"
-									size={23}
-									color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
-								/>
-								<ThemedText style={styles.noSubscriptionText}>{t("memberIsInactive")}</ThemedText>
-							</View>
-						)}
+						<SellPackageContainer />
 					</>
 				)}
 			</View>
 		)
-	}
-
-	const handleInactivateMember = async () => {
-		const inactivate = async () => {
-			const succes = await inactivateMember(route.params?.memberId)
-			if (succes) {
-				toast.show(t("memberInactivated"), { type: "success" })
-				setMember((prev) => (prev ? { ...prev, isActive: false } : prev))
-			}
-		}
-
-		Alert.alert(t("inactivateMember"), t("inactivateMemberConfirmation"), [
-			{
-				text: t("cancel"),
-				style: "cancel",
-			},
-			{
-				text: t("inactivate"),
-				style: "destructive",
-				onPress: async () => await inactivate(),
-			},
-		])
-	}
-
-	const handleActivateMember = async () => {
-		const activate = async () => {
-			const succes = await activateMember(route.params?.memberId)
-			if (succes) {
-				toast.show(t("memberActivated"), { type: "success" })
-				setMember((prev) => (prev ? { ...prev, isActive: true } : prev))
-			}
-		}
-
-		Alert.alert(t("activateMember"), t("activateMemberConfirmation"), [
-			{
-				text: t("cancel"),
-				style: "cancel",
-			},
-			{
-				text: t("activate"),
-				style: "default",
-				onPress: async () => await activate(),
-			},
-		])
 	}
 
 	const DetailsRow = ({ label, value, iconName }: { label: string; value: string; iconName: AllIconNames }) => {
@@ -481,36 +503,60 @@ export default function MemberDetailsScreen() {
 	}
 
 	const TabBar = () => {
+		const TabButton = ({ label, iconName, pageIndex }: { label: string; iconName: AllIconNames; pageIndex: number }) => {
+			const isActive = activePage === pageIndex
+
+			return (
+				<TouchableOpacity
+					style={[styles.tab, isActive && styles.tabActive]}
+					onPress={() => {
+						setActivePage(pageIndex)
+						pagerRef.current?.setPage(pageIndex)
+					}}
+				>
+					<ThemedIcon
+						name={iconName}
+						size={16}
+						color={isActive ? (darkMode ? "#000" : "#fff") : undefined}
+					/>
+					<ThemedText style={[styles.tabText, isActive && styles.tabTextActive]}>{label}</ThemedText>
+				</TouchableOpacity>
+			)
+		}
+
 		return (
 			<View style={styles.tabBar}>
-				<TouchableOpacity
-					style={[styles.tab, activePage === 0 && styles.tabActive]}
-					onPress={() => {
-						setActivePage(0)
-						pagerRef.current?.setPage(0)
-					}}
-				>
-					<ThemedIcon
-						name="account"
-						size={16}
-						color={activePage === 0 ? (darkMode ? "#000" : "#fff") : undefined}
-					/>
-					<ThemedText style={[styles.tabText, activePage === 0 && styles.tabTextActive]}>{t("memberDetails")}</ThemedText>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={[styles.tab, activePage === 1 && styles.tabActive]}
-					onPress={() => {
-						setActivePage(1)
-						pagerRef.current?.setPage(1)
-					}}
-				>
-					<ThemedIcon
-						name="card-text"
-						size={16}
-						color={activePage === 1 ? (darkMode ? "#000" : "#fff") : undefined}
-					/>
-					<ThemedText style={[styles.tabText, activePage === 1 && styles.tabTextActive]}>{t("subscriptionInfo")}</ThemedText>
-				</TouchableOpacity>
+				<TabButton
+					label={t("memberDetails")}
+					iconName="account"
+					pageIndex={0}
+				/>
+				<TabButton
+					label={t("subscriptionInfo")}
+					iconName="card-text"
+					pageIndex={1}
+				/>
+			</View>
+		)
+	}
+
+	const MemberNotFoundView = () => {
+		return (
+			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+				{memberStatus === "loading" ? (
+					<ThemedActivityIndicator size={70} />
+				) : (
+					memberStatus === "error" && (
+						<View style={{ justifyContent: "center", alignItems: "center", gap: 5 }}>
+							<ThemedIcon
+								name="account-alert-outline"
+								size={90}
+								style={{ alignSelf: "center", marginLeft: 10, opacity: 0.7 }}
+							/>
+							<ThemedText style={{ textAlign: "center" }}>{t("memberNotFound")}</ThemedText>
+						</View>
+					)
+				)}
 			</View>
 		)
 	}
@@ -522,22 +568,7 @@ export default function MemberDetailsScreen() {
 				onBackPress={goBack}
 			/>
 			{!member ? (
-				<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-					{memberStatus === "loading" ? (
-						<ThemedActivityIndicator size={70} />
-					) : (
-						memberStatus === "error" && (
-							<View style={{ justifyContent: "center", alignItems: "center", gap: 5 }}>
-								<ThemedIcon
-									name="account-alert-outline"
-									size={90}
-									style={{ alignSelf: "center", marginLeft: 10, opacity: 0.7 }}
-								/>
-								<ThemedText style={{ textAlign: "center" }}>{t("memberNotFound")}</ThemedText>
-							</View>
-						)
-					)}
-				</View>
+				<MemberNotFoundView />
 			) : (
 				<>
 					{/* Tab Bar */}
@@ -769,7 +800,6 @@ const createStyles = (darkMode: boolean) => {
 		sellPackageButton: {
 			paddingVertical: 14,
 			alignItems: "center",
-			marginTop: 24,
 		},
 		sellPackageButtonText: {
 			color: darkMode ? "#000" : "#fff",
@@ -786,6 +816,22 @@ const createStyles = (darkMode: boolean) => {
 			padding: 12,
 			borderRadius: 8,
 			borderColor: theme.red.foreground,
+		},
+		subButtonsContainer: {
+			gap: 10,
+			marginTop: 15,
+		},
+		cancelSubscriptionButton: {
+			backgroundColor: theme.red.background,
+			paddingVertical: 14,
+			alignItems: "center",
+			borderWidth: 1,
+			borderColor: theme.red.foreground,
+		},
+		cancelSubscriptionButtonText: {
+			color: theme.red.foreground,
+			fontSize: 16,
+			fontWeight: "bold",
 		},
 	})
 }
