@@ -130,5 +130,14 @@
 	"weight": "Weight (KG)",
 	"height": "Height (CM)",
 	"weightPlaceholder": "Weight (kg)",
-	"heightPlaceholder": "Height (cm)"
+	"heightPlaceholder": "Height (cm)",
+	"resumeSubscription": "Resume Subscription",
+	"pauseSubscription": "Pause Subscription",
+	"subscriptionPaused": "Subscription paused.",
+	"subscriptionPauseError": "An error occurred while pausing the subscription.",
+	"pauseSubscriptionConfirmation": "Are you sure you want to pause this subscription?",
+	"resumeSubscriptionConfirmation": "Are you sure you want to resume this subscription?",
+	"subscriptionResumed": "Subscription resumed.",
+	"subscriptionResumeError": "An error occurred while resuming the subscription.",
+	"pausedAt": "Paused At"
 }

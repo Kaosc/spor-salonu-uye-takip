@@ -34,10 +34,8 @@ export default function MemberListContent() {
 			const subscriptionsData = await getAllSubscriptions()
 
 			const membersWithSubscription = membersData.map((member) => {
-				const hasActiveSubscription = subscriptionsData.some(
-					(sub: Subscription) => sub.memberUid === member.uid && sub.status === "ACTIVE",
-				)
-				return { ...member, hasActiveSubscription }
+				const subscriptionStatus = subscriptionsData.find((sub: Subscription) => sub.memberUid === member.uid)?.status || "NONE"
+				return { ...member, subscriptionStatus }
 			})
 
 			setMembers(membersWithSubscription)

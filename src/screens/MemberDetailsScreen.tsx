@@ -13,7 +13,12 @@ import ThemedButton from "../components/ui/ThemedButton"
 import BMIDisplay from "../components/BMIDisplay"
 
 import { activateMember, getMemberById, inactivateMember } from "../lib/firebase/firestore/member"
-import { cancelSubscription, getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
+import {
+	cancelSubscription,
+	getSubscriptionsByMemberId,
+	pauseSubscription,
+	resumeSubscription,
+} from "../lib/firebase/firestore/subscriptions"
 import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 import { Theme } from "../utils/theme"
 
@@ -91,7 +96,7 @@ export default function MemberDetailsScreen() {
 
 		if (subscription.length > 0) {
 			// find active subscription and set it to state
-			const activeSubscription = subscription.find((sub) => sub.status === "ACTIVE")
+			const activeSubscription = subscription.find((sub) => sub.status === "ACTIVE" || sub.status === "PAUSED")
 
 			if (activeSubscription) {
 				setsubscription(activeSubscription)
@@ -226,9 +231,81 @@ export default function MemberDetailsScreen() {
 		])
 	}
 
+	const handleSubPause = async () => {
+		const pauseSub = async () => {
+			if (!subscription?.id) return
+			const paused = await pauseSubscription(subscription.id)
+			if (paused) {
+				toast.show(t("subscriptionPaused"), { type: "success" })
+				fetchSubscription()
+			} else {
+				toast.show(t("subscriptionPauseError"), { type: "error" })
+			}
+		}
+
+		Alert.alert(t("pauseSubscription"), t("pauseSubscriptionConfirmation"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("pauseSubscription"),
+				style: "default",
+				onPress: async () => await pauseSub(),
+			},
+		])
+	}
+
+	const handleSubResume = async () => {
+		const resumeSub = async () => {
+			if (!subscription?.id) return
+			const resumed = await resumeSubscription(subscription.id)
+			if (resumed) {
+				toast.show(t("subscriptionResumed"), { type: "success" })
+				fetchSubscription()
+			} else {
+				toast.show(t("subscriptionResumeError"), { type: "error" })
+			}
+		}
+
+		Alert.alert(t("resumeSubscription"), t("resumeSubscriptionConfirmation"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("resumeSubscription"),
+				style: "default",
+				onPress: async () => await resumeSub(),
+			},
+		])
+	}
+
 	const SubscriptionDetails = () => {
 		const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
-		const daysLeft = subscription ? calculateEndDateAsDays(subscription.startDate, subscription.packageType) : null
+		const daysLeft = subscription ? calculateEndDateAsDays(subscription.endDate) : null
+
+		const PauseToggleButton = () => {
+			if (subscription && subscription.status === "PAUSED") {
+				return (
+					<ThemedButton
+						style={styles.pauseToggleButton}
+						onPress={() => handleSubResume()}
+					>
+						<ThemedText style={styles.pauseButtonText}>{t("resumeSubscription")}</ThemedText>
+					</ThemedButton>
+				)
+			} else if (subscription && subscription.status === "ACTIVE") {
+				return (
+					<ThemedButton
+						style={styles.pauseToggleButton}
+						onPress={() => handleSubPause()}
+					>
+						<ThemedText style={styles.pauseButtonText}>{t("pauseSubscription")}</ThemedText>
+					</ThemedButton>
+				)
+			}
+		}
 
 		const CancelSubscriptionButton = () => {
 			if (!subscription || subscription.status !== "ACTIVE") return <></>
@@ -250,13 +327,13 @@ export default function MemberDetailsScreen() {
 					onPress={() => {
 						navigation.navigate("Tabs", {
 							screen: "MemberStack",
-							params : {
+							params: {
 								screen: "SubscriptionFormScreen",
 								params: {
 									member: member,
 									activeSubscriptionId: subscription?.id || false,
-								}
-							}
+								},
+							},
 						})
 					}}
 				>
@@ -265,9 +342,10 @@ export default function MemberDetailsScreen() {
 			)
 		}
 
-		const SellPackageContainer = () => {
+		const ActionButtonsView = () => {
 			return member?.isActive ? (
 				<View style={styles.subButtonsContainer}>
+					<PauseToggleButton />
 					<CancelSubscriptionButton />
 					<SellPackageButton />
 				</View>
@@ -328,6 +406,7 @@ export default function MemberDetailsScreen() {
 							value={formatEndDate(subscription.endDate)}
 							iconName="calendar-end"
 						/>
+
 						<DetailsRow
 							label={t("paymentMethod")}
 							value={t(subscription.paymentMethod)}
@@ -358,7 +437,16 @@ export default function MemberDetailsScreen() {
 							/>
 						)}
 
-						<SellPackageContainer />
+						{subscription.pausedAt && (
+							<DetailsRow
+								label={t("pausedAt")}
+								value={safeTimestampToDateTimeString(subscription.pausedAt)}
+								iconName="clock-outline"
+							/>
+						)}
+						<View style={styles.divider} />
+
+						<ActionButtonsView />
 					</>
 				) : (
 					<>
@@ -373,7 +461,7 @@ export default function MemberDetailsScreen() {
 							<ThemedText style={styles.noSubscriptionSubtitle}>{t("sellPackagePrompt")}</ThemedText>
 						</View>
 
-						<SellPackageContainer />
+						<ActionButtonsView />
 					</>
 				)}
 			</View>
@@ -740,9 +828,7 @@ const createStyles = (darkMode: boolean) => {
 			opacity: 0.8,
 		},
 		divider: {
-			height: StyleSheet.hairlineWidth,
-			backgroundColor: theme.border,
-			marginVertical: 16,
+			marginVertical: 15,
 		},
 		infoRow: {
 			flexDirection: "row",
@@ -848,7 +934,6 @@ const createStyles = (darkMode: boolean) => {
 			flex: 1,
 			flexDirection: "row",
 			gap: 8,
-			marginTop: 20,
 			alignItems: "center",
 			borderWidth: 1,
 			padding: 12,
@@ -857,7 +942,6 @@ const createStyles = (darkMode: boolean) => {
 		},
 		subButtonsContainer: {
 			gap: 10,
-			marginTop: 15,
 		},
 		cancelSubscriptionButton: {
 			backgroundColor: theme.red.background,
@@ -898,6 +982,18 @@ const createStyles = (darkMode: boolean) => {
 		bodyMetricValue: {
 			fontSize: 16,
 			fontWeight: "700",
+		},
+		pauseToggleButton: {
+			backgroundColor: theme.orange.background,
+			paddingVertical: 14,
+			alignItems: "center",
+			borderWidth: 1,
+			borderColor: theme.orange.foreground,
+		},
+		pauseButtonText: {
+			color: theme.orange.foreground,
+			fontSize: 16,
+			fontWeight: "bold",
 		},
 	})
 }

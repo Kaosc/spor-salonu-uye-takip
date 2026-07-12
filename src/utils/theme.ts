@@ -40,6 +40,10 @@ export const Theme = {
 			background: "#3a1a1a",
 			foreground: "#ff6b6b",
 		},
+		orange: {
+			background: "#3a2a1a",
+			foreground: "#ffb347",
+		},
 	},
 	light: {
 		background: "#ffffff",
@@ -53,6 +57,10 @@ export const Theme = {
 		red: {
 			background: "#ffdae0",
 			foreground: "#c62828",
+		},
+		orange: {
+			background: "#fff0e0",
+			foreground: "#ff8c00",
 		},
 	},
 }

@@ -39,7 +39,8 @@ export const safeTimestampToDateTimeString = (timestamp: unknown): string => {
 		}
 		// Already a Date object
 		if (timestamp instanceof Date) {
-			return isNaN(timestamp.getTime()) ? "" : timestamp.toISOString().replace("T", " ").split(".")[0]
+			const dateTimeString = isNaN(timestamp.getTime()) ? "" : timestamp.toISOString().replace("T", " ").split(".")[0]
+			return new Date(dateTimeString).toLocaleString("tr-TR")
 		}
 		return ""
 	} catch {
@@ -47,29 +48,12 @@ export const safeTimestampToDateTimeString = (timestamp: unknown): string => {
 	}
 }
 
-export const calculateEndDateAsDays = (start: unknown, pkg: "MONTHLY" | "QUARTERLY" | "YEARLY"): number => {
-	const startDate = (() => {
-		if (!start) return new Date(NaN)
-		if (typeof (start as any).toDate === "function") return (start as any).toDate()
-		if (start instanceof Date) return start
-		return new Date(NaN)
-	})()
-
-	if (isNaN(startDate.getTime())) return 0
-
-	const end = new Date(startDate)
-	switch (pkg) {
-		case "MONTHLY":
-			end.setMonth(end.getMonth() + 1)
-			break
-		case "QUARTERLY":
-			end.setMonth(end.getMonth() + 3)
-			break
-		case "YEARLY":
-			end.setMonth(end.getMonth() + 12)
-			break
-	}
-	return Math.ceil((end.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
+export const calculateEndDateAsDays = (end: Date | FirebaseTimestamp): number => {
+	// Get the difference between todays date and the end date in milliseconds and return the difference in days
+	const endDate = end instanceof Date ? end : end.toDate()
+	const today = new Date()
+	const diffInMs = endDate.getTime() - today.getTime()
+	return Math.ceil(diffInMs / (1000 * 60 * 60 * 24))
 }
 
 export function toDate(value: any): Date | null {

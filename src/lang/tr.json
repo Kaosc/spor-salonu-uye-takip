@@ -97,11 +97,11 @@
 	"scanMembership": "Üyelik Tara",
 	"subscription": "Abonelik",
 	"subscriptions": "Abonelikler",
-	"paused": "Donduruldu",
+	"paused": "Durduruldu",
 	"all": "Tümü",
 	"expiring_soon": "Yaklaşanlar",
 	"recently_expired": "Bitenler",
-	"paused_subs": "Dondurulanlar",
+	"paused_subs": "Durdurulanlar",
 	"totalRevenueThisMonth": "Bu Ayki Ciro",
 	"activeSubscriptions": "Aktif Abonelikler",
 	"noSubscriptionsFound": "Abonelik bulunamadı",
@@ -129,5 +129,14 @@
 	"weight": "Kilo (KG)",
 	"height": "Boy (CM)",
 	"weightPlaceholder": "Kilo (kg)",
-	"heightPlaceholder": "Boy (cm)"
-}
+	"heightPlaceholder": "Boy (cm)",
+	"resumeSubscription": "Aboneliği Devam ettir",
+	"pauseSubscription": "Aboneliği Durdur",
+	"subscriptionPaused": "Abonelik durduruldu.",
+	"subscriptionPauseError": "Abonelik durdurulurken bir hata oluştu.",
+	"pauseSubscriptionConfirmation": "Bu aboneliği durdurmak istediğinizden emin misiniz?",
+	"resumeSubscriptionConfirmation": "Bu aboneliği devam ettirmek istediğinizden emin misiniz?",
+	"subscriptionResumed": "Abonelik devam ettirildi.",
+	"subscriptionResumeError": "Abonelik devam ettirilirken bir hata oluştu.",
+	"pausedAt": "Durdurulma Tarihi"
+	}

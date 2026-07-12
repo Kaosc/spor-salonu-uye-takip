@@ -105,7 +105,7 @@ interface Member {
 }
 
 interface MemberCard extends Member {
-	hasActiveSubscription: boolean
+	subscriptionStatus: SubscriptionStatus | "NONE" // ACTIVE, EXPIRED, CANCELLED, PAUSED, NONE
 }
 
 type PackageType = "MONTHLY" | "QUARTERLY" | "YEARLY"
@@ -119,6 +119,7 @@ interface Subscription {
 	price: number
 	paymentMethod: PaymentMethod
 	status: SubscriptionStatus
+	pausedAt?: Date | FirebaseTimestamp
 	createdBy: string
 	updatedBy?: string
 	createdAt: Date | import("@react-native-firebase/firestore").FieldValue

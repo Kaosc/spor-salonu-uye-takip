@@ -16,13 +16,16 @@ export default function MemberListCard({ member }: { member: MemberCard }) {
 
 	const styles = createStyles(darkMode)
 
-	const memberStatusColor = member.isActive
-		? Theme[darkMode ? "dark" : "light"].green.foreground
-		: Theme[darkMode ? "dark" : "light"].red.foreground
+	const thene = Theme[darkMode ? "dark" : "light"]
 
-	const subStatusColor = member.hasActiveSubscription
-		? Theme[darkMode ? "dark" : "light"].green.foreground
-		: Theme[darkMode ? "dark" : "light"].red.foreground
+	const memberStatusColor = member.isActive ? thene.green.foreground : thene.red.foreground
+
+	const subStatusColor =
+		member.subscriptionStatus === "ACTIVE"
+			? thene.green.foreground
+			: member.subscriptionStatus === "PAUSED"
+				? thene.orange.foreground
+				: thene.red.foreground
 
 	const handleNavigate = () => {
 		navigation.navigate("MemberDetailsScreen", {
@@ -49,7 +52,7 @@ export default function MemberListCard({ member }: { member: MemberCard }) {
 				<View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
 					<ThemedText style={styles.itemSubscriptionLabel}>{t("subscription") + ": "}</ThemedText>
 					<ThemedText style={[styles.itemSubscription, { color: subStatusColor }]}>
-						{member.hasActiveSubscription ? t("active") : t("none")}
+						{member.subscriptionStatus === "ACTIVE" ? t("active") : member.subscriptionStatus === "PAUSED" ? t("paused") : t("none")}
 					</ThemedText>
 				</View>
 			</View>
