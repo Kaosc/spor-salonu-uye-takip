@@ -32,7 +32,7 @@ export default function RootNavigator() {
 				name="MemberDetailsScreen"
 				component={MemberDetailsScreen}
 			/>
-						<Stack.Screen
+			<Stack.Screen
 				name="SearchScreen"
 				component={SearchScreen}
 			/>

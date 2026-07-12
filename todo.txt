@@ -15,3 +15,8 @@
 # User Tab
    - start with registiration and login screen
        - !! if user already registered by the staff it will have a auth saved to firebase so user either needs to reset its password or login with the email and password that staff has created for the user. 
+
+
+# Data
+   - Kilo, Boy, Vücut yağ oranı, vicüt külte endeksi
+   - Check-ins

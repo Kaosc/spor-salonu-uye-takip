@@ -27,7 +27,7 @@ export default function MemberDetailsScreen() {
 	const styles = createStyles(darkMode)
 	const theme = Theme[darkMode ? "dark" : "light"]
 
-	const [activePage, setActivePage] = useState(0)
+	const [activePage, setActivePage] = useState(route.params?.initialPage || 0)
 	const pagerRef = useRef<PagerView>(null)
 
 	const [memberStatus, setMemberStatus] = useState<"idle" | "loading" | "error">("idle")
@@ -81,7 +81,9 @@ export default function MemberDetailsScreen() {
 		const subscription = await getSubscriptionsByMemberId(route.params?.memberId)
 
 		if (subscription.length > 0) {
-			setsubscription(subscription[0])
+			// find active subscription and set it to state
+			const activeSubscription = subscription.find((sub) => sub.status === "ACTIVE")
+			setsubscription(activeSubscription || subscription[0])
 		}
 
 		clearTimeout(t)
@@ -232,12 +234,18 @@ export default function MemberDetailsScreen() {
 						{member?.isActive ? (
 							<ThemedButton
 								style={styles.sellPackageButton}
-								onPress={() =>
-									navigation.navigate("SubscriptionFormScreen", {
-										memberId: route.params?.memberId,
-										subscriptionId: subscription?.id || false,
+								onPress={() => {
+									navigation.navigate("Tabs", {
+										screen: "MemberStack",
+										params: {
+											screen: "SubscriptionFormScreen",
+											params: {
+												memberId: route.params?.memberId,
+												activeSubscriptionId: subscription?.id || false,
+											},
+										},
 									})
-								}
+								}}
 							>
 								<ThemedText style={styles.sellPackageButtonText}>{t("sellPackage")}</ThemedText>
 							</ThemedButton>
@@ -269,9 +277,15 @@ export default function MemberDetailsScreen() {
 							<ThemedButton
 								style={styles.sellPackageButton}
 								onPress={() =>
-									navigation.navigate("SubscriptionFormScreen", {
-										memberId: route.params?.memberId,
-										subscriptionId: false,
+									navigation.navigate("Tabs", {
+										screen: "MemberStack",
+										params: {
+											screen: "SubscriptionFormScreen",
+											params: {
+												memberId: route.params?.memberId,
+												activeSubscriptionId: false,
+											},
+										},
 									})
 								}
 							>
@@ -531,7 +545,7 @@ export default function MemberDetailsScreen() {
 					<PagerView
 						ref={pagerRef}
 						style={{ flex: 1 }}
-						initialPage={0}
+						initialPage={route.params?.initialPage || 0}
 						onPageSelected={(e) => setActivePage(e.nativeEvent.position)}
 					>
 						<ScrollView

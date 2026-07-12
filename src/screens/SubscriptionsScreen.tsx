@@ -115,6 +115,7 @@ export default function SubscriptionsScreen() {
 					navigation.navigate("MemberDetailsScreen", {
 						memberId: item.memberUid,
 						prevScreen: "SubscriptionsScreen",
+						initialPage: 1
 					})
 				}
 			>

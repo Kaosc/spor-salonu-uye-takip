@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { View, TextInput, TouchableOpacity, StyleSheet, Platform } from "react-native"
+import { useEffect, useState } from "react"
+import { View, TextInput, TouchableOpacity, StyleSheet, Platform, BackHandler } from "react-native"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -41,6 +41,26 @@ export default function SubscriptionFormScreen() {
 		if (selectedDate) {
 			setStartDate(selectedDate)
 		}
+	}
+
+	useEffect(() => {
+		const backAction = () => {
+			goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+
+	const goBack = () => {
+		navigation.dispatch(StackActions.popToTop())
+		navigation.dispatch(
+			StackActions.replace("MemberDetailsScreen", {
+				memberId: memberId,
+				refresh: true,
+				initialPage: 1,
+			}),
+		)
 	}
 
 	const calculateEndDate = (start: Date, pkg: PackageType): Date => {
@@ -103,15 +123,17 @@ export default function SubscriptionFormScreen() {
 			setSubmitting(false)
 			if (success) {
 				toast.show(t("subscriptionAdded"), { type: "success" })
-				navigation.dispatch(StackActions.popToTop())
-				navigation.dispatch(StackActions.replace("MemberListScreen", { refresh: true }))
+				goBack()
 			}
 		}
 	}
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={t("sellPackage")} />
+			<CustomHeader
+				title={t("sellPackage")}
+				onBackPress={goBack}
+			/>
 			<View style={styles.content}>
 				{/* Package Type */}
 				<ThemedText style={styles.label}>{t("packageType")}</ThemedText>
