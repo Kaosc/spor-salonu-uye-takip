@@ -82,6 +82,7 @@ export default function MemberFormScreen() {
 			lastName: "",
 			phoneNumber: "",
 			email: "",
+			address: "",
 			lockerNumber: route.params?.prefilledLockerNumber || "",
 			gender: "UNSPECIFIED",
 			birthDate: "",
@@ -142,6 +143,7 @@ export default function MemberFormScreen() {
 							lastName: member.lastName || "",
 							phoneNumber: member.phoneNumber || "",
 							email: member.email || "",
+							address: member.address || "",
 							lockerNumber: member.lockerNumber || "",
 							gender: member.gender || "UNSPECIFIED",
 							birthDate: safeTimestampToDateString(member.birthDate),
@@ -173,6 +175,7 @@ export default function MemberFormScreen() {
 			lastName: data.lastName,
 			phoneNumber: data.phoneNumber,
 			email: data.email,
+			address: data.address || undefined,
 			lockerNumber: data.lockerNumber || "",
 			gender: data.gender || ("UNSPECIFIED" as Gender),
 			birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
@@ -337,6 +340,37 @@ export default function MemberFormScreen() {
 
 									<Controller
 										control={control}
+										name="address"
+										render={({ field: { onChange, value } }) => (
+											<View style={styles.field}>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>{t("address")}</ThemedText>
+													<ThemedIcon
+														name="home"
+														size={18}
+													/>
+												</View>
+												<TextInput
+													style={[
+														styles.input,
+														{
+															minHeight: 90,
+															textAlignVertical: "top",
+														},
+													]}
+													value={value}
+													multiline
+													numberOfLines={4}
+													onChangeText={onChange}
+													placeholder={t("address")}
+													placeholderTextColor={darkMode ? "#666" : "#999"}
+												/>
+											</View>
+										)}
+									/>
+
+									<Controller
+										control={control}
 										name="gender"
 										render={({ field: { onChange, value } }) => {
 											const genderLabels: Record<string, string> = {
@@ -443,7 +477,7 @@ export default function MemberFormScreen() {
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
 												<View style={styles.labelRow}>
-													<ThemedText style={styles.label}>Kilo (kg)</ThemedText>
+													<ThemedText style={styles.label}>{t("weight")}</ThemedText>
 													<ThemedIcon
 														name="scale-bathroom"
 														size={18}
@@ -453,7 +487,7 @@ export default function MemberFormScreen() {
 													style={styles.input}
 													value={value}
 													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
-													placeholder="Kilo (kg)"
+													placeholder={t("weightPlaceholder")}
 													keyboardType="decimal-pad"
 													placeholderTextColor={darkMode ? "#666" : "#999"}
 												/>
@@ -467,7 +501,7 @@ export default function MemberFormScreen() {
 										render={({ field: { onChange, value } }) => (
 											<View style={styles.field}>
 												<View style={styles.labelRow}>
-													<ThemedText style={styles.label}>Boy (cm)</ThemedText>
+													<ThemedText style={styles.label}>{t("height")}</ThemedText>
 													<ThemedIcon
 														name="human-male-height"
 														size={18}
@@ -477,7 +511,7 @@ export default function MemberFormScreen() {
 													style={styles.input}
 													value={value}
 													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
-													placeholder="Boy (cm)"
+													placeholder={t("heightPlaceholder")}
 													keyboardType="decimal-pad"
 													placeholderTextColor={darkMode ? "#666" : "#999"}
 												/>

@@ -53,6 +53,7 @@ type FormValues = {
 	lastName: string
 	phoneNumber: string
 	email: string
+	address: string
 	lockerNumber: string
 	gender: Gender
 	birthDate: string

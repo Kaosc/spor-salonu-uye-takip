@@ -125,5 +125,10 @@
 	"subscriptionCancelled": "Subscription cancelled successfully.",
 	"cancelSubscription": "Cancel Subscription",
 	"cancelSubscriptionConfirmation": "Are you sure you want to cancel this subscription?",
-	"inactivateMemberWithActiveSubscriptionConfirmation": "This member has an active subscription. Are you sure you want to deactivate the member? This will cancel the active subscription."
+	"inactivateMemberWithActiveSubscriptionConfirmation": "This member has an active subscription. Are you sure you want to deactivate the member? This will cancel the active subscription.",
+	"address": "Address",
+	"weight": "Weight (KG)",
+	"height": "Height (CM)",
+	"weightPlaceholder": "Weight (kg)",
+	"heightPlaceholder": "Height (cm)"
 }

@@ -465,7 +465,7 @@ export default function MemberDetailsScreen() {
 								name="scale-bathroom"
 								size={18}
 							/>
-							<ThemedText style={styles.bodyMetricLabel}>Kilo</ThemedText>
+							<ThemedText style={styles.bodyMetricLabel}>{t("weight")}</ThemedText>
 							<ThemedText style={styles.bodyMetricValue}>{member.weight ? `${member.weight} kg` : "-"}</ThemedText>
 						</View>
 						<View style={styles.bodyMetricItem}>
@@ -473,7 +473,7 @@ export default function MemberDetailsScreen() {
 								name="human-male-height"
 								size={18}
 							/>
-							<ThemedText style={styles.bodyMetricLabel}>Boy</ThemedText>
+							<ThemedText style={styles.bodyMetricLabel}>{t("height")}</ThemedText>
 							<ThemedText style={styles.bodyMetricValue}>{member.height ? `${member.height} cm` : "-"}</ThemedText>
 						</View>
 					</View>
