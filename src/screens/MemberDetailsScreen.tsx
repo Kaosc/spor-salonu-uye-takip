@@ -10,6 +10,7 @@ import CustomHeader from "../components/CustomHeader"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
+import BMIDisplay from "../components/BMIDisplay"
 
 import { activateMember, getMemberById, inactivateMember } from "../lib/firebase/firestore/member"
 import { cancelSubscription, getSubscriptionsByMemberId } from "../lib/firebase/firestore/subscriptions"
@@ -455,6 +456,36 @@ export default function MemberDetailsScreen() {
 					value={member.bloodType || "-"}
 					iconName="water"
 				/>
+
+				{/* Body Metrics Card */}
+				<View style={styles.bodyMetricsContainer}>
+					<View style={styles.bodyMetricsRow}>
+						<View style={styles.bodyMetricItem}>
+							<ThemedIcon
+								name="scale-bathroom"
+								size={18}
+							/>
+							<ThemedText style={styles.bodyMetricLabel}>Kilo</ThemedText>
+							<ThemedText style={styles.bodyMetricValue}>{member.weight ? `${member.weight} kg` : "-"}</ThemedText>
+						</View>
+						<View style={styles.bodyMetricItem}>
+							<ThemedIcon
+								name="human-male-height"
+								size={18}
+							/>
+							<ThemedText style={styles.bodyMetricLabel}>Boy</ThemedText>
+							<ThemedText style={styles.bodyMetricValue}>{member.height ? `${member.height} cm` : "-"}</ThemedText>
+						</View>
+					</View>
+
+					{member.weight && member.height && member.height > 0 && (
+						<BMIDisplay
+							weight={member.weight}
+							height={member.height}
+						/>
+					)}
+				</View>
+
 				<DetailsRow
 					label={t("lockerNumber")}
 					value={member.lockerNumber || "-"}
@@ -832,6 +863,34 @@ const createStyles = (darkMode: boolean) => {
 			color: theme.red.foreground,
 			fontSize: 16,
 			fontWeight: "bold",
+		},
+		// Body Metrics
+		bodyMetricsContainer: {
+			marginTop: 16,
+			marginBottom: 8,
+			paddingVertical: 16,
+			paddingHorizontal: 12,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
+			borderRadius: 8,
+			backgroundColor: darkMode ? "#111" : "#f8f8f8",
+		},
+		bodyMetricsRow: {
+			flexDirection: "row",
+			justifyContent: "space-around",
+		},
+		bodyMetricItem: {
+			alignItems: "center",
+			gap: 4,
+		},
+		bodyMetricLabel: {
+			fontSize: 12,
+			opacity: 0.6,
+			fontWeight: "600",
+		},
+		bodyMetricValue: {
+			fontSize: 16,
+			fontWeight: "700",
 		},
 	})
 }

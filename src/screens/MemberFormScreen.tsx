@@ -86,6 +86,8 @@ export default function MemberFormScreen() {
 			gender: "UNSPECIFIED",
 			birthDate: "",
 			bloodType: "",
+			weight: "",
+			height: "",
 			emergencyName: "",
 			emergencyPhone: "",
 		},
@@ -144,6 +146,8 @@ export default function MemberFormScreen() {
 							gender: member.gender || "UNSPECIFIED",
 							birthDate: safeTimestampToDateString(member.birthDate),
 							bloodType: member.bloodType || "",
+							weight: member.weight?.toString() || "",
+							height: member.height?.toString() || "",
 							emergencyName: member.emergencyContact?.name || "",
 							emergencyPhone: member.emergencyContact?.phone || "",
 						})
@@ -173,6 +177,8 @@ export default function MemberFormScreen() {
 			gender: data.gender || ("UNSPECIFIED" as Gender),
 			birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
 			bloodType: data.bloodType || "",
+			weight: data.weight ? parseFloat(data.weight) : undefined,
+			height: data.height ? parseFloat(data.height) : undefined,
 			emergencyContact: {
 				name: data.emergencyName || "",
 				phone: data.emergencyPhone || "",
@@ -427,6 +433,54 @@ export default function MemberFormScreen() {
 														{value || t("bloodTypePlaceholder")}
 													</ThemedText>
 												</TouchableOpacity>
+											</View>
+										)}
+									/>
+
+									<Controller
+										control={control}
+										name="weight"
+										render={({ field: { onChange, value } }) => (
+											<View style={styles.field}>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>Kilo (kg)</ThemedText>
+													<ThemedIcon
+														name="scale-bathroom"
+														size={18}
+													/>
+												</View>
+												<TextInput
+													style={styles.input}
+													value={value}
+													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
+													placeholder="Kilo (kg)"
+													keyboardType="decimal-pad"
+													placeholderTextColor={darkMode ? "#666" : "#999"}
+												/>
+											</View>
+										)}
+									/>
+
+									<Controller
+										control={control}
+										name="height"
+										render={({ field: { onChange, value } }) => (
+											<View style={styles.field}>
+												<View style={styles.labelRow}>
+													<ThemedText style={styles.label}>Boy (cm)</ThemedText>
+													<ThemedIcon
+														name="human-male-height"
+														size={18}
+													/>
+												</View>
+												<TextInput
+													style={styles.input}
+													value={value}
+													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
+													placeholder="Boy (cm)"
+													keyboardType="decimal-pad"
+													placeholderTextColor={darkMode ? "#666" : "#999"}
+												/>
 											</View>
 										)}
 									/>
