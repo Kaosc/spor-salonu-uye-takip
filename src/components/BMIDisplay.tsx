@@ -1,6 +1,7 @@
 import React, { useMemo } from "react"
 import { useSelector } from "react-redux"
 import { StyleSheet, View } from "react-native"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "./ui/ThemedText"
 
@@ -8,6 +9,9 @@ import { Theme } from "../utils/theme"
 
 export default function BMIDisplay({ weight, height }: { weight: number; height: number }) {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { t } = useTranslation()
+
+	const theme = Theme[darkMode ? "dark" : "light"]
 	const styles = createStyles(darkMode)
 
 	const bmi = useMemo(() => {
@@ -16,10 +20,10 @@ export default function BMIDisplay({ weight, height }: { weight: number; height:
 	}, [weight, height])
 
 	const getBmiStatus = (bmiValue: number): { label: string; color: string } => {
-		if (bmiValue < 18.5) return { label: "Zayıf", color: "#f0ad4e" }
-		if (bmiValue < 25) return { label: "Normal", color: darkMode ? Theme.dark.green.foreground : Theme.light.green.foreground }
-		if (bmiValue < 30) return { label: "Fazla Kilolu", color: "#f0ad4e" }
-		return { label: "Obez", color: darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground }
+		if (bmiValue < 18.5) return { label: t("underweight"), color: theme.orange.foreground }
+		if (bmiValue < 25) return { label: t("normal"), color: theme.green.foreground }
+		if (bmiValue < 30) return { label: t("overweight"), color: theme.orange.foreground }
+		return { label: t("obese"), color: theme.red.foreground }
 	}
 
 	const status = getBmiStatus(bmi)
@@ -49,7 +53,7 @@ const createStyles = (darkMode: boolean) => {
 			justifyContent: "space-between",
 			marginTop: 12,
 			paddingTop: 12,
-         paddingHorizontal: 12,
+			paddingHorizontal: 12,
 			borderTopWidth: StyleSheet.hairlineWidth,
 			borderTopColor: theme.border,
 		},

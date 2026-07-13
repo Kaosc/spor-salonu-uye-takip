@@ -4,6 +4,8 @@ import { useSelector } from "react-redux"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 import MemberHomeScreen from "../screens/member/MemberHomeScreen"
+import MemberSubscriptionsScreen from "../screens/member/MemberSubscriptionsScreen"
+import MemberProfileScreen from "../screens/member/MemberProfileScreen"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { moderateScale } from "../utils/responsive"
@@ -52,7 +54,35 @@ export default function MemberTabNavigator() {
 							color={v.color}
 						/>
 					),
-					tabBarLabel: t("memberList"),
+					tabBarLabel: t("home"),
+				}}
+			/>
+			<Tabs.Screen
+				name="MemberSubscriptionsScreen"
+				component={MemberSubscriptionsScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "card-text" : "card-text-outline"}
+							size={31}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: t("mySubscriptions"),
+				}}
+			/>
+			<Tabs.Screen
+				name="MemberProfileScreen"
+				component={MemberProfileScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "account" : "account-outline"}
+							size={31}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: t("myProfile"),
 				}}
 			/>
 		</Tabs.Navigator>

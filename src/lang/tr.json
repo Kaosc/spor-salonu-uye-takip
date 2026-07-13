@@ -148,5 +148,15 @@
 	"emailNotVerified": "Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın.",
 	"registerSuccess": "Kayıt Başarılı. Lütfen e-posta adresinize gönderilen onay linkine tıklayın.",
 	"logout": "Çıkış Yap",
-	"userItSelf": "Kullanıcının kendisi"
+	"userItSelf": "Kullanıcının kendisi",
+	"member": "Üye",
+	"showMyQRCode": "QR Kodumu Göster",
+	"myProfile": "Profilim",
+	"mySubscriptions": "Aboneliğim",
+	"contactInformation": "İletişim Bilgileri",
+	"bodyMetrics": "Vücut Ölçüleri",
+	"underweight": "Zayıf",
+	"normal": "Normal",
+	"overweight": "Fazla Kilolu",
+	"obese": "Obez"
 }

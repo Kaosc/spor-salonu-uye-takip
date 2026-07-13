@@ -125,7 +125,11 @@ export default function LoginScreen() {
 					onPress={handleLogin}
 					disabled={isLoading}
 				>
-					{isLoading ? <ActivityIndicator color="#000" /> : <ThemedText style={styles.buttonText}>{t("login")}</ThemedText>}
+					{isLoading ? (
+						<ActivityIndicator color={darkMode ? "#000" : "#fff"} />
+					) : (
+						<ThemedText style={styles.buttonText}>{t("login")}</ThemedText>
+					)}
 				</ThemedButton>
 
 				{!isStaffLogin && (

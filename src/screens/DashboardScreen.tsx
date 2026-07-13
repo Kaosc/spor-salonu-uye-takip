@@ -19,6 +19,7 @@ import { getStaffUserById } from "../lib/firebase/firestore/users"
 import { moderateScale } from "../utils/responsive"
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { Theme } from "../utils/theme"
+import SettingsButton from "../components/SettingsButton"
 
 export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -50,18 +51,6 @@ export default function DashboardScreen() {
 		dispatch(logout())
 		navigation.dispatch(StackActions.replace("AuthStack"))
 	}
-
-	const SettingsButton = () => (
-		<TouchableOpacity
-			style={{ marginRight: 15 }}
-			onPress={() => navigation.navigate("SettingsStack", { screen: "SettingsScreen" })}
-		>
-			<ThemedIcon
-				name="cog-outline"
-				size={28}
-			/>
-		</TouchableOpacity>
-	)
 
 	if (loading) {
 		return (

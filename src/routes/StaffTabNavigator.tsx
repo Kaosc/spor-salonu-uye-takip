@@ -93,7 +93,7 @@ export default function StaffTabNavigator() {
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon
-							name={v.focused ? "card-account-details" : "card-account-details-outline"}
+							name={v.focused ? "card-text" : "card-text-outline"}
 							size={31}
 							color={v.color}
 						/>

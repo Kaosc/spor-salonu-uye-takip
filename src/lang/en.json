@@ -149,5 +149,15 @@
 	"emailNotVerified": "Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın.",
 	"registerSuccess": "Registration successful. Please check your email for a verification link.",
 	"logout": "Logout",
-	"userItSelf": "User Itself"
+	"userItSelf": "User Itself",
+	"member": "Member",
+	"showMyQRCode": "Show My QR Code",
+	"myProfile": "My Profile",
+	"mySubscriptions": "My Subscriptions",
+	"contactInformation": "Contact Information",
+	"bodyMetrics": "Body Metrics",
+	"underweight": "Underweight",
+	"normal": "Normal",
+	"overweight": "Overweight",
+	"obese": "Obese"
 }

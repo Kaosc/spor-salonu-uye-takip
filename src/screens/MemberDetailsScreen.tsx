@@ -19,10 +19,11 @@ import {
 	pauseSubscription,
 	resumeSubscription,
 } from "../lib/firebase/firestore/subscriptions"
-import { calculateEndDateAsDays, safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
+import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
 import { Theme } from "../utils/theme"
 
 import { AllIconNames } from "../types/icon"
+import SubscriptionView from "../components/SubscriptionView"
 
 interface RouteParams extends RouteProp<ParamListBase> {
 	params: {
@@ -113,31 +114,6 @@ export default function MemberDetailsScreen() {
 		fetchMember()
 		fetchSubscription()
 	}, [route.params?.memberId])
-
-	const formatEndDate = (date: unknown) => {
-		const dateStr = safeTimestampToDateString(date)
-		if (!dateStr) return "-"
-		return new Date(dateStr).toLocaleDateString()
-	}
-
-	const getStatusColor = (status?: string) => {
-		switch (status) {
-			case "ACTIVE":
-				return darkMode ? Theme.dark.green.foreground : Theme.light.green.foreground
-			case "EXPIRED":
-				return darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground
-			case "CANCELLED":
-				return darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground
-			case "PAUSED":
-				return "#f0ad4e"
-			default:
-				return theme.text
-		}
-	}
-
-	const formatPrice = (price: number) => {
-		return `${price.toFixed(2)} ₺`
-	}
 
 	const handleSubCancel = async (alert = true) => {
 		const cancelSub = async () => {
@@ -282,9 +258,6 @@ export default function MemberDetailsScreen() {
 	}
 
 	const SubscriptionDetails = () => {
-		const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
-		const daysLeft = subscription ? calculateEndDateAsDays(subscription.endDate) : null
-
 		const PauseToggleButton = () => {
 			if (subscription && subscription.status === "PAUSED") {
 				return (
@@ -369,83 +342,7 @@ export default function MemberDetailsScreen() {
 					</View>
 				) : subscription ? (
 					<>
-						{/* Status Badge */}
-						<View style={[styles.statusBadge, { borderColor: statusColor }]}>
-							<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-							<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>
-								{t(subscription.status?.toLowerCase() || "")}
-							</ThemedText>
-						</View>
-
-						{/* Package Header */}
-						<View style={styles.subHeader}>
-							<ThemedText style={styles.packageName}>{t(subscription.packageType)}</ThemedText>
-							<ThemedText style={styles.packagePrice}>{formatPrice(subscription.price)}</ThemedText>
-						</View>
-
-						{/* Days Left */}
-						{daysLeft !== null && (
-							<View style={styles.daysLeftRow}>
-								<ThemedText style={styles.daysLeftNumber}>{daysLeft}</ThemedText>
-								<ThemedText style={styles.daysLeftLabel}>{t("daysLeft")}</ThemedText>
-							</View>
-						)}
-
-						{/* Divider */}
-						<View style={styles.divider} />
-
-						{/* Info Rows */}
-						<DetailsRow
-							label={t("startDate")}
-							value={formatEndDate(subscription.startDate)}
-							iconName="calendar-start"
-						/>
-
-						<DetailsRow
-							label={t("endDate")}
-							value={formatEndDate(subscription.endDate)}
-							iconName="calendar-end"
-						/>
-
-						<DetailsRow
-							label={t("paymentMethod")}
-							value={t(subscription.paymentMethod)}
-							iconName="credit-card-outline"
-						/>
-
-						{subscription.notes ? (
-							<DetailsRow
-								label={t("notes")}
-								value={subscription.notes}
-								iconName="note-text-outline"
-							/>
-						) : null}
-
-						<View style={styles.divider} />
-
-						<DetailsRow
-							label={t("createdBy")}
-							value={subscription.createdBy || "-"}
-							iconName="account-plus-outline"
-						/>
-
-						{subscription.createdAt && (
-							<DetailsRow
-								label={t("createdAt")}
-								value={safeTimestampToDateTimeString(subscription.createdAt)}
-								iconName="clock-outline"
-							/>
-						)}
-
-						{subscription.pausedAt && (
-							<DetailsRow
-								label={t("pausedAt")}
-								value={safeTimestampToDateTimeString(subscription.pausedAt)}
-								iconName="clock-outline"
-							/>
-						)}
-						<View style={styles.divider} />
-
+						<SubscriptionView subscription={subscription} />
 						<ActionButtonsView />
 					</>
 				) : (

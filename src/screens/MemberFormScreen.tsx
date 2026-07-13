@@ -212,7 +212,7 @@ export default function MemberFormScreen() {
 			isActive: true,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			createdBy: isNewMember ? t("userItSelf") : authEmail?.split("@")[0] || "unknown",
+			createdBy: isNewMember ? t("userItSelf") : authEmail || "unknown",
 		}
 
 		if (isEditing && memberId) {
