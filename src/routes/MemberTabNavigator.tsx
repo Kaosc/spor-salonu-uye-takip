@@ -14,7 +14,7 @@ import LockerScreen from "../screens/LockerScreen"
 
 const Tabs = createBottomTabNavigator()
 
-export default function TabsNavigator() {
+export default function StaffTabNavigator() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const { t } = useTranslation()
 

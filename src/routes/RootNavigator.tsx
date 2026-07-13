@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-import TabsNavigator from "./TabsNavigator"
+import StaffTabNavigator from "./StaffTabNavigator"
 
 import AuthStack from "./stacks/AuthStack"
 import SettingsStack from "./stacks/SettingsStack"
@@ -26,7 +26,7 @@ export default function RootNavigator() {
 		>
 			<Stack.Screen
 				name="Tabs"
-				component={TabsNavigator}
+				component={StaffTabNavigator}
 			/>
 			<Stack.Screen
 				name="MemberDetailsScreen"
