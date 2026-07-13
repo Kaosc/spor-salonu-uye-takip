@@ -32,7 +32,8 @@ import { Theme } from "../utils/theme"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const staffID = useSelector((state: RootState) => state.auth.email)
+	const authEmail = useSelector((state: RootState) => state.auth.email)
+	const newMemberUid = useSelector((state: RootState) => state.auth.uid)
 	const navigation = useNavigation<any>()
 	const { t } = useTranslation()
 
@@ -42,6 +43,7 @@ export default function MemberFormScreen() {
 
 	const [loading, setLoading] = useState(false)
 
+	const isNewMember = route.params?.isNewMember || false
 	const memberId = route.params?.memberId
 	const isEditing = !!memberId
 
@@ -77,23 +79,42 @@ export default function MemberFormScreen() {
 		navigation.goBack()
 	}
 
-	const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>({
-		defaultValues: {
-			firstName: "",
-			lastName: "",
-			phoneNumber: "",
-			email: "",
-			address: "",
-			lockerNumber: route.params?.prefilledLockerNumber || "",
-			gender: "UNSPECIFIED",
-			birthDate: "",
-			bloodType: "",
-			weight: 0,
-			height: 0,
-			emergencyName: "",
-			emergencyPhone: "",
-		},
-	})
+	const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>(
+		isNewMember
+			? {
+					defaultValues: {
+						firstName: "",
+						lastName: "",
+						phoneNumber: "",
+						email: authEmail,
+						address: "",
+						gender: "UNSPECIFIED",
+						birthDate: "",
+						bloodType: "",
+						weight: 0,
+						height: 0,
+						emergencyName: "",
+						emergencyPhone: "",
+					},
+				}
+			: {
+					defaultValues: {
+						firstName: "",
+						lastName: "",
+						phoneNumber: "",
+						email: "",
+						address: "",
+						lockerNumber: route.params?.prefilledLockerNumber || "",
+						gender: "UNSPECIFIED",
+						birthDate: "",
+						bloodType: "",
+						weight: 0,
+						height: 0,
+						emergencyName: "",
+						emergencyPhone: "",
+					},
+				},
+	)
 
 	const currentLockerNumber = watch("lockerNumber")
 
@@ -171,7 +192,7 @@ export default function MemberFormScreen() {
 		let success = false
 
 		const memberData: Member = {
-			uid: memberId || nanoid(),
+			uid: memberId || newMemberUid || nanoid(),
 			firstName: data.firstName,
 			lastName: data.lastName,
 			phoneNumber: data.phoneNumber,
@@ -191,7 +212,7 @@ export default function MemberFormScreen() {
 			isActive: true,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			createdBy: staffID?.split("@")[0] || "unknown",
+			createdBy: isNewMember ? t("userItSelf") : authEmail?.split("@")[0] || "unknown",
 		}
 
 		if (isEditing && memberId) {
@@ -212,8 +233,20 @@ export default function MemberFormScreen() {
 		if (success) {
 			//reset state
 			reset()
+
+			if (isNewMember) {
+				navigation.dispatch(StackActions.popToTop())
+				navigation.dispatch(StackActions.replace("MemberTabs", { screen: "MemberHomeScreen" }))
+				return
+			}
+
 			navigation.dispatch(StackActions.popToTop())
-			navigation.dispatch(StackActions.replace("MemberListScreen", { refresh: true }))
+			navigation.dispatch(
+				StackActions.replace("Tabs", {
+					screen: "MemberStack",
+					params: { screen: "MemberListScreen", params: { refresh: true } },
+				}),
+			)
 		}
 	}
 
@@ -327,6 +360,7 @@ export default function MemberFormScreen() {
 													/>
 												</View>
 												<TextInput
+													editable={!isNewMember}
 													style={styles.input}
 													value={value}
 													onChangeText={onChange}
@@ -373,7 +407,7 @@ export default function MemberFormScreen() {
 									<Controller
 										control={control}
 										name="gender"
-										render={({ field: { onChange, value } }) => {
+										render={({ field: { value } }) => {
 											const genderLabels: Record<string, string> = {
 												MALE: t("male"),
 												FEMALE: t("female"),
@@ -520,30 +554,32 @@ export default function MemberFormScreen() {
 										)}
 									/>
 
-									<Controller
-										control={control}
-										name="lockerNumber"
-										render={({ field: { value } }) => (
-											<View style={styles.field}>
-												<View style={styles.labelRow}>
-													<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
-													<ThemedIcon
-														name="lock"
-														size={18}
-													/>
+									{!isNewMember && (
+										<Controller
+											control={control}
+											name="lockerNumber"
+											render={({ field: { value } }) => (
+												<View style={styles.field}>
+													<View style={styles.labelRow}>
+														<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
+														<ThemedIcon
+															name="lock"
+															size={18}
+														/>
+													</View>
+													<TouchableOpacity
+														style={[styles.selectButton, route.params?.prefilledLockerNumber && styles.inputDisabled]}
+														onPress={() => lockerSheetRef.current?.snapToIndex(0)}
+														activeOpacity={0.6}
+													>
+														<ThemedText style={[styles.selectButtonText, !value ? styles.placeholder : null]}>
+															{value || t("selectLocker")}
+														</ThemedText>
+													</TouchableOpacity>
 												</View>
-												<TouchableOpacity
-													style={[styles.selectButton, route.params?.prefilledLockerNumber && styles.inputDisabled]}
-													onPress={() => lockerSheetRef.current?.snapToIndex(0)}
-													activeOpacity={0.6}
-												>
-													<ThemedText style={[styles.selectButtonText, !value ? styles.placeholder : null]}>
-														{value || t("selectLocker")}
-													</ThemedText>
-												</TouchableOpacity>
-											</View>
-										)}
-									/>
+											)}
+										/>
+									)}
 
 									<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
 
@@ -598,7 +634,9 @@ export default function MemberFormScreen() {
 										style={styles.button}
 										onPress={handleSubmit(onSubmit)}
 									>
-										<ThemedText style={styles.buttonText}>{isEditing ? t("updateMember") : t("saveMember")}</ThemedText>
+										<ThemedText style={styles.buttonText}>
+											{isEditing ? (isNewMember ? t("update") : t("updateMember")) : isNewMember ? t("save") : t("saveMember")}
+										</ThemedText>
 									</ThemedButton>
 								</View>
 							</ScrollView>

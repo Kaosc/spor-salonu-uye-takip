@@ -18,7 +18,6 @@ import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
 
 import { staffLoginAction, memberLoginAction } from "../store/features/authSlice"
-
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const { isLoading } = useSelector((state: RootState) => state.auth)
@@ -28,8 +27,7 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
-
-	const [isStaffLogin, setIsStaffLogin] = useState(true)
+	const [isStaffLogin, setIsStaffLogin] = useState(false)
 
 	const EMAIL = useMemo(() => {
 		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""
@@ -59,10 +57,14 @@ export default function LoginScreen() {
 		const result = await dispatch(action({ email, password }))
 
 		if (action.fulfilled.match(result)) {
-			// Just makin sure the role is correct before navigating
 			const role = result.payload?.role
-			const screen = role === "MEMBER" ? "MemberTabs" : "Tabs"
-			navigation.dispatch(StackActions.replace(screen))
+			const isNewMember = "isNewMember" in result.payload ? result.payload.isNewMember : false
+
+			if (isNewMember && role === "MEMBER") {
+				navigation.navigate("MemberFormScreen", { isNewMember: true })
+			} else {
+				navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
+			}
 		} else {
 			// Catch redux state error here
 			setError(t("loginFailed"))

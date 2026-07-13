@@ -13,7 +13,7 @@ export const memberLoginAction = createAsyncThunk(
 	"auth/memberLoginAction",
 	async ({ email, password }: { email: string; password: string }) => {
 		const result = await memberLogin(email, password)
-		return { uid: result.uid, email: result.email, role: result.role }
+		return { uid: result.uid, email: result.email, role: result.role, isNewMember: result.isNewMember }
 	},
 )
 

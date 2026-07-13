@@ -78,7 +78,7 @@ export const memberLogin = async (email: string, password: string) => {
 		}
 
 		// Scenario C: Brand new organic user — no member doc exists
-		return { isNewMember: true, uid, email } as any
+		return { isNewMember: true, uid, email, role: "MEMBER" as UserRole } as any
 	} catch (e: any) {
 		console.error("[AUTH] memberLogin:", e?.message || e)
 		throw e

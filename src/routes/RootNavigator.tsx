@@ -12,12 +12,13 @@ import ConsentScreen from "../screens/ConsentScreen"
 import MemberDetailsScreen from "../screens/MemberDetailsScreen"
 
 import { getConsentAccepted } from "../utils/storage"
+import MemberFormScreen from "../screens/MemberFormScreen"
 
 const Stack = createNativeStackNavigator()
 
 export default function RootNavigator() {
 	const { isAuthenticated, role } = useSelector((state: RootState) => state.auth)
-	console.log(role)
+
 	return (
 		<Stack.Navigator
 			initialRouteName={
@@ -40,6 +41,10 @@ export default function RootNavigator() {
 			<Stack.Screen
 				name="MemberDetailsScreen"
 				component={MemberDetailsScreen}
+			/>
+			<Stack.Screen
+				name="MemberFormScreen"
+				component={MemberFormScreen}
 			/>
 			<Stack.Screen
 				name="SearchScreen"
