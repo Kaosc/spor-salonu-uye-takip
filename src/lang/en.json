@@ -139,5 +139,14 @@
 	"resumeSubscriptionConfirmation": "Are you sure you want to resume this subscription?",
 	"subscriptionResumed": "Subscription resumed.",
 	"subscriptionResumeError": "An error occurred while resuming the subscription.",
-	"pausedAt": "Paused At"
+	"pausedAt": "Paused At",
+	"confirmPassword": "Confirm Password",
+	"passwordMinLength": "Password must be at least 6 characters",
+	"passwordMismatch": "Passwords do not match",
+	"register": "Register",
+	"alreadyHaveAccount": "Already have an account? Login",
+	"staffRecordNotFound": "Staff record not found in the database.",
+	"emailNotVerified": "Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın.",
+	"registerSuccess": "Registration successful. Please check your email for a verification link.",
+	"logout": "Çıkış Yap"
 }

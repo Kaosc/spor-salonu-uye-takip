@@ -1,5 +1,14 @@
-import { useState } from "react"
-import { View, Text, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, Platform } from "react-native"
+import { useMemo, useState } from "react"
+import {
+	View,
+	Text,
+	TextInput,
+	StyleSheet,
+	ActivityIndicator,
+	KeyboardAvoidingView,
+	Platform,
+	TouchableOpacity,
+} from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
@@ -8,7 +17,7 @@ import { Image } from "expo-image"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
 
-import { loginAction } from "../store/features/authSlice"
+import { staffLoginAction, memberLoginAction } from "../store/features/authSlice"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
@@ -20,25 +29,45 @@ export default function LoginScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [email, setEmail] = useState(__DEV__ ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : "")
-	const [password, setPassword] = useState(__DEV__ ? process.env.EXPO_PUBLIC_ADMIN_PASSWORD || "" : "")
+	const [isStaffLogin, setIsStaffLogin] = useState(true)
+
+	const EMAIL = useMemo(() => {
+		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""
+	}, [isStaffLogin])
+
+	const PASSWORD = useMemo(() => {
+		return __DEV__
+			? isStaffLogin
+				? process.env.EXPO_PUBLIC_ADMIN_PASSWORD || ""
+				: process.env.EXPO_PUBLIC_MEMBER_PASSWORD || ""
+			: ""
+	}, [isStaffLogin])
+
+	const [email, setEmail] = useState(EMAIL)
+	const [password, setPassword] = useState(PASSWORD)
 	const [error, setError] = useState("")
-	const [loginType, setLoginType] = useState<"STAFF" | "MEMBER">("STAFF")
 
 	const handleLogin = async () => {
 		if (!email.trim() || !password.trim()) {
 			setError(t("emailAndPasswordRequired"))
 			return
 		}
+
 		setError("")
-		const result = await dispatch(loginAction({ email, password }))
-		if (loginAction.fulfilled.match(result)) {
-			navigation.dispatch(StackActions.replace("Tabs"))
+
+		const action = isStaffLogin ? staffLoginAction : memberLoginAction
+		const result = await dispatch(action({ email, password }))
+
+		if (action.fulfilled.match(result)) {
+			// Just makin sure the role is correct before navigating
+			const role = result.payload?.role
+			const screen = role === "MEMBER" ? "MemberTabs" : "Tabs"
+			navigation.dispatch(StackActions.replace(screen))
 		} else {
+			// Catch redux state error here
 			setError(t("loginFailed"))
 		}
 	}
-
 	return (
 		<KeyboardAvoidingView
 			style={styles.container}
@@ -50,7 +79,24 @@ export default function LoginScreen() {
 					style={styles.logo}
 				/>
 
-				<ThemedText style={styles.title}>{loginType === "STAFF" ? t("staffLogin") : t("memberLogin")}</ThemedText>
+				<ThemedText style={styles.title}>{isStaffLogin ? t("staffLogin") : t("memberLogin")}</ThemedText>
+
+				<View style={styles.segmentedControl}>
+					<TouchableOpacity
+						style={[styles.segment, isStaffLogin && styles.segmentActive]}
+						activeOpacity={0.7}
+						onPress={() => setIsStaffLogin(true)}
+					>
+						<Text style={[styles.segmentText, isStaffLogin && styles.segmentTextActive]}>{t("staffLogin")}</Text>
+					</TouchableOpacity>
+					<TouchableOpacity
+						style={[styles.segment, !isStaffLogin && styles.segmentActive]}
+						activeOpacity={0.7}
+						onPress={() => setIsStaffLogin(false)}
+					>
+						<Text style={[styles.segmentText, !isStaffLogin && styles.segmentTextActive]}>{t("memberLogin")}</Text>
+					</TouchableOpacity>
+				</View>
 
 				<TextInput
 					style={styles.input}
@@ -79,6 +125,16 @@ export default function LoginScreen() {
 				>
 					{isLoading ? <ActivityIndicator color="#000" /> : <ThemedText style={styles.buttonText}>{t("login")}</ThemedText>}
 				</ThemedButton>
+
+				{!isStaffLogin && (
+					<TouchableOpacity
+						style={styles.registerLink}
+						activeOpacity={0.7}
+						onPress={() => navigation.navigate("RegisterScreen")}
+					>
+						<ThemedText style={styles.registerLinkText}>{t("register")}</ThemedText>
+					</TouchableOpacity>
+				)}
 			</View>
 		</KeyboardAvoidingView>
 	)
@@ -99,8 +155,33 @@ const createStyles = (darkMode: boolean) =>
 		title: {
 			fontSize: 28,
 			fontWeight: "700",
-			marginBottom: 32,
+			marginBottom: 16,
 			textAlign: "center",
+		},
+		segmentedControl: {
+			flexDirection: "row",
+			borderWidth: 1,
+			borderColor: "#ccc",
+			borderRadius: 8,
+			overflow: "hidden",
+			marginBottom: 24,
+		},
+		segment: {
+			flex: 1,
+			paddingVertical: 12,
+			alignItems: "center",
+			backgroundColor: "transparent",
+		},
+		segmentActive: {
+			backgroundColor: darkMode ? "#fff" : "#000",
+		},
+		segmentText: {
+			fontSize: 15,
+			fontWeight: "600",
+			color: darkMode ? "#fff" : "#000",
+		},
+		segmentTextActive: {
+			color: darkMode ? "#000" : "#fff",
 		},
 		input: {
 			borderWidth: 1,
@@ -126,10 +207,18 @@ const createStyles = (darkMode: boolean) =>
 			width: 140,
 			height: 140,
 			borderRadius: 20,
-			marginBottom: 100,
+			marginBottom: 60,
 			borderWidth: darkMode ? 0 : 1,
 			alignSelf: "center",
 			borderColor: "#ccc",
 			borderBottomWidth: darkMode ? 0 : 2,
+		},
+		registerLink: {
+			marginTop: 16,
+			alignItems: "center",
+		},
+		registerLinkText: {
+			fontSize: 14,
+			textDecorationLine: "underline",
 		},
 	})

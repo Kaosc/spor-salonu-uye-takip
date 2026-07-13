@@ -1,27 +1,31 @@
 import { useEffect, useState } from "react"
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from "react-native"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import QRCode from "react-native-qrcode-svg"
 import { useTranslation } from "react-i18next"
-import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
 
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
-import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
-import CameraViewModal from "../components/QRScannerView"
+import CustomHeader from "../components/CustomHeader"
+import QRScannerView from "../components/QRScannerView"
+import ThemedButton from "../components/ui/ThemedButton"
 
+import { logout } from "../store/features/authSlice"
+import { logoutUser } from "../lib/firebase/auth"
 import { getStaffUserById } from "../lib/firebase/firestore/users"
+
 import { moderateScale } from "../utils/responsive"
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
-import CustomHeader from "../components/CustomHeader"
 import { Theme } from "../utils/theme"
-import QRScannerView from "../components/QRScannerView"
 
 export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const uid = useSelector((state: RootState) => state.auth.uid)
 	const theme = Theme[darkMode ? "dark" : "light"]
+	const dispatch = useDispatch<any>()
 	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
@@ -40,6 +44,12 @@ export default function DashboardScreen() {
 			.catch(() => {})
 			.finally(() => setLoading(false))
 	}, [uid])
+
+	const handleLogout = async () => {
+		await logoutUser()
+		dispatch(logout())
+		navigation.dispatch(StackActions.replace("AuthStack"))
+	}
 
 	const SettingsButton = () => (
 		<TouchableOpacity
@@ -206,6 +216,13 @@ export default function DashboardScreen() {
 						/>
 					</View>
 				</TouchableOpacity>
+
+				<ThemedButton
+					onPress={handleLogout}
+					style={styles.logoutButton}
+				>
+					<ThemedText style={styles.logoutText}>{t("logout")}</ThemedText>
+				</ThemedButton>
 			</ScrollView>
 		</>
 	)
@@ -309,6 +326,21 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.background,
 			alignItems: "center",
 			justifyContent: "center",
+		},
+		logoutButton: {
+			marginHorizontal: 20,
+			paddingVertical: 12,
+			borderRadius: 12,
+			backgroundColor: theme.red.background,
+			alignItems: "center",
+			justifyContent: "center",
+			borderWidth: 1,
+			borderColor: theme.red.foreground,
+		},
+		logoutText: {
+			fontSize: 16,
+			fontWeight: "bold",
+			color: theme.red.foreground,
 		},
 	})
 }

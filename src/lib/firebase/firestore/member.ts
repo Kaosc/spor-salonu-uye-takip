@@ -8,8 +8,9 @@ import {
 	getDoc,
 	serverTimestamp,
 	setDoc,
+	query,
+	where,
 } from "@react-native-firebase/firestore"
-import { registerMember } from "../auth"
 
 const db = getFirestore()
 
@@ -17,15 +18,9 @@ const COLLECTION = "members"
 
 export const addMember = async (memberData: Member): Promise<boolean> => {
 	try {
-		// Register Member
-		const newUID = await registerMember(memberData.email)
-		if (!newUID) return false
-
-		// Add member data with the new UID
-		const docRef = doc(db, COLLECTION, newUID)
+		const docRef = doc(db, COLLECTION, memberData.uid)
 		const member: Member = {
 			...memberData,
-			uid: newUID,
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
 		}
@@ -92,6 +87,24 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 		return null
 	} catch (e) {
 		console.error("[FIRESTORE] getMemberById:", e)
+		throw e
+	}
+}
+
+export const getMemberByEmail = async (email: string): Promise<Member | null> => {
+	try {
+		const membersRef = collection(db, COLLECTION)
+		const q = query(membersRef, where("email", "==", email))
+		const snapshot = await getDocs(q)
+
+		if (!snapshot.empty) {
+			const docSnap = snapshot.docs[0]
+			return { ...docSnap.data() } as Member
+		}
+
+		return null
+	} catch (e) {
+		console.error("[FIRESTORE] getMemberByEmail:", e)
 		throw e
 	}
 }

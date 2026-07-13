@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useSelector } from "react-redux"
 import { useEffect, useState, useRef, useMemo } from "react"
 import { useTranslation } from "react-i18next"
+import { nanoid } from "@reduxjs/toolkit"
 
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker"
 import BottomSheet from "@gorhom/bottom-sheet"
@@ -87,8 +88,8 @@ export default function MemberFormScreen() {
 			gender: "UNSPECIFIED",
 			birthDate: "",
 			bloodType: "",
-			weight: "",
-			height: "",
+			weight: 0,
+			height: 0,
 			emergencyName: "",
 			emergencyPhone: "",
 		},
@@ -148,8 +149,8 @@ export default function MemberFormScreen() {
 							gender: member.gender || "UNSPECIFIED",
 							birthDate: safeTimestampToDateString(member.birthDate),
 							bloodType: member.bloodType || "",
-							weight: member.weight?.toString() || "",
-							height: member.height?.toString() || "",
+							weight: member.weight || 0,
+							height: member.height || 0,
 							emergencyName: member.emergencyContact?.name || "",
 							emergencyPhone: member.emergencyContact?.phone || "",
 						})
@@ -170,18 +171,18 @@ export default function MemberFormScreen() {
 		let success = false
 
 		const memberData: Member = {
-			uid: memberId || "",
+			uid: memberId || nanoid(),
 			firstName: data.firstName,
 			lastName: data.lastName,
 			phoneNumber: data.phoneNumber,
 			email: data.email,
-			address: data.address || undefined,
+			address: data.address || "",
 			lockerNumber: data.lockerNumber || "",
 			gender: data.gender || ("UNSPECIFIED" as Gender),
 			birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
 			bloodType: data.bloodType || "",
-			weight: data.weight ? parseFloat(data.weight) : undefined,
-			height: data.height ? parseFloat(data.height) : undefined,
+			weight: data.weight ? data.weight : 0,
+			height: data.height ? data.height : 0,
 			emergencyContact: {
 				name: data.emergencyName || "",
 				phone: data.emergencyPhone || "",
@@ -485,7 +486,7 @@ export default function MemberFormScreen() {
 												</View>
 												<TextInput
 													style={styles.input}
-													value={value}
+													value={value.toString()}
 													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
 													placeholder={t("weightPlaceholder")}
 													keyboardType="decimal-pad"
@@ -509,7 +510,7 @@ export default function MemberFormScreen() {
 												</View>
 												<TextInput
 													style={styles.input}
-													value={value}
+													value={value.toString()}
 													onChangeText={(text) => onChange(text.replace(/[^0-9.]/g, ""))}
 													placeholder={t("heightPlaceholder")}
 													keyboardType="decimal-pad"

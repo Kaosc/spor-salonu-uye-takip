@@ -1,43 +1,98 @@
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut } from "@react-native-firebase/auth"
-import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore"
-import { nanoid } from "@reduxjs/toolkit"
+import {
+	createUserWithEmailAndPassword,
+	getAuth,
+	sendEmailVerification,
+	signInWithEmailAndPassword,
+	signOut,
+} from "@react-native-firebase/auth"
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, writeBatch } from "@react-native-firebase/firestore"
 import { t } from "i18next"
 
 const auth = getAuth()
 const db = getFirestore()
 
-export const loginWithEmail = async (email: string, password: string) => {
+export const staffLogin = async (email: string, password: string) => {
+	const userCredential = await signInWithEmailAndPassword(auth, email, password)
+	const uid = userCredential.user.uid
+
+	const staffRef = doc(db, "users", uid)
+	const staffDoc = await getDoc(staffRef)
+
+	if (!staffDoc.exists()) {
+		await signOut(auth)
+		throw new Error(t("staffRecordNotFound"))
+	}
+
+	const data = staffDoc.data()
+	return { uid, email, role: data?.role as UserRole }
+}
+
+export const memberLogin = async (email: string, password: string) => {
 	try {
 		const userCredential = await signInWithEmailAndPassword(auth, email, password)
 		const uid = userCredential.user.uid
 
-		// Check if the user is a staff member
-		const staffRef = doc(db, "users", uid)
-		const staffDoc = await getDoc(staffRef)
-		if (staffDoc.exists()) {
-			const data = staffDoc.data()
-			return { uid, email, role: data?.role as UserRole }
+		// 1. Email must be verified
+		if (!userCredential.user.emailVerified) {
+			await signOut(auth)
+			throw new Error(t("emailNotVerified"))
 		}
 
-		// Check if the user is a member
+		// 2. Check if a member doc exists with this email (query directly to get doc ID)
 		const membersRef = collection(db, "members")
-		const q = query(membersRef, where("email", "==", email))
-		const memberDocs = await getDocs(q)
-		if (!memberDocs.empty) return { uid, email, role: "MEMBER" as UserRole }
+		const memberQuery = query(membersRef, where("email", "==", email))
+		const memberSnapshot = await getDocs(memberQuery)
 
-		throw new Error("Kullanıcı veritabanında bulunamadı.")
+		if (!memberSnapshot.empty) {
+			const oldDoc = memberSnapshot.docs[0]
+			const oldDocId = oldDoc.id
+			const oldData = oldDoc.data()
+
+			// Scenario A: Staff created this record — uid missing or doesn't match
+			if (!oldData.uid || oldData.uid !== uid) {
+				const batch = writeBatch(db)
+
+				// Create new member doc with the new Auth UID, copying all old data
+				const newMemberRef = doc(db, "members", uid)
+				batch.set(newMemberRef, { ...oldData, uid, isActive: true })
+
+				// Reassign all subscriptions from oldDocId to new uid
+				const subsRef = collection(db, "subscriptions")
+				const subsQuery = query(subsRef, where("memberUid", "==", oldDocId))
+				const subsSnapshot = await getDocs(subsQuery)
+
+				// Update each subscription's memberUid to the new uid
+				subsSnapshot.forEach((subDoc) => {
+					batch.update(subDoc.ref, { memberUid: uid })
+				})
+
+				// Delete the old member document
+				const oldMemberRef = doc(db, "members", oldDocId)
+				batch.delete(oldMemberRef)
+
+				await batch.commit()
+			}
+
+			// Scenario B: Regular returning member — uid matches
+			return { uid, email, role: "MEMBER" as UserRole }
+		}
+
+		// Scenario C: Brand new organic user — no member doc exists
+		return { isNewMember: true, uid, email } as any
 	} catch (e: any) {
-		console.error("[AUTH] loginWithEmail:", e?.message || e)
+		console.error("[AUTH] memberLogin:", e?.message || e)
 		throw e
 	}
 }
 
-export const registerMember = async (email: string) => {
+export const registerMember = async (email: string, password: string) => {
 	let uid: string | null = null
 
 	try {
-		const tempPassword = nanoid(12)
-		const credential = await createUserWithEmailAndPassword(auth, email, tempPassword)
+		const credential = await createUserWithEmailAndPassword(auth, email, password)
+		await sendEmailVerification(credential.user)
+		await signOut(auth)
+		toast.show(t("registerSuccess"), { duration: 10000, type: "success" })
 		uid = credential.user.uid
 	} catch (error: any) {
 		console.error("[AUTH] registerMember:", error?.message || error)
@@ -60,26 +115,6 @@ export const registerMember = async (email: string) => {
 	}
 
 	return uid
-
-	// // 2. Acaba personel bu adamı daha önceden e-postasıyla Sanal olarak kaydetmiş miydi?
-	// const membersRef = collection(db, "members")
-	// const q = query(membersRef, where("email", "==", email))
-	// const snapshot = await getDocs(q)
-
-	// if (!snapshot.empty) {
-	// 	// Personel önceden kaydetmiş! O zaman o eski dökümanı silip,
-	// 	// verilerini Auth UID'si ile yeni bir dökümana taşıyabiliriz.
-	// 	// (Veya mevcut dökümanı güncelleriz)
-	// } else {
-	// 	// Yepyeni bir müşteri, personelin haberi yok.
-	// 	// Veritabanına UID'sini belge adı (doc id) yaparak ekle
-	// 	await setDoc(doc(db, "members", uid), {
-	// 		email,
-	// 		role: "MEMBER",
-	// 		isActive: true,
-	// 		createdAt: serverTimestamp(),
-	// 	})
-	// }
 }
 
 export const logoutUser = async (): Promise<void> => {

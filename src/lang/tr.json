@@ -138,5 +138,14 @@
 	"resumeSubscriptionConfirmation": "Bu aboneliği devam ettirmek istediğinizden emin misiniz?",
 	"subscriptionResumed": "Abonelik devam ettirildi.",
 	"subscriptionResumeError": "Abonelik devam ettirilirken bir hata oluştu.",
-	"pausedAt": "Durdurulma Tarihi"
-	}
+	"pausedAt": "Durdurulma Tarihi",
+	"confirmPassword": "Şifreyi Onayla",
+	"passwordMinLength": "Şifre en az 6 karakter olmalıdır",
+	"passwordMismatch": "Şifreler eşleşmiyor",
+	"register": "Kayıt Ol",
+	"alreadyHaveAccount": "Zaten hesabın var mı? Giriş Yap",
+	"staffRecordNotFound": "Kullanıcı veritabanında bulunamadı.",
+	"emailNotVerified": "Lütfen giriş yapmadan önce e-posta adresinizi doğrulayın.",
+	"registerSuccess": "Kayıt Başarılı. Lütfen e-posta adresinize gönderilen onay linkine tıklayın.",
+	"logout": "Çıkış Yap"
+}

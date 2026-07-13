@@ -58,8 +58,8 @@ type FormValues = {
 	gender: Gender
 	birthDate: string
 	bloodType: string
-	weight: string
-	height: string
+	weight: number
+	height: number
 	emergencyName: string
 	emergencyPhone: string
 }

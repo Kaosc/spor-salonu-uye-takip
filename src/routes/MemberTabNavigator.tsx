@@ -3,24 +3,20 @@ import { useTranslation } from "react-i18next"
 import { useSelector } from "react-redux"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
-
-import MemberStack from "./stacks/MemberStack"
-import DashboardScreen from "../screens/DashboardScreen"
-import SubscriptionStack from "./stacks/SubscriptionStack"
+import MemberHomeScreen from "../screens/member/MemberHomeScreen"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { moderateScale } from "../utils/responsive"
-import LockerScreen from "../screens/LockerScreen"
 
 const Tabs = createBottomTabNavigator()
 
-export default function StaffTabNavigator() {
+export default function MemberTabNavigator() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const { t } = useTranslation()
 
 	return (
 		<Tabs.Navigator
-			initialRouteName="DashboardScreen"
+			initialRouteName="MemberHomeScreen"
 			backBehavior="initialRoute"
 			screenOptions={{
 				headerStyle: {
@@ -46,22 +42,8 @@ export default function StaffTabNavigator() {
 			}}
 		>
 			<Tabs.Screen
-				name="MemberStack"
-				component={MemberStack}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={v.focused ? "account-group" : "account-group-outline"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("memberList"),
-				}}
-			/>
-			<Tabs.Screen
-				name="DashboardScreen"
-				component={DashboardScreen}
+				name="MemberHomeScreen"
+				component={MemberHomeScreen}
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon
@@ -70,35 +52,7 @@ export default function StaffTabNavigator() {
 							color={v.color}
 						/>
 					),
-					tabBarLabel: t("dashboard"),
-				}}
-			/>
-			<Tabs.Screen
-				name="LockerScreen"
-				component={LockerScreen}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={"locker"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("lockers"),
-				}}
-			/>
-			<Tabs.Screen
-				name="SubscriptionStack"
-				component={SubscriptionStack}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={v.focused ? "card-account-details" : "card-account-details-outline"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("subscriptions"),
+					tabBarLabel: t("memberList"),
 				}}
 			/>
 		</Tabs.Navigator>

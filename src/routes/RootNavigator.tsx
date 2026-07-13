@@ -2,6 +2,7 @@ import { useSelector } from "react-redux"
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
 import StaffTabNavigator from "./StaffTabNavigator"
+import MemberTabNavigator from "./MemberTabNavigator"
 
 import AuthStack from "./stacks/AuthStack"
 import SettingsStack from "./stacks/SettingsStack"
@@ -15,18 +16,26 @@ import { getConsentAccepted } from "../utils/storage"
 const Stack = createNativeStackNavigator()
 
 export default function RootNavigator() {
-	const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated)
-
+	const { isAuthenticated, role } = useSelector((state: RootState) => state.auth)
+	console.log(role)
 	return (
 		<Stack.Navigator
-			initialRouteName={getConsentAccepted() ? (isAuthenticated ? "Tabs" : "AuthStack") : "Consent"}
+			initialRouteName={
+				getConsentAccepted() ? (isAuthenticated ? (role === "MEMBER" ? "MemberTabs" : "Tabs") : "AuthStack") : "Consent"
+			}
 			screenOptions={{
 				headerShown: false,
 			}}
 		>
+			{role !== "MEMBER" && (
+				<Stack.Screen
+					name="Tabs"
+					component={StaffTabNavigator}
+				/>
+			)}
 			<Stack.Screen
-				name="Tabs"
-				component={StaffTabNavigator}
+				name="MemberTabs"
+				component={MemberTabNavigator}
 			/>
 			<Stack.Screen
 				name="MemberDetailsScreen"
