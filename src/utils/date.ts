@@ -48,11 +48,30 @@ export const safeTimestampToDateTimeString = (timestamp: unknown): string => {
 	}
 }
 
-export const calculateEndDateAsDays = (end: Date | FirebaseTimestamp): number => {
+export const calculateEndDateAsDays = (end: Date | FirebaseTimestamp, pausedAt?: Date | FirebaseTimestamp): number => {
 	// Get the difference between todays date and the end date in milliseconds and return the difference in days
 	const endDate = end instanceof Date ? end : end.toDate()
+	const pausedDate = pausedAt instanceof Date ? pausedAt : pausedAt?.toDate()
 	const today = new Date()
-	const diffInMs = endDate.getTime() - today.getTime()
+
+	let diffInMs = 0
+
+	if (pausedDate) {
+		// Paused duration is the difference between today and the paused date in milliseconds
+		const pausedDurationMs = today.getTime() - pausedDate.getTime()
+		// Maximum pause duration is the difference between the end date and the paused date
+		const maximumPauseDurationMs = endDate.getTime() - pausedDate.getTime()
+		// If the paused duration is more than the maximum pause duration, we set the new end date to now + remaining duration of the subscription. Otherwise, we set the new end date to end date + paused duration.
+		if (pausedDurationMs > maximumPauseDurationMs) {
+			diffInMs = maximumPauseDurationMs
+		} else {
+			// If the paused duration is less than or equal to the maximum pause duration, we set the new end date to end date + paused duration.
+			diffInMs = endDate.getTime() - today.getTime() + pausedDurationMs
+		}
+	} else {
+		diffInMs = endDate.getTime() - today.getTime()
+	}
+
 	return Math.ceil(diffInMs / (1000 * 60 * 60 * 24))
 }
 

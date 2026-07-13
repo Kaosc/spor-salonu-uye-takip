@@ -49,6 +49,7 @@ export const memberLogin = async (email: string, password: string) => {
 			const oldData = oldDoc.data()
 
 			// Scenario A: Staff created this record — uid missing or doesn't match
+			// We found user by the email and the member collection uid doesn't match the auth uid, so we need to migrate the data to the new uid
 			if (!oldData.uid || oldData.uid !== uid) {
 				const batch = writeBatch(db)
 

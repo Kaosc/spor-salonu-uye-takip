@@ -69,8 +69,18 @@ export const resumeSubscription = async (subscriptionId: string) => {
 		const now = new Date()
 		const pausedDurationMs = now.getTime() - pausedAt.getTime()
 
-		// Calculate the new end date by adding the paused duration to the original end date
-		const newEndDate = new Date(endDate.getTime() + pausedDurationMs)
+		// Let say user paused the sub after 10 day of the 1 month sub. and start the sub after 30 days. So in this case maximuum pause duration should be 20 days (30 - 10 = 20 days). So we need to check if the paused duration is more than the remaining duration of the subscription. If it is, we should set the end date to the current date + remaining duration of the subscription.
+		const maximumPauseDurationMs = endDate.getTime() - pausedAt.getTime()
+		let newEndDate: Date
+
+		// If the paused duration is more than the maximum pause duration, we set the new end date to now + remaining duration of the subscription. Otherwise, we set the new end date to end date + paused duration.
+		if (pausedDurationMs > maximumPauseDurationMs) {
+			const remainingDurationMs = endDate.getTime() - pausedAt.getTime()
+			newEndDate = new Date(now.getTime() + remainingDurationMs)
+		} else {
+			// If the paused duration is less than or equal to the maximum pause duration, we set the new end date to end date + paused duration.
+			newEndDate = new Date(endDate.getTime() + pausedDurationMs)
+		}
 
 		await updateDoc(subRef, {
 			status: "ACTIVE",

@@ -31,7 +31,7 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 	}
 
 	const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
-	const daysLeft = subscription ? calculateEndDateAsDays(subscription.endDate) : null
+	const daysLeft = subscription ? calculateEndDateAsDays(subscription.endDate, subscription.pausedAt) : null
 
 	const formatPrice = (price: number) => {
 		return `${price.toFixed(2)} ₺`
@@ -82,6 +82,14 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 				value={formatEndDate(subscription.endDate)}
 				iconName="calendar-end"
 			/>
+
+			{subscription.pausedAt && (
+				<DetailsRow
+					label={t("pausedAt")}
+					value={formatEndDate(subscription.pausedAt)}
+					iconName="pause-circle-outline"
+				/>
+			)}
 
 			<DetailsRow
 				label={t("paymentMethod")}
