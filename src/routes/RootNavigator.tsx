@@ -9,10 +9,10 @@ import SettingsStack from "./stacks/SettingsStack"
 
 import SearchScreen from "../screens/SearchScreen"
 import ConsentScreen from "../screens/ConsentScreen"
-import MemberDetailsScreen from "../screens/MemberDetailsScreen"
+import MemberDetailsScreen from "../screens/member/MemberDetailsScreen"
 
 import { getConsentAccepted } from "../utils/storage"
-import MemberFormScreen from "../screens/MemberFormScreen"
+import MemberFormScreen from "../screens/member/MemberFormScreen"
 
 const Stack = createNativeStackNavigator()
 

@@ -11,6 +11,7 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import CustomHeader from "../components/CustomHeader"
 import QRScannerView from "../components/QRScannerView"
 import ThemedButton from "../components/ui/ThemedButton"
+import SettingsButton from "../components/SettingsButton"
 
 import { logout } from "../store/features/authSlice"
 import { logoutUser } from "../lib/firebase/auth"
@@ -19,7 +20,6 @@ import { getStaffUserById } from "../lib/firebase/firestore/users"
 import { moderateScale } from "../utils/responsive"
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { Theme } from "../utils/theme"
-import SettingsButton from "../components/SettingsButton"
 
 export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>

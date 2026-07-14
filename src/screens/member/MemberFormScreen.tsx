@@ -19,16 +19,16 @@ import { nanoid } from "@reduxjs/toolkit"
 import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker"
 import BottomSheet from "@gorhom/bottom-sheet"
 
-import ThemedText from "../components/ui/ThemedText"
-import ThemedIcon from "../components/ui/ThemedIcon"
-import CustomHeader from "../components/CustomHeader"
-import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
-import ThemedButton from "../components/ui/ThemedButton"
-import ThemedBottomSheet from "../components/ui/ThemedBottomSheet"
+import ThemedText from "../../components/ui/ThemedText"
+import ThemedIcon from "../../components/ui/ThemedIcon"
+import CustomHeader from "../../components/CustomHeader"
+import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
+import ThemedButton from "../../components/ui/ThemedButton"
+import ThemedBottomSheet from "../../components/ui/ThemedBottomSheet"
 
-import { addMember, getAllMembers, getMemberById, updateMember } from "../lib/firebase/firestore/member"
-import { safeTimestampToDateString } from "../utils/date"
-import { Theme } from "../utils/theme"
+import { addMember, getAllMembers, getMemberById, updateMember } from "../../lib/firebase/firestore/member"
+import { safeTimestampToDateString } from "../../utils/date"
+import { Theme } from "../../utils/theme"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)

@@ -1,6 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 
-import MemberListScreen from "../../screens/MemberListScreen"
+import MemberListScreen from "../../screens/member/MemberListScreen"
 import SubscriptionFormScreen from "../../screens/SubscriptionFormScreen"
 
 const Stack = createNativeStackNavigator()

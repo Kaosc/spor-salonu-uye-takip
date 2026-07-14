@@ -5,25 +5,25 @@ import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import PagerView from "react-native-pager-view"
 
-import ThemedText from "../components/ui/ThemedText"
-import CustomHeader from "../components/CustomHeader"
-import ThemedIcon from "../components/ui/ThemedIcon"
-import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
-import ThemedButton from "../components/ui/ThemedButton"
-import BMIDisplay from "../components/BMIDisplay"
+import ThemedText from "../../components/ui/ThemedText"
+import CustomHeader from "../../components/CustomHeader"
+import ThemedIcon from "../../components/ui/ThemedIcon"
+import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
+import ThemedButton from "../../components/ui/ThemedButton"
+import BMIDisplay from "../../components/BMIDisplay"
 
-import { activateMember, getMemberById, inactivateMember } from "../lib/firebase/firestore/member"
+import { activateMember, getMemberById, inactivateMember } from "../../lib/firebase/firestore/member"
 import {
 	cancelSubscription,
 	getSubscriptionsByMemberId,
 	pauseSubscription,
 	resumeSubscription,
-} from "../lib/firebase/firestore/subscriptions"
-import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../utils/date"
-import { Theme } from "../utils/theme"
+} from "../../lib/firebase/firestore/subscriptions"
+import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../../utils/date"
+import { Theme } from "../../utils/theme"
 
-import { AllIconNames } from "../types/icon"
-import SubscriptionView from "../components/SubscriptionView"
+import { AllIconNames } from "../../types/icon"
+import SubscriptionView from "../../components/SubscriptionView"
 
 interface RouteParams extends RouteProp<ParamListBase> {
 	params: {

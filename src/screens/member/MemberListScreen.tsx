@@ -6,14 +6,14 @@ import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import { useMMKVBoolean, useMMKVObject } from "react-native-mmkv"
 
-import ThemedText from "../components/ui/ThemedText"
-import ThemedIcon from "../components/ui/ThemedIcon"
-import MemberListCard from "../components/MemberListCard"
+import ThemedText from "../../components/ui/ThemedText"
+import ThemedIcon from "../../components/ui/ThemedIcon"
+import MemberListCard from "../../components/MemberListCard"
 
-import { getAllMembers } from "../lib/firebase/firestore/member"
-import { getAllSubscriptions } from "../lib/firebase/firestore/subscriptions"
+import { getAllMembers } from "../../lib/firebase/firestore/member"
+import { getAllSubscriptions } from "../../lib/firebase/firestore/subscriptions"
 
-import { Theme } from "../utils/theme"
+import { Theme } from "../../utils/theme"
 
 export default function MemberListContent() {
 	const navigation = useNavigation<any>()

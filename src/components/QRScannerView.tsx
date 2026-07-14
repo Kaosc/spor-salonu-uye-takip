@@ -19,7 +19,7 @@ type QRScannerViewProps = {
 	checkingIn: boolean
 }
 
-export default function QRScannerView({ onClose, checkingIn }	: QRScannerViewProps) {
+export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProps) {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const insets = useSafeAreaInsets()
@@ -35,7 +35,6 @@ export default function QRScannerView({ onClose, checkingIn }	: QRScannerViewPro
 	}, [])
 
 	const handleOnQrScanned = async (result: any) => {
-		console.log(scanned.current)
 		if (result?.data && !scanned.current) {
 			scanned.current = true
 
