@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
 import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
@@ -75,6 +75,11 @@ export default function MemberDetailsScreen() {
 
 		if (prevScreen === "LockerScreen") {
 			navigation.navigate("Tabs", { screen: "LockerScreen" })
+			return
+		}
+
+		if (prevScreen === "CheckinsListScreen") {
+			navigation.navigate("Tabs", { screen: "CheckinsListScreen" })
 			return
 		}
 

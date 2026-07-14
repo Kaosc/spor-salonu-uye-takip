@@ -1,15 +1,14 @@
-import { useEffect, useState } from "react"
-import { View, ScrollView, Modal, TouchableOpacity, StyleSheet } from "react-native"
+import { useEffect, useMemo, useState } from "react"
+import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
-import QRCode from "react-native-qrcode-svg"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
-import ThemedButton from "../../components/ui/ThemedButton"
 import CustomHeader from "../../components/CustomHeader"
 import SettingsButton from "../../components/SettingsButton"
+import QRCodeModal from "../../components/QRCodeModal"
 
 import { Theme } from "../../utils/theme"
 import { moderateScale } from "../../utils/responsive"
@@ -23,10 +22,18 @@ export default function MemberHomeScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const theme = Theme[darkMode ? "dark" : "light"]
-
 	const [qrModalVisible, setQrModalVisible] = useState(false)
 	const [member, setMember] = useState<Member | null>(null)
+
+	const QrData: CheckIn = useMemo(() => {
+		if (!member) return {} as CheckIn
+
+		return {
+			memberUid: member.uid,
+			firstName: member.firstName,
+			lastName: member.lastName,
+		} as CheckIn
+	}, [member])
 
 	const fetchMember = async () => {
 		if (!uid) return
@@ -108,32 +115,11 @@ export default function MemberHomeScreen() {
 			</ScrollView>
 
 			{/* QR Code Modal */}
-			<Modal
+			<QRCodeModal
+				data={QrData}
 				visible={qrModalVisible}
-				transparent
-				animationType="fade"
-				onRequestClose={() => setQrModalVisible(false)}
-			>
-				<View style={styles.modalOverlay}>
-					<View style={[styles.modalContent, { backgroundColor: theme.cardBackground }]}>
-						<View style={styles.qrContainer}>
-							{member?.uid && (
-								<QRCode
-									value={member.uid}
-									size={moderateScale(300)}
-									backgroundColor="white"
-									color="black"
-								/>
-							)}
-						</View>
-						<ThemedButton
-							style={styles.closeButton}
-							onPress={() => setQrModalVisible(false)}
-							text={t("close")}
-						/>
-					</View>
-				</View>
-			</Modal>
+				onClose={() => setQrModalVisible(false)}
+			/>
 		</View>
 	)
 }
@@ -208,45 +194,6 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 15,
 			fontWeight: "bold",
 			opacity: 0.7,
-		},
-		// Modal
-		modalOverlay: {
-			flex: 1,
-			backgroundColor: "rgba(0,0,0,0.6)",
-			justifyContent: "center",
-			alignItems: "center",
-			padding: moderateScale(15),
-		},
-		modalContent: {
-			width: "100%",
-			borderRadius: 20,
-			padding: moderateScale(30),
-			alignItems: "center",
-			borderWidth: 1,
-			borderColor: theme.border,
-			gap: 50,
-		},
-		modalTitle: {
-			fontSize: 20,
-			fontWeight: "700",
-			marginBottom: moderateScale(24),
-		},
-		qrContainer: {
-			padding: moderateScale(16),
-			borderRadius: 16,
-			backgroundColor: "#ffffff",
-		},
-		qrHint: {
-			fontSize: 13,
-			opacity: 0.5,
-			textAlign: "center",
-			marginTop: moderateScale(16),
-			marginBottom: moderateScale(24),
-		},
-		closeButton: {
-			width: "100%",
-			paddingVertical: moderateScale(14),
-			alignItems: "center",
 		},
 	})
 }

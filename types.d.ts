@@ -128,8 +128,13 @@ interface Subscription {
 	notes?: string
 }
 
-interface CheckIn {
+interface CheckInQRData {
 	memberUid: string
+	firstName: string
+	lastName: string
+}
+
+interface CheckIn extends CheckInQRData {
 	checkInTime: Date | FieldValue
 	lastCheckedInBy: string
 }

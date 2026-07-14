@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from "react-native"
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import QRCode from "react-native-qrcode-svg"
 import { useTranslation } from "react-i18next"
@@ -12,13 +12,15 @@ import CustomHeader from "../components/CustomHeader"
 import QRScannerView from "../components/QRScannerView"
 import ThemedButton from "../components/ui/ThemedButton"
 import SettingsButton from "../components/SettingsButton"
+import QRCodeModal from "../components/QRCodeModal"
 
 import { logout } from "../store/features/authSlice"
+
 import { logoutUser } from "../lib/firebase/auth"
 import { getStaffUserById } from "../lib/firebase/firestore/users"
+import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 
 import { moderateScale } from "../utils/responsive"
-import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { Theme } from "../utils/theme"
 
 export default function DashboardScreen() {
@@ -77,23 +79,11 @@ export default function DashboardScreen() {
 
 	return (
 		<>
-			<Modal
+			<QRCodeModal
+				data={uid}
 				visible={qrModalVisible}
-				transparent
-				animationType="fade"
-				onRequestClose={() => setQrModalVisible(false)}
-			>
-				<TouchableOpacity
-					style={styles.modalOverlay}
-					activeOpacity={1}
-					onPress={() => setQrModalVisible(false)}
-				>
-					<QRCode
-						value={staffUser.uid}
-						size={moderateScale(Dimensions.get("window").width * 0.85)}
-					/>
-				</TouchableOpacity>
-			</Modal>
+				onClose={() => setQrModalVisible(false)}
+			/>
 
 			{scannerModalVisible && (
 				<QRScannerView
@@ -230,7 +220,7 @@ export default function DashboardScreen() {
 								name="check-circle-outline"
 								size={moderateScale(40)}
 							/>
-							<ThemedText style={styles.qrCardTitle}>{"Check In"}</ThemedText>
+							<ThemedText style={styles.qrCardTitle}>{t("userCheckin")}</ThemedText>
 						</View>
 					</TouchableOpacity>
 				</View>
@@ -248,6 +238,7 @@ export default function DashboardScreen() {
 
 const createStyles = (darkMode: boolean) => {
 	const theme = Theme[darkMode ? "dark" : "light"]
+
 	return StyleSheet.create({
 		container: {
 			flexGrow: 1,
@@ -331,20 +322,10 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			justifyContent: "center",
 		},
-		qrCardTextContainer: {
-			flex: 1,
-			marginRight: 16,
-		},
 		qrCardTitle: {
 			fontSize: 15,
 			fontWeight: "700",
 			textAlign: "center",
-		},
-		modalOverlay: {
-			flex: 1,
-			backgroundColor: theme.background,
-			alignItems: "center",
-			justifyContent: "center",
 		},
 		logoutButton: {
 			marginHorizontal: 20,

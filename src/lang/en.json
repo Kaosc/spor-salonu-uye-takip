@@ -163,5 +163,9 @@
 	"total": "Total",
 	"empty": "Empty",
 	"occupied": "Occupied",
-	"previousSubscriptions": "Previous Subscriptions"
+	"previousSubscriptions": "Previous Subscriptions",
+	"checkins": "Check-ins",
+	"userCheckin": "Check In",
+	"checkin_success": "Member checked in successfully.",
+	"checkin_failed": "Member check-in failed. Please try again."
 }

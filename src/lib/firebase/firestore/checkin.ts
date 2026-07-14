@@ -1,5 +1,16 @@
 import { getAuth } from "@react-native-firebase/auth"
-import { collection, doc, getDoc, getDocs, getFirestore, serverTimestamp, setDoc } from "@react-native-firebase/firestore"
+import {
+	collection,
+	doc,
+	getDoc,
+	getDocs,
+	getFirestore,
+	orderBy,
+	query,
+	serverTimestamp,
+	setDoc,
+} from "@react-native-firebase/firestore"
+
 import { COLLECTIONS } from "../enums"
 
 const auth = getAuth()
@@ -22,7 +33,8 @@ export const getCheckInByMemberUid = async (memberUid: string): Promise<CheckIn 
 export const getAllCheckIns = async (): Promise<CheckIn[]> => {
 	try {
 		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
-		const querySnapshot = await getDocs(checkInsCollection)
+		const q = query(checkInsCollection, orderBy("checkInTime", "desc"))
+		const querySnapshot = await getDocs(q)
 		const checkIns: CheckIn[] = []
 
 		querySnapshot.forEach((doc) => {
@@ -33,20 +45,23 @@ export const getAllCheckIns = async (): Promise<CheckIn[]> => {
 		return checkIns
 	} catch (e) {
 		console.error("[FIRESTORE] getAllCheckIns:", e)
-		throw e
+		return []
 	}
 }
 
-export const checkInMember = async (memberUid: string): Promise<boolean> => {
+export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean> => {
 	try {
 		const checkInRef = doc(collection(db, COLLECTIONS.CHECKINS))
-		const checkInData: CheckIn = {
-			memberUid: memberUid,
+
+		const data: CheckIn = {
+			memberUid: checkInData.memberUid,
+			firstName: checkInData.firstName,
+			lastName: checkInData.lastName,
 			checkInTime: serverTimestamp(),
 			lastCheckedInBy: auth.currentUser?.email || "unknown",
 		}
 
-		await setDoc(checkInRef, checkInData)
+		await setDoc(checkInRef, data)
 		return true
 	} catch (e) {
 		console.error("[FIRESTORE] checkInMember:", e)

@@ -162,5 +162,9 @@
 	"total": "Toplam",
 	"empty": "Boş",
 	"occupied": "Dolu",
-	"previousSubscriptions": "Önceki Abonelikler"
+	"previousSubscriptions": "Önceki Abonelikler",
+	"checkins": "Girişler",
+	"userCheckin": "Üye Girişi",
+	"checkin_success": "Üye başarıyla giriş yaptı.",
+	"checkin_failed": "Üye girişi başarısız. Lütfen tekrar deneyin."
 }

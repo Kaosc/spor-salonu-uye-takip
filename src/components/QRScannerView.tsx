@@ -38,14 +38,14 @@ export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProp
 		if (result?.data && !scanned.current) {
 			scanned.current = true
 
-			const memberUid = result.data
+			const memberQrData: CheckInQRData = JSON.parse(result.data)
 			let checkInSucces = false
 
 			if (checkingIn) {
-				const checkedIn = await checkInMember(memberUid)
+				const checkedIn = await checkInMember(memberQrData)
 
 				if (checkedIn) {
-					const incremented = await incrementMemberCheckInCount(memberUid)
+					const incremented = await incrementMemberCheckInCount(memberQrData.memberUid)
 					if (incremented) {
 						toast.show(t("checkin_success"), {
 							type: "success",
@@ -61,7 +61,7 @@ export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProp
 				}
 			} else {
 				setTimeout(() => {
-					navigation.navigate("MemberDetailsScreen", { memberId: memberUid })
+					navigation.navigate("MemberDetailsScreen", { memberId: memberQrData.memberUid })
 				}, 500)
 			}
 
