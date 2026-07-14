@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
 import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
@@ -49,7 +49,10 @@ export default function MemberDetailsScreen() {
 	const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	const [member, setMember] = useState<Member | null>(null)
-	const [subscription, setsubscription] = useState<Subscription | null>(null)
+	const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null)
+	const [activeSubscription, setActiveSubscription] = useState<Subscription | null>(null)
+
+	const totalSubscriptions = useMemo(() => subscriptions?.length || 0, [subscriptions])
 
 	useEffect(() => {
 		const backAction = () => {
@@ -93,21 +96,21 @@ export default function MemberDetailsScreen() {
 	const fetchSubscription = async () => {
 		if (!route.params?.memberId) return
 		let t = setTimeout(() => setSubscriptionStatus("loading"), 1000)
-		const subscription = await getSubscriptionsByMemberId(route.params?.memberId)
+		const subscriptions = await getSubscriptionsByMemberId(route.params?.memberId)
 
-		if (subscription.length > 0) {
+		if (subscriptions.length > 0) {
 			// find active subscription and set it to state
-			const activeSubscription = subscription.find((sub) => sub.status === "ACTIVE" || sub.status === "PAUSED")
-
+			const activeSubscription = subscriptions.find((sub) => sub.status === "ACTIVE" || sub.status === "PAUSED")
 			if (activeSubscription) {
-				setsubscription(activeSubscription)
-			} else {
-				setsubscription(null)
+				setActiveSubscription(activeSubscription)
 			}
+
+			const otherSubscriptions = subscriptions.filter((sub) => sub.id !== activeSubscription?.id)
+			setSubscriptions(otherSubscriptions)
 		}
 
 		clearTimeout(t)
-		setSubscriptionStatus(subscription.length > 0 ? "idle" : "error")
+		setSubscriptionStatus(subscriptions.length > 0 ? "idle" : "error")
 	}
 
 	useEffect(() => {
@@ -117,8 +120,8 @@ export default function MemberDetailsScreen() {
 
 	const handleSubCancel = async (alert = true) => {
 		const cancelSub = async () => {
-			if (!subscription?.id) return
-			const canceled = await cancelSubscription(subscription.id)
+			if (!activeSubscription?.id) return
+			const canceled = await cancelSubscription(activeSubscription.id)
 
 			if (canceled) {
 				toast.show(t("subscriptionCancelled"), { type: "success" })
@@ -155,7 +158,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		// If the member has an active subscription, show a warning alert to the user that the subscription will be cancelled if they inactivate the member.
-		if (subscription && subscription.status === "ACTIVE") {
+		if (activeSubscription && activeSubscription.status === "ACTIVE") {
 			Alert.alert(t("inactivateMember"), t("inactivateMemberWithActiveSubscriptionConfirmation"), [
 				{
 					text: t("cancel"),
@@ -209,8 +212,8 @@ export default function MemberDetailsScreen() {
 
 	const handleSubPause = async () => {
 		const pauseSub = async () => {
-			if (!subscription?.id) return
-			const paused = await pauseSubscription(subscription.id)
+			if (!activeSubscription?.id) return
+			const paused = await pauseSubscription(activeSubscription.id)
 			if (paused) {
 				toast.show(t("subscriptionPaused"), { type: "success" })
 				fetchSubscription()
@@ -234,8 +237,8 @@ export default function MemberDetailsScreen() {
 
 	const handleSubResume = async () => {
 		const resumeSub = async () => {
-			if (!subscription?.id) return
-			const resumed = await resumeSubscription(subscription.id)
+			if (!activeSubscription?.id) return
+			const resumed = await resumeSubscription(activeSubscription.id)
 			if (resumed) {
 				toast.show(t("subscriptionResumed"), { type: "success" })
 				fetchSubscription()
@@ -259,7 +262,7 @@ export default function MemberDetailsScreen() {
 
 	const SubscriptionDetails = () => {
 		const PauseToggleButton = () => {
-			if (subscription && subscription.status === "PAUSED") {
+			if (activeSubscription && activeSubscription.status === "PAUSED") {
 				return (
 					<ThemedButton
 						style={styles.pauseToggleButton}
@@ -268,7 +271,7 @@ export default function MemberDetailsScreen() {
 						<ThemedText style={styles.pauseButtonText}>{t("resumeSubscription")}</ThemedText>
 					</ThemedButton>
 				)
-			} else if (subscription && subscription.status === "ACTIVE") {
+			} else if (activeSubscription && activeSubscription.status === "ACTIVE") {
 				return (
 					<ThemedButton
 						style={styles.pauseToggleButton}
@@ -281,7 +284,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		const CancelSubscriptionButton = () => {
-			if (!subscription || subscription.status !== "ACTIVE") return <></>
+			if (!activeSubscription || activeSubscription.status !== "ACTIVE") return <></>
 
 			return (
 				<ThemedButton
@@ -304,7 +307,7 @@ export default function MemberDetailsScreen() {
 								screen: "SubscriptionFormScreen",
 								params: {
 									member: member,
-									activeSubscriptionId: subscription?.id || false,
+									activeSubscriptionId: activeSubscription?.id || false,
 								},
 							},
 						})
@@ -335,16 +338,45 @@ export default function MemberDetailsScreen() {
 		}
 
 		return (
-			<View style={styles.card}>
+			<View>
 				{subscriptionStatus === "loading" ? (
 					<View style={{ padding: 40, alignItems: "center" }}>
 						<ThemedActivityIndicator size={50} />
 					</View>
-				) : subscription ? (
-					<>
-						<SubscriptionView subscription={subscription} />
-						<ActionButtonsView />
-					</>
+				) : subscriptions ? (
+					<View style={{ gap: 25 }}>
+						{/* CURRENTLY ACTIVE OR PAUSED SUBSCRIPTION */}
+						<View style={styles.card}>
+							{activeSubscription && <SubscriptionView subscription={activeSubscription} />}
+							<ActionButtonsView />
+						</View>
+						{/* PREVIOUS SUBSCRIPTIONS (CANCELED OR EXPIRED) */}
+						{subscriptions.length > 0 ? (
+							<>
+								<View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+									<ThemedIcon
+										name="history"
+										size={30}
+										style={{ marginTop: 2.5 }}
+									/>
+									<ThemedText style={styles.sectionTitle}>{t("previousSubscriptions")}</ThemedText>
+								</View>
+								{subscriptions.map((sub) => (
+									<View
+										style={styles.card}
+										key={sub.id}
+									>
+										<SubscriptionView
+											key={sub.id}
+											subscription={sub}
+										/>
+									</View>
+								))}
+							</>
+						) : (
+							<></>
+						)}
+					</View>
 				) : (
 					<>
 						<View style={styles.noSubscriptionCard}>
@@ -671,6 +703,10 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.cardBackground,
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
+			borderRadius: 12,
+			padding: 20,
+		},
+		subParentCard: {
 			borderRadius: 12,
 			padding: 20,
 		},
