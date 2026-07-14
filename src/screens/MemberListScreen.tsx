@@ -4,7 +4,7 @@ import { FlashList } from "@shopify/flash-list"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { useMMKVObject } from "react-native-mmkv"
+import { useMMKVBoolean, useMMKVObject } from "react-native-mmkv"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
@@ -25,9 +25,7 @@ export default function MemberListContent() {
 	const styles = createStyles(darkMode)
 
 	const [members, setMembers] = useMMKVObject<MemberCard[]>("members")
-
-	// TODO : IMPLEMENT PAGINATION AS SCROLL REACHES TO END OF THE LIST, CURRENTLY IT LOADS ALL MEMBERS AT ONCE
-	// 10 USER AT EVERY SCROLL END
+	const [coldStart, setColdStart] = useMMKVBoolean("coldStart")
 	const fetchMembers = async () => {
 		try {
 			const membersData = await getAllMembers()
@@ -45,9 +43,10 @@ export default function MemberListContent() {
 	}
 
 	useEffect(() => {
-		if (route.params?.refresh || members?.length === 0) {
+		if (route.params?.refresh || members?.length === 0 || coldStart) {
 			fetchMembers()
-			navigation.setParams({ refresh: false })
+			if (coldStart) setColdStart(false)
+			setTimeout(() => navigation.setParams({ refresh: false }), 300)
 		}
 	}, [])
 

@@ -104,7 +104,7 @@ export default function MemberFormScreen() {
 						phoneNumber: "",
 						email: "",
 						address: "",
-						lockerNumber: route.params?.prefilledLockerNumber || "",
+						lockerNumber: route.params?.prefilledLockerNumber || 0,
 						gender: "UNSPECIFIED",
 						birthDate: "",
 						bloodType: "",
@@ -122,7 +122,7 @@ export default function MemberFormScreen() {
 		const occupiedNumbers: number[] = []
 		members.forEach((m) => {
 			if (m.lockerNumber && m.lockerNumber !== currentLockerNumber) {
-				const n = parseInt(m.lockerNumber, 10)
+				const n = m.lockerNumber
 				if (!isNaN(n)) occupiedNumbers.push(n)
 			}
 		})
@@ -131,7 +131,7 @@ export default function MemberFormScreen() {
 			{
 				text: t("cancel"),
 				onPress: () => {
-					setValue("lockerNumber", "")
+					setValue("lockerNumber", 0)
 					lockerSheetRef.current?.close()
 				},
 			},
@@ -143,7 +143,7 @@ export default function MemberFormScreen() {
 				items.push({
 					text: `Locker ${num}`,
 					onPress: () => {
-						setValue("lockerNumber", num.toString())
+						setValue("lockerNumber", num)
 						lockerSheetRef.current?.close()
 					},
 				})
@@ -166,7 +166,7 @@ export default function MemberFormScreen() {
 							phoneNumber: member.phoneNumber || "",
 							email: member.email || "",
 							address: member.address || "",
-							lockerNumber: member.lockerNumber || "",
+							lockerNumber: member.lockerNumber || 0,
 							gender: member.gender || "UNSPECIFIED",
 							birthDate: safeTimestampToDateString(member.birthDate),
 							bloodType: member.bloodType || "",
@@ -198,7 +198,7 @@ export default function MemberFormScreen() {
 			phoneNumber: data.phoneNumber,
 			email: data.email,
 			address: data.address || "",
-			lockerNumber: data.lockerNumber || "",
+			lockerNumber: data.lockerNumber || 0,
 			gender: data.gender || ("UNSPECIFIED" as Gender),
 			birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
 			bloodType: data.bloodType || "",

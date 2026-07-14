@@ -89,56 +89,61 @@ export default function SubscriptionsScreen() {
 		}
 	})
 
-	const renderItem = ({ item }: { item: Subscription }) => {
-		const member = members[item.memberUid]
-		const memberName = member ? `${member.firstName} ${member.lastName}` : "Bilinmeyen Üye"
-		const endDate = safeTimestampToDateString(item.endDate)
+	const renderItem = useCallback(
+		({ item }: { item: Subscription }) => {
+			const member = members[item.memberUid]
+			const memberName = member ? `${member.firstName} ${member.lastName}` : "Bilinmeyen Üye"
+			const endDate = safeTimestampToDateString(item.endDate)
 
-		let statusColor = theme.green.foreground
-		if (item.status === "PAUSED") statusColor = "#f0a500"
-		if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
+			let statusColor = theme.green.foreground
+			if (item.status === "PAUSED") statusColor = "#f0a500"
+			if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
 
-		const statusLabel =
-			item.status === "ACTIVE"
-				? t("active")
-				: item.status === "PAUSED"
-					? t("paused")
-					: item.status === "EXPIRED"
-						? t("expired")
-						: t("cancelled")
+			const statusLabel =
+				item.status === "ACTIVE"
+					? t("active")
+					: item.status === "PAUSED"
+						? t("paused")
+						: item.status === "EXPIRED"
+							? t("expired")
+							: t("cancelled")
 
-		return (
-			<TouchableOpacity
-				style={styles.listItem}
-				activeOpacity={0.7}
-				onPress={() =>
-					navigation.navigate("MemberDetailsScreen", {
-						memberId: item.memberUid,
-						prevScreen: "SubscriptionsScreen",
-						initialPage: 1
-					})
-				}
-			>
-				<View style={styles.listItemLeft}>
-					<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-					<View style={styles.listItemInfo}>
-						<ThemedText
-							style={styles.memberName}
-							numberOfLines={1}
-						>
-							{memberName}
-						</ThemedText>
-						<ThemedText style={styles.subscriptionInfo}>
-							{t(item.packageType)} · {endDate || "—"}
-						</ThemedText>
+			return (
+				<TouchableOpacity
+					style={styles.listItem}
+					activeOpacity={0.7}
+					onPress={() =>
+						navigation.navigate("MemberDetailsScreen", {
+							memberId: item.memberUid,
+							prevScreen: "SubscriptionsScreen",
+							initialPage: 1,
+						})
+					}
+				>
+					<View style={styles.listItemLeft}>
+						<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+						<View style={styles.listItemInfo}>
+							<ThemedText
+								style={styles.memberName}
+								numberOfLines={1}
+							>
+								{memberName}
+							</ThemedText>
+							<ThemedText style={styles.subscriptionInfo}>
+								{t(item.packageType)} · {endDate || "—"}
+							</ThemedText>
+						</View>
 					</View>
-				</View>
-				<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-					<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
-				</View>
-			</TouchableOpacity>
-		)
-	}
+					<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+						<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
+					</View>
+				</TouchableOpacity>
+			)
+		},
+		[members],
+	)
+
+	const keyExtractor = useCallback((item: Subscription, index: number) => item.id || index.toString(), [])
 
 	if (loading) {
 		return (
@@ -205,7 +210,8 @@ export default function SubscriptionsScreen() {
 						<FlashList
 							data={filteredSubscriptions}
 							renderItem={renderItem}
-							keyExtractor={(item: any) => item.id}
+							onRefresh={fetchData}
+							keyExtractor={keyExtractor}
 							showsVerticalScrollIndicator={false}
 							contentContainerStyle={styles.flashListContent}
 						/>

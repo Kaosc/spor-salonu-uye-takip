@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { FlashList } from "@shopify/flash-list"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
@@ -20,6 +21,7 @@ interface Locker {
 export default function LockerScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { t } = useTranslation()
 	const styles = createStyles(darkMode)
 
 	const [loading, setLoading] = useState(true)
@@ -47,7 +49,7 @@ export default function LockerScreen() {
 
 			members.forEach((member) => {
 				if (member.lockerNumber) {
-					const num = parseInt(member.lockerNumber, 10)
+					const num = member.lockerNumber
 					if (num >= 1 && num <= TOTAL_LOCKERS) {
 						lockerArray[num - 1].owner = member
 						occupied++
@@ -131,7 +133,7 @@ export default function LockerScreen() {
 						size={20}
 						color={darkMode ? "#e9e9e9" : "#000"}
 					/>
-					<ThemedText style={styles.summaryLabel}>Total</ThemedText>
+					<ThemedText style={styles.summaryLabel}>{t("total")}</ThemedText>
 					<ThemedText style={styles.summaryValue}>{TOTAL_LOCKERS}</ThemedText>
 				</View>
 
@@ -141,7 +143,7 @@ export default function LockerScreen() {
 						size={20}
 						color={theme.green.foreground}
 					/>
-					<ThemedText style={styles.summaryLabel}>Empty</ThemedText>
+					<ThemedText style={styles.summaryLabel}>{t("empty")}</ThemedText>
 					<ThemedText style={[styles.summaryValue, { color: theme.green.foreground }]}>{emptyCount}</ThemedText>
 				</View>
 
@@ -151,7 +153,7 @@ export default function LockerScreen() {
 						size={20}
 						color={theme.red.foreground}
 					/>
-					<ThemedText style={styles.summaryLabel}>Occupied</ThemedText>
+					<ThemedText style={styles.summaryLabel}>{t("occupied")}</ThemedText>
 					<ThemedText style={[styles.summaryValue, { color: theme.red.foreground }]}>{occupiedCount}</ThemedText>
 				</View>
 			</View>

@@ -27,7 +27,7 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
-	const [isStaffLogin, setIsStaffLogin] = useState(false)
+	const [isStaffLogin, setIsStaffLogin] = useState(true)
 
 	const EMAIL = useMemo(() => {
 		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""

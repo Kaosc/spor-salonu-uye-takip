@@ -479,7 +479,7 @@ export default function MemberDetailsScreen() {
 
 				<DetailsRow
 					label={t("lockerNumber")}
-					value={member.lockerNumber || "-"}
+					value={member.lockerNumber?.toString() || "-"}
 					iconName="lock"
 				/>
 				<DetailsRow
@@ -793,6 +793,7 @@ const createStyles = (darkMode: boolean) => {
 			borderBottomColor: theme.border,
 		},
 		rowLabel: {
+			flex: 1,
 			flexDirection: "row",
 			alignItems: "center",
 			gap: 8,
@@ -803,6 +804,7 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "bold",
 		},
 		value: {
+			flex: 1,
 			fontSize: 15,
 			fontWeight: "600",
 		},

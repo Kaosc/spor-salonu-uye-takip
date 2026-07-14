@@ -54,7 +54,7 @@ type FormValues = {
 	phoneNumber: string
 	email: string
 	address: string
-	lockerNumber: string
+	lockerNumber: number
 	gender: Gender
 	birthDate: string
 	bloodType: string
@@ -88,7 +88,7 @@ interface Member {
 	lastName: string
 	phoneNumber: string
 	address?: string
-	lockerNumber?: string
+	lockerNumber?: number
 	gender: Gender
 	birthDate?: Date
 	bloodType?: string

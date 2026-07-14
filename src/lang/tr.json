@@ -158,5 +158,8 @@
 	"underweight": "Zayıf",
 	"normal": "Normal",
 	"overweight": "Fazla Kilolu",
-	"obese": "Obez"
+	"obese": "Obez",
+	"total": "Toplam",
+	"empty": "Boş",
+	"occupied": "Dolu"
 }
