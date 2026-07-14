@@ -1,9 +1,11 @@
 import { useState } from "react"
-import { View, Text, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, TouchableOpacity } from "react-native"
+import { Text, TextInput, StyleSheet, ActivityIndicator, KeyboardAvoidingView, TouchableOpacity, ScrollView } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 import { useForm, Controller } from "react-hook-form"
+import { moderateScale } from "../utils/responsive"
+import { Image } from "expo-image"
 
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
@@ -58,7 +60,15 @@ export default function RegisterScreen() {
 			style={styles.container}
 			behavior={"padding"}
 		>
-			<View style={styles.form}>
+			<ScrollView
+				style={{ flex: 1 }}
+				contentContainerStyle={styles.form}
+			>
+				<Image
+					source={darkMode ? require("../assets/logo-transparent-white.png") : require("../assets/logo-transparent-black.png")}
+					style={styles.logo}
+				/>
+
 				<ThemedText style={styles.title}>{t("register")}</ThemedText>
 
 				<Controller
@@ -102,6 +112,7 @@ export default function RegisterScreen() {
 						/>
 					)}
 				/>
+
 				{errors.password && <Text style={styles.fieldError}>{errors.password.message}</Text>}
 
 				<Controller
@@ -123,6 +134,7 @@ export default function RegisterScreen() {
 						/>
 					)}
 				/>
+
 				{errors.confirmPassword && <Text style={styles.fieldError}>{errors.confirmPassword.message}</Text>}
 
 				{firebaseError ? <Text style={styles.error}>{firebaseError}</Text> : null}
@@ -130,6 +142,7 @@ export default function RegisterScreen() {
 				<ThemedButton
 					onPress={handleSubmit(onSubmit)}
 					disabled={isSubmitting}
+					style={{ marginTop: 25 }}
 				>
 					{isSubmitting ? <ActivityIndicator color="#000" /> : <ThemedText style={styles.buttonText}>{t("register")}</ThemedText>}
 				</ThemedButton>
@@ -141,7 +154,7 @@ export default function RegisterScreen() {
 				>
 					<ThemedText style={styles.loginLinkText}>{t("alreadyHaveAccount")}</ThemedText>
 				</TouchableOpacity>
-			</View>
+			</ScrollView>
 		</KeyboardAvoidingView>
 	)
 }
@@ -157,13 +170,13 @@ const createStyles = (darkMode: boolean) => {
 			paddingHorizontal: 40,
 		},
 		form: {
-			gap: 3,
+			gap: 5,
 			width: "100%",
 		},
 		title: {
 			fontSize: 28,
 			fontWeight: "700",
-			marginBottom: 32,
+			marginBottom: 20,
 			textAlign: "center",
 		},
 		input: {
@@ -202,6 +215,13 @@ const createStyles = (darkMode: boolean) => {
 		loginLinkText: {
 			fontSize: 14,
 			textDecorationLine: "underline",
+		},
+		logo: {
+			width: moderateScale(120),
+			height: moderateScale(120),
+			borderRadius: 20,
+			marginBottom: 50,
+			alignSelf: "center",
 		},
 	})
 }

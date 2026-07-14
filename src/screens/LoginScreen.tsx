@@ -6,7 +6,6 @@ import {
 	StyleSheet,
 	ActivityIndicator,
 	KeyboardAvoidingView,
-	Platform,
 	TouchableOpacity,
 	ScrollView,
 } from "react-native"
@@ -18,7 +17,11 @@ import { Image } from "expo-image"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
 
-import { staffLoginAction, memberLoginAction } from "../store/features/authSlice"
+import { resetPassword } from "../lib/firebase/auth"
+import { staffLoginAction, memberLoginAction, toggleLoading } from "../store/features/authSlice"
+import { moderateScale } from "../utils/responsive"
+import { Theme } from "../utils/theme"
+
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
 	const { isLoading } = useSelector((state: RootState) => state.auth)
@@ -28,7 +31,8 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
-	const [isStaffLogin, setIsStaffLogin] = useState(false)
+	const [isStaffLogin, setIsStaffLogin] = useState(true)
+	const [forgotPassword, setForgotPassword] = useState(false)
 
 	const EMAIL = useMemo(() => {
 		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""
@@ -46,7 +50,28 @@ export default function LoginScreen() {
 	const [password, setPassword] = useState(PASSWORD)
 	const [error, setError] = useState("")
 
+	const handleForgotPassword = async () => {
+		if (!email.trim()) {
+			setError(t("emailRequired"))
+			return
+		}
+
+		dispatch(toggleLoading())
+		const success = await resetPassword(email)
+
+		if (success) {
+			setForgotPassword(false)
+		}
+
+		dispatch(toggleLoading())
+	}
+
 	const handleLogin = async () => {
+		if (forgotPassword) {
+			handleForgotPassword()
+			return
+		}
+
 		if (!email.trim() || !password.trim()) {
 			setError(t("emailAndPasswordRequired"))
 			return
@@ -82,29 +107,32 @@ export default function LoginScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				<Image
-					source={darkMode ? require("../assets/logow.png") : require("../assets/logob.png")}
+					source={darkMode ? require("../assets/logo-transparent-white.png") : require("../assets/logo-transparent-black.png")}
 					style={styles.logo}
 				/>
 
-				<ThemedText style={styles.title}>{isStaffLogin ? t("staffLogin") : t("memberLogin")}</ThemedText>
+				<ThemedText style={styles.title}>
+					{forgotPassword ? t("resetPasswordTitle") : isStaffLogin ? t("staffLogin") : t("memberLogin")}
+				</ThemedText>
 
-				<View style={styles.segmentedControl}>
-					<TouchableOpacity
-						style={[styles.segment, isStaffLogin && styles.segmentActive]}
-						activeOpacity={0.7}
-						onPress={() => setIsStaffLogin(true)}
-					>
-						<Text style={[styles.segmentText, isStaffLogin && styles.segmentTextActive]}>{t("staffLogin")}</Text>
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={[styles.segment, !isStaffLogin && styles.segmentActive]}
-						activeOpacity={0.7}
-						onPress={() => setIsStaffLogin(false)}
-					>
-						<Text style={[styles.segmentText, !isStaffLogin && styles.segmentTextActive]}>{t("memberLogin")}</Text>
-					</TouchableOpacity>
-				</View>
-
+				{!forgotPassword && (
+					<View style={styles.segmentedControl}>
+						<TouchableOpacity
+							style={[styles.segment, isStaffLogin && styles.segmentActive]}
+							activeOpacity={0.7}
+							onPress={() => setIsStaffLogin(true)}
+						>
+							<Text style={[styles.segmentText, isStaffLogin && styles.segmentTextActive]}>{t("staffLogin")}</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							style={[styles.segment, !isStaffLogin && styles.segmentActive]}
+							activeOpacity={0.7}
+							onPress={() => setIsStaffLogin(false)}
+						>
+							<Text style={[styles.segmentText, !isStaffLogin && styles.segmentTextActive]}>{t("memberLogin")}</Text>
+						</TouchableOpacity>
+					</View>
+				)}
 				<TextInput
 					style={styles.input}
 					placeholder={t("email")}
@@ -115,14 +143,16 @@ export default function LoginScreen() {
 					keyboardType="email-address"
 				/>
 
-				<TextInput
-					style={styles.input}
-					placeholder={t("password")}
-					placeholderTextColor="#888"
-					value={password}
-					onChangeText={setPassword}
-					secureTextEntry
-				/>
+				{!forgotPassword && (
+					<TextInput
+						style={styles.input}
+						placeholder={t("password")}
+						placeholderTextColor="#888"
+						value={password}
+						onChangeText={setPassword}
+						secureTextEntry
+					/>
+				)}
 
 				{error ? <Text style={styles.error}>{error}</Text> : null}
 
@@ -133,7 +163,7 @@ export default function LoginScreen() {
 					{isLoading ? (
 						<ActivityIndicator color={darkMode ? "#000" : "#fff"} />
 					) : (
-						<ThemedText style={styles.buttonText}>{t("login")}</ThemedText>
+						<ThemedText style={styles.buttonText}>{forgotPassword ? t("sendResetEmail") : t("login")}</ThemedText>
 					)}
 				</ThemedButton>
 
@@ -146,13 +176,23 @@ export default function LoginScreen() {
 						<ThemedText style={styles.registerLinkText}>{t("register")}</ThemedText>
 					</TouchableOpacity>
 				)}
+
+				<TouchableOpacity
+					style={styles.registerLink}
+					activeOpacity={0.7}
+					onPress={() => setForgotPassword(!forgotPassword)}
+				>
+					<ThemedText style={styles.registerLinkText}>{forgotPassword ? t("backToLogin") : t("sendResetEmail")}</ThemedText>
+				</TouchableOpacity>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+
+	return StyleSheet.create({
 		container: {
 			flex: 1,
 			justifyContent: "flex-start",
@@ -164,7 +204,7 @@ const createStyles = (darkMode: boolean) =>
 		},
 		contentContainer: {
 			flexGrow: 1,
-			justifyContent: "center",
+			marginTop: 70,
 		},
 		title: {
 			fontSize: 28,
@@ -175,7 +215,7 @@ const createStyles = (darkMode: boolean) =>
 		segmentedControl: {
 			flexDirection: "row",
 			borderWidth: 1,
-			borderColor: "#ccc",
+			borderColor: theme.border,
 			borderRadius: 8,
 			overflow: "hidden",
 			marginBottom: 24,
@@ -199,7 +239,7 @@ const createStyles = (darkMode: boolean) =>
 		},
 		input: {
 			borderWidth: 1,
-			borderColor: "#ccc",
+			borderColor: theme.border,
 			borderRadius: 8,
 			paddingVertical: 12,
 			paddingHorizontal: 16,
@@ -218,14 +258,11 @@ const createStyles = (darkMode: boolean) =>
 			textAlign: "center",
 		},
 		logo: {
-			width: 140,
-			height: 140,
+			width: moderateScale(120),
+			height: moderateScale(120),
 			borderRadius: 20,
-			marginBottom: 60,
-			borderWidth: darkMode ? 0 : 1,
+			marginBottom: 50,
 			alignSelf: "center",
-			borderColor: "#ccc",
-			borderBottomWidth: darkMode ? 0 : 2,
 		},
 		registerLink: {
 			marginTop: 16,
@@ -236,3 +273,4 @@ const createStyles = (darkMode: boolean) =>
 			textDecorationLine: "underline",
 		},
 	})
+}

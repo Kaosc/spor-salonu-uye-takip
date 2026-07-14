@@ -166,5 +166,11 @@
 	"checkins": "Girişler",
 	"userCheckin": "Üye Girişi",
 	"checkin_success": "Üye başarıyla giriş yaptı.",
-	"checkin_failed": "Üye girişi başarısız. Lütfen tekrar deneyin."
+	"checkin_failed": "Üye girişi başarısız. Lütfen tekrar deneyin.",
+	"sendResetEmail": "E-posta Gönder",
+	"resetPassword": "Şifremi Unuttum",
+	"backToLogin": "Girişe Dön",
+	"resetPasswordTitle": "Şifre Sıfırlama",
+	"resetEmailSent": "Şifre sıfırlama e-postası gönderildi. Lütfen e-posta adresinizi kontrol edin.",
+	"resetEmailError": "Şifre sıfırlama e-postası gönderilirken bir hata oluştu. Lütfen tekrar deneyin."
 }

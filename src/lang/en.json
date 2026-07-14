@@ -167,5 +167,11 @@
 	"checkins": "Check-ins",
 	"userCheckin": "Check In",
 	"checkin_success": "Member checked in successfully.",
-	"checkin_failed": "Member check-in failed. Please try again."
+	"checkin_failed": "Member check-in failed. Please try again.",
+	"sendResetEmail": "Send Reset Email",
+	"resetPassword": "Reset Password",
+	"backToLogin": "Back to Login",
+	"resetPasswordTitle": "Reset Password",
+	"resetEmailSent": "A password reset email has been sent. Please check your inbox.",
+	"resetEmailError": "An error occurred while sending the password reset email. Please try again later."
 }

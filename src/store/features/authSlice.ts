@@ -34,6 +34,9 @@ export const authSlice = createSlice({
 			state.role = undefined
 			state.isLoading = false
 		},
+		toggleLoading(state) {
+			state.isLoading = !state.isLoading
+		},
 	},
 	extraReducers: (builder) => {
 		builder
@@ -68,4 +71,4 @@ export const authSlice = createSlice({
 	},
 })
 
-export const { logout } = authSlice.actions
+export const { logout, toggleLoading } = authSlice.actions

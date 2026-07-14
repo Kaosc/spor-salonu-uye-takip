@@ -2,6 +2,7 @@ import {
 	createUserWithEmailAndPassword,
 	getAuth,
 	sendEmailVerification,
+	sendPasswordResetEmail,
 	signInWithEmailAndPassword,
 	signOut,
 } from "@react-native-firebase/auth"
@@ -117,6 +118,18 @@ export const registerMember = async (email: string, password: string) => {
 	}
 
 	return uid
+}
+
+export const resetPassword = async (email: string): Promise<boolean> => {
+	try {
+		await sendPasswordResetEmail(auth, email)
+		toast.show(t("resetEmailSent"), { duration: 6000, type: "success" })
+		return true
+	} catch (error: any) {
+		console.error("[AUTH] sendPasswordResetEmail:", error?.message || error)
+		toast.show(t("resetEmailError"), { duration: 10000, type: "danger" })
+		return false
+	}
 }
 
 export const logoutUser = async (): Promise<void> => {
