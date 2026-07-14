@@ -31,7 +31,7 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 	}
 
 	const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
-	const daysLeft = subscription ? calculateEndDateAsDays(subscription.endDate, subscription.pausedAt) : null
+	const daysLeft = subscription ? subscription.status === "ACTIVE" || subscription.status === "PAUSED" ? calculateEndDateAsDays(subscription.endDate, subscription.pausedAt) : 0 : null
 
 	const formatPrice = (price: number) => {
 		return `${price.toFixed(2)} ₺`
@@ -226,6 +226,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		daysLeftNumber: {
 			fontSize: 32,
+			marginTop: 3,
 			fontWeight: "800",
 		},
 		daysLeftLabel: {
