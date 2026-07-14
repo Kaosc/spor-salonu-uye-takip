@@ -16,7 +16,7 @@ export default class FirebaseHandler {
 			},
 			apple: {
 				provider: __DEV__ ? "debug" : "appAttestWithDeviceCheckFallback",
-				debugToken: "DCA3E0CD-74D1-4B94-8EDA-8CD3BE210038",
+				debugToken: "648EAA8D-EEA2-4B91-8566-9667E5B1CA18",
 			},
 		})
 
