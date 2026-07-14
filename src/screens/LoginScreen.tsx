@@ -31,7 +31,7 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
-	const [isStaffLogin, setIsStaffLogin] = useState(true)
+	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
 
 	const EMAIL = useMemo(() => {
@@ -167,7 +167,15 @@ export default function LoginScreen() {
 					)}
 				</ThemedButton>
 
-				{!isStaffLogin && (
+				<TouchableOpacity
+					style={styles.registerLink}
+					activeOpacity={0.7}
+					onPress={() => setForgotPassword(!forgotPassword)}
+				>
+					<ThemedText style={styles.registerLinkText}>{forgotPassword ? t("backToLogin") : t("resetPassword")}</ThemedText>
+				</TouchableOpacity>
+
+				{!isStaffLogin && !forgotPassword && (
 					<TouchableOpacity
 						style={styles.registerLink}
 						activeOpacity={0.7}
@@ -176,14 +184,6 @@ export default function LoginScreen() {
 						<ThemedText style={styles.registerLinkText}>{t("register")}</ThemedText>
 					</TouchableOpacity>
 				)}
-
-				<TouchableOpacity
-					style={styles.registerLink}
-					activeOpacity={0.7}
-					onPress={() => setForgotPassword(!forgotPassword)}
-				>
-					<ThemedText style={styles.registerLinkText}>{forgotPassword ? t("backToLogin") : t("sendResetEmail")}</ThemedText>
-				</TouchableOpacity>
 			</ScrollView>
 		</KeyboardAvoidingView>
 	)

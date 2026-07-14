@@ -44,20 +44,6 @@ export default function MemberTabNavigator() {
 			}}
 		>
 			<Tabs.Screen
-				name="MemberHomeScreen"
-				component={MemberHomeScreen}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={v.focused ? "home" : "home-outline"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("home"),
-				}}
-			/>
-			<Tabs.Screen
 				name="MemberSubscriptionsScreen"
 				component={MemberSubscriptionsScreen}
 				options={{
@@ -69,6 +55,20 @@ export default function MemberTabNavigator() {
 						/>
 					),
 					tabBarLabel: t("mySubscriptions"),
+				}}
+			/>
+			<Tabs.Screen
+				name="MemberHomeScreen"
+				component={MemberHomeScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "home" : "home-outline"}
+							size={31}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: t("home"),
 				}}
 			/>
 			<Tabs.Screen
