@@ -7,6 +7,7 @@ import {
 } from "@react-native-firebase/auth"
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, writeBatch } from "@react-native-firebase/firestore"
 import { t } from "i18next"
+import { COLLECTIONS } from "./enums"
 
 const auth = getAuth()
 const db = getFirestore()
@@ -15,7 +16,7 @@ export const staffLogin = async (email: string, password: string) => {
 	const userCredential = await signInWithEmailAndPassword(auth, email, password)
 	const uid = userCredential.user.uid
 
-	const staffRef = doc(db, "users", uid)
+	const staffRef = doc(db, COLLECTIONS.USERS, uid)
 	const staffDoc = await getDoc(staffRef)
 
 	if (!staffDoc.exists()) {
@@ -39,7 +40,7 @@ export const memberLogin = async (email: string, password: string) => {
 		}
 
 		// 2. Check if a member doc exists with this email (query directly to get doc ID)
-		const membersRef = collection(db, "members")
+		const membersRef = collection(db, COLLECTIONS.MEMBERS)
 		const memberQuery = query(membersRef, where("email", "==", email))
 		const memberSnapshot = await getDocs(memberQuery)
 
@@ -54,11 +55,11 @@ export const memberLogin = async (email: string, password: string) => {
 				const batch = writeBatch(db)
 
 				// Create new member doc with the new Auth UID, copying all old data
-				const newMemberRef = doc(db, "members", uid)
+				const newMemberRef = doc(db, COLLECTIONS.MEMBERS, uid)
 				batch.set(newMemberRef, { ...oldData, uid, isActive: true })
 
 				// Reassign all subscriptions from oldDocId to new uid
-				const subsRef = collection(db, "subscriptions")
+				const subsRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
 				const subsQuery = query(subsRef, where("memberUid", "==", oldDocId))
 				const subsSnapshot = await getDocs(subsQuery)
 
@@ -68,7 +69,7 @@ export const memberLogin = async (email: string, password: string) => {
 				})
 
 				// Delete the old member document
-				const oldMemberRef = doc(db, "members", oldDocId)
+				const oldMemberRef = doc(db, COLLECTIONS.MEMBERS, oldDocId)
 				batch.delete(oldMemberRef)
 
 				await batch.commit()

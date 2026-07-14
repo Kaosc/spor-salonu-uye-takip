@@ -129,9 +129,8 @@ export default function MemberHomeScreen() {
 						<ThemedButton
 							style={styles.closeButton}
 							onPress={() => setQrModalVisible(false)}
-						>
-							<ThemedText style={styles.closeButtonText}>{t("close")}</ThemedText>
-						</ThemedButton>
+							text={t("close")}
+						/>
 					</View>
 				</View>
 			</Modal>
@@ -141,6 +140,7 @@ export default function MemberHomeScreen() {
 
 const createStyles = (darkMode: boolean) => {
 	const theme = Theme[darkMode ? "dark" : "light"]
+
 	return StyleSheet.create({
 		container: {
 			flex: 1,
@@ -178,7 +178,7 @@ const createStyles = (darkMode: boolean) => {
 			marginHorizontal: moderateScale(16),
 			padding: moderateScale(18),
 			borderRadius: 16,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 			gap: 12,
@@ -199,7 +199,7 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			padding: moderateScale(20),
 			borderRadius: 16,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 			gap: 10,
@@ -247,11 +247,6 @@ const createStyles = (darkMode: boolean) => {
 			width: "100%",
 			paddingVertical: moderateScale(14),
 			alignItems: "center",
-		},
-		closeButtonText: {
-			color: darkMode ? "#000" : "#fff",
-			fontSize: 16,
-			fontWeight: "bold",
 		},
 	})
 }

@@ -10,15 +10,15 @@ import {
 	setDoc,
 	query,
 	where,
+	increment,
 } from "@react-native-firebase/firestore"
+import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
 
-const COLLECTION = "members"
-
 export const addMember = async (memberData: Member): Promise<boolean> => {
 	try {
-		const docRef = doc(db, COLLECTION, memberData.uid)
+		const docRef = doc(db, COLLECTIONS.MEMBERS, memberData.uid)
 		const member: Member = {
 			...memberData,
 			createdAt: serverTimestamp(),
@@ -36,7 +36,7 @@ export const addMember = async (memberData: Member): Promise<boolean> => {
 export const updateMember = async (updatedMemberData: Member): Promise<boolean> => {
 	try {
 		const memberId = updatedMemberData.uid
-		const memberRef = doc(db, COLLECTION, memberId)
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 
 		await updateDoc(memberRef, {
 			...updatedMemberData,
@@ -52,7 +52,7 @@ export const updateMember = async (updatedMemberData: Member): Promise<boolean> 
 
 export const deleteMember = async (memberId: string): Promise<void> => {
 	try {
-		const memberRef = doc(db, COLLECTION, memberId)
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 		await deleteDoc(memberRef)
 	} catch (e) {
 		console.error("[FIRESTORE] deleteMember:", e)
@@ -62,7 +62,7 @@ export const deleteMember = async (memberId: string): Promise<void> => {
 
 export const getAllMembers = async (): Promise<Member[]> => {
 	try {
-		const membersRef = collection(db, COLLECTION)
+		const membersRef = collection(db, COLLECTIONS.MEMBERS)
 		const snapshot = await getDocs(membersRef)
 
 		return snapshot.docs.map((docSnap) => ({
@@ -77,7 +77,7 @@ export const getAllMembers = async (): Promise<Member[]> => {
 
 export const getMemberById = async (memberId: string): Promise<Member | null> => {
 	try {
-		const memberRef = doc(db, COLLECTION, memberId)
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 		const docSnap = await getDoc(memberRef)
 
 		if (docSnap.exists()) {
@@ -93,7 +93,7 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 
 export const getMemberByEmail = async (email: string): Promise<Member | null> => {
 	try {
-		const membersRef = collection(db, COLLECTION)
+		const membersRef = collection(db, COLLECTIONS.MEMBERS)
 		const q = query(membersRef, where("email", "==", email))
 		const snapshot = await getDocs(q)
 
@@ -111,7 +111,7 @@ export const getMemberByEmail = async (email: string): Promise<Member | null> =>
 
 export const inactivateMember = async (memberId: string): Promise<boolean> => {
 	try {
-		const memberRef = doc(db, COLLECTION, memberId)
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 		await updateDoc(memberRef, {
 			isActive: false,
 			updatedAt: serverTimestamp(),
@@ -125,7 +125,7 @@ export const inactivateMember = async (memberId: string): Promise<boolean> => {
 
 export const activateMember = async (memberId: string): Promise<boolean> => {
 	try {
-		const memberRef = doc(db, COLLECTION, memberId)
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 		await updateDoc(memberRef, {
 			isActive: true,
 			updatedAt: serverTimestamp(),
@@ -133,6 +133,20 @@ export const activateMember = async (memberId: string): Promise<boolean> => {
 		return true
 	} catch (e) {
 		console.error("[FIRESTORE] activateMember:", e)
+		return false
+	}
+}
+
+export const incrementMemberCheckInCount = async (memberId: string): Promise<boolean> => {
+	try {
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
+		await updateDoc(memberRef, {
+			totalCheckIns: increment(1),
+			updatedAt: serverTimestamp(),
+		})
+		return true
+	} catch (e) {
+		console.error("[FIRESTORE] incrementMemberCheckInCount:", e)
 		return false
 	}
 }

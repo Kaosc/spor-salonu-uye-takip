@@ -52,8 +52,6 @@ export default function MemberDetailsScreen() {
 	const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null)
 	const [activeSubscription, setActiveSubscription] = useState<Subscription | null>(null)
 
-	const totalSubscriptions = useMemo(() => subscriptions?.length || 0, [subscriptions])
-
 	useEffect(() => {
 		const backAction = () => {
 			goBack()

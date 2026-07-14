@@ -1,12 +1,11 @@
 import { getFirestore, addDoc, collection, query, where, getDocs, getDoc, updateDoc, doc } from "@react-native-firebase/firestore"
+import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
 
-const COLLECTION = "subscriptions"
-
 export const addSubscription = async (subscription: Subscription) => {
 	try {
-		const subRef = collection(db, COLLECTION)
+		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
 		await addDoc(subRef, subscription)
 		return !!subRef.id
 	} catch (e) {
@@ -17,7 +16,7 @@ export const addSubscription = async (subscription: Subscription) => {
 
 export const cancelSubscription = async (subscriptionId: string) => {
 	try {
-		const subRef = doc(db, COLLECTION, subscriptionId)
+		const subRef = doc(db, COLLECTIONS.SUBSCRIPTIONS, subscriptionId)
 		const subDoc = await getDoc(subRef)
 
 		if (!subDoc.exists()) {
@@ -34,7 +33,7 @@ export const cancelSubscription = async (subscriptionId: string) => {
 
 export const pauseSubscription = async (subscriptionId: string) => {
 	try {
-		const subRef = doc(db, COLLECTION, subscriptionId)
+		const subRef = doc(db, COLLECTIONS.SUBSCRIPTIONS, subscriptionId)
 		const subDoc = await getDoc(subRef)
 
 		if (!subDoc.exists()) {
@@ -52,7 +51,7 @@ export const pauseSubscription = async (subscriptionId: string) => {
 
 export const resumeSubscription = async (subscriptionId: string) => {
 	try {
-		const subRef = doc(db, COLLECTION, subscriptionId)
+		const subRef = doc(db, COLLECTIONS.SUBSCRIPTIONS, subscriptionId)
 		const subDoc = await getDoc(subRef)
 
 		if (!subDoc.exists()) {
@@ -97,7 +96,7 @@ export const resumeSubscription = async (subscriptionId: string) => {
 
 export const getAllSubscriptions = async (): Promise<any[]> => {
 	try {
-		const subRef = collection(db, COLLECTION)
+		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
 		const snapshot = await getDocs(subRef)
 
 		const subscriptions: any[] = []
@@ -114,7 +113,7 @@ export const getAllSubscriptions = async (): Promise<any[]> => {
 
 export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Subscription[]> => {
 	try {
-		const subRef = collection(db, COLLECTION)
+		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
 		const q = query(subRef, where("memberUid", "==", memberUid))
 		const subscriptionDocs = await getDocs(q)
 

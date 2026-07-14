@@ -1,12 +1,11 @@
 import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
+import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
 
-const COLLECTION = "users"
-
 export const getStaffUserById = async (uid: string): Promise<StaffUser | null> => {
 	try {
-		const docRef = doc(db, COLLECTION, uid)
+		const docRef = doc(db, COLLECTIONS.USERS, uid)
 		const docSnap = await getDoc(docRef)
 
 		if (docSnap.exists()) {

@@ -1,33 +1,71 @@
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { TouchableOpacity, StyleSheet, Modal, View, Dimensions } from "react-native"
 import { Image } from "expo-image"
 import { useSelector } from "react-redux"
 import { CameraView, useCameraPermissions } from "expo-camera"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useTranslation } from "react-i18next"
 
 import ThemedIcon from "./ui/ThemedIcon"
 import ThemedText from "./ui/ThemedText"
 
 import { Theme } from "../utils/theme"
+import { checkInMember } from "../lib/firebase/firestore/checkin"
+import { incrementMemberCheckInCount } from "../lib/firebase/firestore/member"
 
-export default function QRScannerView({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+type QRScannerViewProps = {
+	onClose: () => void
+	checkingIn: boolean
+}
+
+export default function QRScannerView({ onClose, checkingIn }	: QRScannerViewProps) {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const insets = useSafeAreaInsets()
+	const { t } = useTranslation()
 
 	const [permission, requestPermission] = useCameraPermissions()
+	const scanned = useRef(false)
 
 	const styles = createStyles(darkMode)
 
 	useEffect(() => {
 		requestPermission()
-	}, [visible])
+	}, [])
 
-	const handleOnQrScanned = (result: any) => {
-		if (result?.data) {
-			const uid = result.data
-			navigation.navigate("MemberStack", { screen: "MemberDetailsScreen", params: { memberId: uid } })
+	const handleOnQrScanned = async (result: any) => {
+		console.log(scanned.current)
+		if (result?.data && !scanned.current) {
+			scanned.current = true
+
+			const memberUid = result.data
+			let checkInSucces = false
+
+			if (checkingIn) {
+				const checkedIn = await checkInMember(memberUid)
+
+				if (checkedIn) {
+					const incremented = await incrementMemberCheckInCount(memberUid)
+					if (incremented) {
+						toast.show(t("checkin_success"), {
+							type: "success",
+						})
+						checkInSucces = true
+					}
+				}
+
+				if (!checkInSucces) {
+					toast.show(t("checkin_failed"), {
+						type: "danger",
+					})
+				}
+			} else {
+				setTimeout(() => {
+					navigation.navigate("MemberDetailsScreen", { memberId: memberUid })
+				}, 500)
+			}
+
 			onClose()
 		}
 	}
@@ -36,7 +74,7 @@ export default function QRScannerView({ visible, onClose }: { visible: boolean; 
 		<Modal
 			animationType="slide"
 			transparent
-			visible={visible}
+			visible={true}
 			onRequestClose={onClose}
 		>
 			<View

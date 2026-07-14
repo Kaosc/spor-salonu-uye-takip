@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions, Modal } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import QRCode from "react-native-qrcode-svg"
@@ -36,6 +36,8 @@ export default function DashboardScreen() {
 	const [qrModalVisible, setQrModalVisible] = useState(false)
 	const [scannerModalVisible, setScannerModalVisible] = useState(false)
 
+	const checkingIn = useRef(false)
+
 	useEffect(() => {
 		if (!uid) return
 
@@ -50,6 +52,11 @@ export default function DashboardScreen() {
 		await logoutUser()
 		dispatch(logout())
 		navigation.dispatch(StackActions.replace("AuthStack"))
+	}
+
+	const handleOnQRModalClose = () => {
+		checkingIn.current = false
+		setScannerModalVisible(false)
 	}
 
 	if (loading) {
@@ -88,10 +95,12 @@ export default function DashboardScreen() {
 				</TouchableOpacity>
 			</Modal>
 
-			<QRScannerView
-				visible={scannerModalVisible}
-				onClose={() => setScannerModalVisible(false)}
-			/>
+			{scannerModalVisible && (
+				<QRScannerView
+					onClose={handleOnQRModalClose}
+					checkingIn={checkingIn.current}
+				/>
+			)}
 
 			<ScrollView
 				style={{ flex: 1 }}
@@ -175,36 +184,56 @@ export default function DashboardScreen() {
 				</View>
 
 				<TouchableOpacity
-					style={styles.qrCard}
+					style={[
+						styles.qrCard,
+						{
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+						},
+					]}
 					activeOpacity={0.7}
 					onPress={() => setQrModalVisible(true)}
 				>
-					<View style={styles.qrCardContent}>
-						<View style={styles.qrCardTextContainer}>
-							<ThemedText style={styles.qrCardTitle}>{t("membershipCard")}</ThemedText>
-						</View>
-						<QRCode
-							value={staffUser.uid}
-							size={moderateScale(70)}
-						/>
-					</View>
+					<ThemedText style={styles.qrCardTitle}>{t("membershipCard")}</ThemedText>
+					<QRCode
+						value={staffUser.uid}
+						size={moderateScale(50)}
+					/>
 				</TouchableOpacity>
 
-				<TouchableOpacity
-					style={styles.qrCard}
-					activeOpacity={0.7}
-					onPress={() => setScannerModalVisible(true)}
-				>
-					<View style={styles.qrCardContent}>
-						<View style={styles.qrCardTextContainer}>
-							<ThemedText style={styles.qrCardTitle}>{t("scanMembership")}</ThemedText>
+				<View style={styles.qrActionsContainer}>
+					<TouchableOpacity
+						style={styles.qrActionButton}
+						activeOpacity={0.7}
+						onPress={() => setScannerModalVisible(true)}
+					>
+						<View style={styles.qrCardContent}>
+							<ThemedIcon
+								name="account-search-outline"
+								size={moderateScale(40)}
+							/>
+							<ThemedText style={styles.qrCardTitle}>{t("memberDetails")}</ThemedText>
 						</View>
-						<ThemedIcon
-							name="camera"
-							size={moderateScale(40)}
-						/>
-					</View>
-				</TouchableOpacity>
+					</TouchableOpacity>
+
+					<TouchableOpacity
+						style={styles.qrActionButton}
+						activeOpacity={0.7}
+						onPress={() => {
+							checkingIn.current = true
+							setScannerModalVisible(true)
+						}}
+					>
+						<View style={styles.qrCardContent}>
+							<ThemedIcon
+								name="check-circle-outline"
+								size={moderateScale(40)}
+							/>
+							<ThemedText style={styles.qrCardTitle}>{"Check In"}</ThemedText>
+						</View>
+					</TouchableOpacity>
+				</View>
 
 				<ThemedButton
 					onPress={handleLogout}
@@ -298,17 +327,18 @@ const createStyles = (darkMode: boolean) => {
 			marginHorizontal: 20,
 		},
 		qrCardContent: {
-			flexDirection: "row",
+			gap: 10,
 			alignItems: "center",
-			justifyContent: "space-between",
+			justifyContent: "center",
 		},
 		qrCardTextContainer: {
 			flex: 1,
 			marginRight: 16,
 		},
 		qrCardTitle: {
-			fontSize: 18,
+			fontSize: 15,
 			fontWeight: "700",
+			textAlign: "center",
 		},
 		modalOverlay: {
 			flex: 1,
@@ -330,6 +360,21 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 16,
 			fontWeight: "bold",
 			color: theme.red.foreground,
+		},
+		qrActionsContainer: {
+			flexDirection: "row",
+			justifyContent: "space-between",
+			marginHorizontal: 15,
+			gap: 5,
+		},
+		qrActionButton: {
+			flex: 1,
+			borderRadius: 16,
+			padding: 20,
+			borderWidth: 1,
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+			marginHorizontal: 5,
 		},
 	})
 }

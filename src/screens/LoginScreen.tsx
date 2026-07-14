@@ -8,6 +8,7 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	TouchableOpacity,
+	ScrollView,
 } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
@@ -27,7 +28,7 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
-	const [isStaffLogin, setIsStaffLogin] = useState(true)
+	const [isStaffLogin, setIsStaffLogin] = useState(false)
 
 	const EMAIL = useMemo(() => {
 		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""
@@ -73,9 +74,13 @@ export default function LoginScreen() {
 	return (
 		<KeyboardAvoidingView
 			style={styles.container}
-			behavior={Platform.OS === "ios" ? "padding" : undefined}
+			behavior={"padding"}
 		>
-			<View style={styles.form}>
+			<ScrollView
+				style={styles.form}
+				contentContainerStyle={styles.contentContainer}
+				showsVerticalScrollIndicator={false}
+			>
 				<Image
 					source={darkMode ? require("../assets/logow.png") : require("../assets/logob.png")}
 					style={styles.logo}
@@ -141,7 +146,7 @@ export default function LoginScreen() {
 						<ThemedText style={styles.registerLinkText}>{t("register")}</ThemedText>
 					</TouchableOpacity>
 				)}
-			</View>
+			</ScrollView>
 		</KeyboardAvoidingView>
 	)
 }
@@ -151,12 +156,15 @@ const createStyles = (darkMode: boolean) =>
 		container: {
 			flex: 1,
 			justifyContent: "flex-start",
-			marginTop: 70,
-			paddingHorizontal: 40,
 		},
 		form: {
+			flex: 1,
 			gap: 3,
-			width: "100%",
+			paddingHorizontal: 40,
+		},
+		contentContainer: {
+			flexGrow: 1,
+			justifyContent: "center",
 		},
 		title: {
 			fontSize: 28,

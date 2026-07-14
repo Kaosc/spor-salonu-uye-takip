@@ -89,6 +89,7 @@ interface Member {
 	phoneNumber: string
 	address?: string
 	lockerNumber?: number
+	totalCheckIns?: number | FieldValue
 	gender: Gender
 	birthDate?: Date
 	bloodType?: string
@@ -127,4 +128,11 @@ interface Subscription {
 	notes?: string
 }
 
+interface CheckIn {
+	memberUid: string
+	checkInTime: Date | FieldValue
+	lastCheckedInBy: string
+}
+
+type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
