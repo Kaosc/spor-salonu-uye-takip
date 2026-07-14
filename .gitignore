@@ -38,5 +38,6 @@ yarn-error.*
 
 # Google Services (Firebase, etc.)
 google-services.json
+GoogleService-Info.plist
 .logininfo.txt
 .env
