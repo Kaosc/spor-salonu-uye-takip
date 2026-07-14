@@ -61,20 +61,6 @@ export default function StaffTabNavigator() {
 				}}
 			/>
 			<Tabs.Screen
-				name="DashboardScreen"
-				component={DashboardScreen}
-				options={{
-					tabBarIcon: (v) => (
-						<ThemedIcon
-							name={v.focused ? "home" : "home-outline"}
-							size={31}
-							color={v.color}
-						/>
-					),
-					tabBarLabel: t("dashboard"),
-				}}
-			/>
-			<Tabs.Screen
 				name="LockerScreen"
 				component={LockerScreen}
 				options={{
@@ -88,6 +74,21 @@ export default function StaffTabNavigator() {
 					tabBarLabel: t("lockers"),
 				}}
 			/>
+			<Tabs.Screen
+				name="DashboardScreen"
+				component={DashboardScreen}
+				options={{
+					tabBarIcon: (v) => (
+						<ThemedIcon
+							name={v.focused ? "home" : "home-outline"}
+							size={31}
+							color={v.color}
+						/>
+					),
+					tabBarLabel: t("dashboard"),
+				}}
+			/>
+
 			<Tabs.Screen
 				name="SubscriptionStack"
 				component={SubscriptionStack}
