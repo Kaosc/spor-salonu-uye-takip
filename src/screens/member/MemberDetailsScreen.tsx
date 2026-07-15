@@ -30,6 +30,7 @@ interface RouteParams extends RouteProp<ParamListBase> {
 		memberId: string
 		initialPage?: number
 		prevScreen: "SearchScreen" | "SubscriptionsScreen" | "LockerScreen" | undefined
+		search?: string
 	}
 }
 
@@ -64,7 +65,7 @@ export default function MemberDetailsScreen() {
 	const goBack = () => {
 		const prevScreen = route.params?.prevScreen
 		if (prevScreen === "SearchScreen") {
-			navigation.navigate("SearchScreen")
+			navigation.navigate("SearchScreen", { search: route?.params?.search })
 			return
 		}
 
@@ -104,12 +105,17 @@ export default function MemberDetailsScreen() {
 		if (subscriptions.length > 0) {
 			// find active subscription and set it to state
 			const activeSubscription = subscriptions.find((sub) => sub.status === "ACTIVE" || sub.status === "PAUSED")
+
 			if (activeSubscription) {
 				setActiveSubscription(activeSubscription)
+			} else {
+				setActiveSubscription(null)
 			}
 
 			const otherSubscriptions = subscriptions.filter((sub) => sub.id !== activeSubscription?.id)
 			setSubscriptions(otherSubscriptions)
+		} else {
+			setSubscriptions(null)
 		}
 
 		clearTimeout(t)
@@ -128,7 +134,10 @@ export default function MemberDetailsScreen() {
 
 			if (canceled) {
 				toast.show(t("subscriptionCancelled"), { type: "success" })
-				fetchSubscription()
+				setTimeout(() => {
+					console.log("Reloading")
+					fetchSubscription()
+				}, 500)
 			} else {
 				toast.show(t("subscriptionCancelError"), { type: "danger" })
 			}

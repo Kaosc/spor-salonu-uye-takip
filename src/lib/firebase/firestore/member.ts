@@ -11,7 +11,9 @@ import {
 	query,
 	where,
 	increment,
+	orderBy,
 } from "@react-native-firebase/firestore"
+
 import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
@@ -63,7 +65,8 @@ export const deleteMember = async (memberId: string): Promise<void> => {
 export const getAllMembers = async (): Promise<Member[]> => {
 	try {
 		const membersRef = collection(db, COLLECTIONS.MEMBERS)
-		const snapshot = await getDocs(membersRef)
+		const q = query(membersRef, orderBy("createdAt", "desc"))
+		const snapshot = await getDocs(q)
 
 		return snapshot.docs.map((docSnap) => ({
 			uid: docSnap.id,

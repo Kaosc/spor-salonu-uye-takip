@@ -1,4 +1,15 @@
-import { getFirestore, addDoc, collection, query, where, getDocs, getDoc, updateDoc, doc } from "@react-native-firebase/firestore"
+import {
+	getFirestore,
+	addDoc,
+	collection,
+	query,
+	where,
+	getDocs,
+	getDoc,
+	updateDoc,
+	doc,
+	orderBy,
+} from "@react-native-firebase/firestore"
 import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()
@@ -7,6 +18,8 @@ export const addSubscription = async (subscription: Subscription) => {
 	try {
 		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
 		await addDoc(subRef, subscription)
+
+		console.info(`[FIRESTORE] Subscription added with ID: ${subRef.id}`)
 		return !!subRef.id
 	} catch (e) {
 		console.error("[FIRESTORE] addSubscription:", e)
@@ -24,6 +37,8 @@ export const cancelSubscription = async (subscriptionId: string) => {
 		}
 
 		await updateDoc(subRef, { status: "CANCELLED" })
+
+		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been cancelled.`)
 		return true
 	} catch (e) {
 		console.error("[FIRESTORE] cancelSubscription:", e)
@@ -40,8 +55,8 @@ export const pauseSubscription = async (subscriptionId: string) => {
 			throw new Error(`Subscription with ID ${subscriptionId} not found`)
 		}
 
-		// Dondurma anını kaydediyoruz
 		await updateDoc(subRef, { status: "PAUSED", pausedAt: new Date() })
+		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been paused.`)
 		return true
 	} catch (e) {
 		console.error("[FIRESTORE] pauseSubscription:", e)
@@ -87,6 +102,7 @@ export const resumeSubscription = async (subscriptionId: string) => {
 			pausedAt: null,
 		})
 
+		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been resumed. New end date: ${newEndDate.toISOString()}`)
 		return true
 	} catch (e) {
 		console.error("[FIRESTORE] resumeSubscription:", e)
@@ -97,13 +113,15 @@ export const resumeSubscription = async (subscriptionId: string) => {
 export const getAllSubscriptions = async (): Promise<any[]> => {
 	try {
 		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
-		const snapshot = await getDocs(subRef)
+		const q = query(subRef, orderBy("startDate", "desc"))
+		const snapshot = await getDocs(q)
 
 		const subscriptions: any[] = []
 		snapshot.forEach((doc) => {
 			subscriptions.push({ id: doc.id, ...doc.data() })
 		})
 
+		console.info(`[FIRESTORE] Retrieved ${subscriptions.length} subscriptions.`)
 		return subscriptions
 	} catch (e) {
 		console.error("[FIRESTORE] getAllSubscriptions:", e)
@@ -123,6 +141,7 @@ export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Sub
 			subscriptions.push({ ...data, id: doc.id })
 		})
 
+		console.info(`[FIRESTORE] Retrieved ${subscriptions.length} subscriptions for member UID: ${memberUid}.`)
 		return subscriptions
 	} catch (e) {
 		console.error("[FIRESTORE] getSubscriptionsByMemberId:", e)

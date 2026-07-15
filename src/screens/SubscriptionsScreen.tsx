@@ -12,7 +12,6 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import { daysSince, daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
 import { Theme } from "../utils/theme"
 import { moderateScale } from "../utils/responsive"
-import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { getAllSubscriptions } from "../lib/firebase/firestore/subscriptions"
 import { getAllMembers } from "../lib/firebase/firestore/member"
 
@@ -162,7 +161,6 @@ export default function SubscriptionsScreen() {
 
 			<ScrollView
 				style={styles.scrollContent}
-				contentContainerStyle={styles.scrollContentContainer}
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Summary Card */}
@@ -236,9 +234,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 		},
 		scrollContent: {
 			flex: 1,
-		},
-		scrollContentContainer: {
-			paddingBottom: BOTTOM_TAB_HEIGHT + moderateScale(20),
 		},
 		// Summary Card
 		summaryCard: {
@@ -363,7 +358,7 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			opacity: 0.6,
 		},
 		flashListContent: {
-			paddingBottom: BOTTOM_TAB_HEIGHT + moderateScale(20),
+			paddingBottom: 10,
 		},
 	})
 }

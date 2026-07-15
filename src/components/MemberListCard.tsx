@@ -8,7 +8,7 @@ import ThemedIcon from "./ui/ThemedIcon"
 import { Theme } from "../utils/theme"
 import { useTranslation } from "react-i18next"
 
-export default function MemberListCard({ member }: { member: MemberCard }) {
+export default function MemberListCard({ member, search }: { member: MemberCard; search?: string | null }) {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const isScearchScreen = navigation.getState().routes.some((route: any) => route.name === "SearchScreen")
@@ -31,6 +31,7 @@ export default function MemberListCard({ member }: { member: MemberCard }) {
 		navigation.navigate("MemberDetailsScreen", {
 			memberId: member.uid,
 			prevScreen: isScearchScreen ? "SearchScreen" : undefined,
+			search: search,
 		})
 	}
 
@@ -52,7 +53,11 @@ export default function MemberListCard({ member }: { member: MemberCard }) {
 				<View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
 					<ThemedText style={styles.itemSubscriptionLabel}>{t("subscription") + ": "}</ThemedText>
 					<ThemedText style={[styles.itemSubscription, { color: subStatusColor }]}>
-						{member.subscriptionStatus === "ACTIVE" ? t("active") : member.subscriptionStatus === "PAUSED" ? t("paused") : t("none")}
+						{member.subscriptionStatus === "ACTIVE"
+							? t("active")
+							: member.subscriptionStatus === "PAUSED"
+								? t("paused")
+								: t("none")}
 					</ThemedText>
 				</View>
 			</View>

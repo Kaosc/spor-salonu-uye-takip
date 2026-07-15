@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from "react"
 import { View, TextInput, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
 import { FlashList } from "@shopify/flash-list"
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useMMKVObject } from "react-native-mmkv"
 import Fuse from "fuse.js"
@@ -14,14 +14,16 @@ import { Theme } from "../utils/theme"
 export default function SearchScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const route = useRoute<any>()
 
 	const styles = createStyles(darkMode)
 
 	const [members] = useMMKVObject<MemberCard[]>("members")
-	const [search, setSearch] = useState("")
+	const [search, setSearch] = useState(route.params?.search || "")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
 	const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const searchRef = useRef<string | null>(null)
 
 	useEffect(() => {
 		const backAction = () => {
@@ -59,11 +61,17 @@ export default function SearchScreen() {
 
 	const filtered = useMemo(() => {
 		if (!debouncedQuery.trim()) return []
+		searchRef.current = search
 		return fuse.search(debouncedQuery).map((r) => r.item)
 	}, [debouncedQuery, fuse])
 
 	const renderItem = useCallback(({ item }: { item: MemberCard }) => {
-		return <MemberListCard member={item} />
+		return (
+			<MemberListCard
+				member={item}
+				search={searchRef.current}
+			/>
+		)
 	}, [])
 
 	const keyExtractor = useCallback((item: MemberCard) => item.uid, [])

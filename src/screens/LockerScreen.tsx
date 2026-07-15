@@ -71,12 +71,9 @@ export default function LockerScreen() {
 		if (locker.owner) {
 			navigation.navigate("MemberDetailsScreen", { memberId: locker.owner.uid, prevScreen: "LockerScreen" })
 		} else {
-			navigation.navigate("Tabs", {
-				screen: "MemberStack",
-				params: {
-					screen: "MemberFormScreen",
-					params: { prefilledLockerNumber: locker.number.toString(), prevScreen: "LockerScreen" },
-				},
+			navigation.navigate("MemberFormScreen", {
+				prefilledLockerNumber: locker.number.toString(),
+				prevScreen: "LockerScreen",
 			})
 		}
 	}

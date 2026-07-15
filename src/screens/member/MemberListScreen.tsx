@@ -26,13 +26,20 @@ export default function MemberListContent() {
 
 	const [members, setMembers] = useMMKVObject<MemberCard[]>("members")
 	const [coldStart, setColdStart] = useMMKVBoolean("coldStart")
+
 	const fetchMembers = async () => {
 		try {
 			const membersData = await getAllMembers()
 			const subscriptionsData = await getAllSubscriptions()
 
 			const membersWithSubscription = membersData.map((member) => {
-				const subscriptionStatus = subscriptionsData.find((sub: Subscription) => sub.memberUid === member.uid)?.status || "NONE"
+				const memberSubs: Subscription[] = subscriptionsData.filter((sub: Subscription) => sub.memberUid === member.uid)
+				let subscriptionStatus: SubscriptionStatus | "NONE" = "NONE"
+
+				if (memberSubs.length > 0) {
+					subscriptionStatus = memberSubs.length > 0 ? memberSubs[0].status : "NONE"
+				}
+
 				return { ...member, subscriptionStatus }
 			})
 
