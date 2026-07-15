@@ -18,7 +18,6 @@ import { logout } from "../../store/features/authSlice"
 import { BOTTOM_TAB_HEIGHT } from "../../lib/constants"
 import { moderateScale } from "../../utils/responsive"
 import { Theme } from "../../utils/theme"
-import SettingsButton from "../../components/SettingsButton"
 
 export default function MemberProfileScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -50,11 +49,16 @@ export default function MemberProfileScreen() {
 
 	if (!member) {
 		return (
-			<View style={styles.container}>
-				<CustomHeader
-					title={t("myProfile")}
-					showBackButton={false}
-				/>
+			<View
+				style={[
+					styles.container,
+					{
+						alignItems: "center",
+						justifyContent: "center",
+					},
+				]}
+			>
+				<ThemedIcon name="account-off" size={80} />
 				<View style={styles.scrollContentContainer}>
 					<ThemedText>{t("memberNotFound")}</ThemedText>
 				</View>
