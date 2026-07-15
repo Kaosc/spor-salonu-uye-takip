@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import {
 	View,
 	Text,
@@ -34,21 +34,23 @@ export default function LoginScreen() {
 	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
 
-	const EMAIL = useMemo(() => {
-		return __DEV__ ? (isStaffLogin ? process.env.EXPO_PUBLIC_ADMIN_EMAIL || "" : process.env.EXPO_PUBLIC_MEMBER_EMAIL || "") : ""
-	}, [isStaffLogin])
-
-	const PASSWORD = useMemo(() => {
-		return __DEV__
-			? isStaffLogin
-				? process.env.EXPO_PUBLIC_ADMIN_PASSWORD || ""
-				: process.env.EXPO_PUBLIC_MEMBER_PASSWORD || ""
-			: ""
-	}, [isStaffLogin])
-
-	const [email, setEmail] = useState(EMAIL)
-	const [password, setPassword] = useState(PASSWORD)
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
 	const [error, setError] = useState("")
+
+	useEffect(() => {
+		if (__DEV__) {
+			setTimeout(() => {
+				if (isStaffLogin) {
+					setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
+					setPassword(process.env.EXPO_PUBLIC_ADMIN_PASSWORD || "")
+				} else {
+					setEmail(process.env.EXPO_PUBLIC_MEMBER_EMAIL || "")
+					setPassword(process.env.EXPO_PUBLIC_MEMBER_PASSWORD || "")
+				}
+			}, 100)
+		}
+	}, [isStaffLogin])
 
 	const handleForgotPassword = async () => {
 		if (!email.trim()) {
