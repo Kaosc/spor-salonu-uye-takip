@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { View, ScrollView, StyleSheet } from "react-native"
+import { View, ScrollView, StyleSheet, BackHandler } from "react-native"
 import { useSelector, useDispatch } from "react-redux"
 import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
@@ -27,6 +27,15 @@ export default function MemberProfileScreen() {
 	const { t } = useTranslation()
 	const styles = createStyles(darkMode)
 	const theme = Theme[darkMode ? "dark" : "light"]
+
+	useEffect(() => {
+		const backAction = () => {
+			navigation.goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
 
 	const handleLogout = async () => {
 		await logoutUser()
@@ -58,7 +67,10 @@ export default function MemberProfileScreen() {
 					},
 				]}
 			>
-				<ThemedIcon name="account-off" size={80} />
+				<ThemedIcon
+					name="account-off"
+					size={80}
+				/>
 				<View style={styles.scrollContentContainer}>
 					<ThemedText>{t("memberNotFound")}</ThemedText>
 				</View>

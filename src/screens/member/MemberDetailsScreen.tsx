@@ -70,6 +70,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		if (prevScreen === "SubscriptionsScreen") {
+			console.log("sasd")
 			navigation.navigate("Tabs", { screen: "SubscriptionStack" })
 			return
 		}
@@ -135,7 +136,6 @@ export default function MemberDetailsScreen() {
 			if (canceled) {
 				toast.show(t("subscriptionCancelled"), { type: "success" })
 				setTimeout(() => {
-					console.log("Reloading")
 					fetchSubscription()
 				}, 500)
 			} else {

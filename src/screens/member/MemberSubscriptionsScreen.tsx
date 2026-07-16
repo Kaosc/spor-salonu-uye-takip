@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { View, ScrollView, StyleSheet } from "react-native"
+import { View, ScrollView, StyleSheet, BackHandler } from "react-native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
@@ -16,11 +17,21 @@ import { BOTTOM_TAB_HEIGHT } from "../../lib/constants"
 
 export default function MemberSubscriptionsScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const navigation = useNavigation() as NavigationProp<any>
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 	const styles = createStyles(darkMode)
 
 	const [subscription, setSubscription] = useState<Subscription | null>(null)
+
+	useEffect(() => {
+		const backAction = () => {
+			navigation.goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
 
 	const fetchMember = async () => {
 		if (!uid) return
