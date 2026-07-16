@@ -13,15 +13,17 @@ import ThemedText from "./ui/ThemedText"
 import { Theme } from "../utils/theme"
 import { checkInMember } from "../lib/firebase/firestore/checkin"
 import { incrementMemberCheckInCount } from "../lib/firebase/firestore/member"
+import { assignLockerToUser } from "../lib/firebase/firestore/lockers"
 
 type QRScannerViewProps = {
 	onClose: () => void
-	checkingIn: boolean
+	action: QRScannerAction
 }
 
-export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProps) {
+export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { uid } = useSelector((state: RootState) => state.auth)
 	const insets = useSafeAreaInsets()
 	const { t } = useTranslation()
 
@@ -35,13 +37,14 @@ export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProp
 	}, [])
 
 	const handleOnQrScanned = async (result: any) => {
+		console.log(result?.data)
 		if (result?.data && !scanned.current) {
 			scanned.current = true
 
 			const memberQrData: CheckInQRData = JSON.parse(result.data)
 			let checkInSucces = false
 
-			if (checkingIn) {
+			if (action === "CHECK_IN") {
 				const checkedIn = await checkInMember(memberQrData)
 
 				if (checkedIn) {
@@ -59,10 +62,24 @@ export default function QRScannerView({ onClose, checkingIn }: QRScannerViewProp
 						type: "danger",
 					})
 				}
-			} else {
+			}
+
+			if (action === "VIEW_MEMBER") {
 				setTimeout(() => {
 					navigation.navigate("MemberDetailsScreen", { memberId: memberQrData.memberUid })
 				}, 500)
+			}
+
+			const lockerId: string = result.data
+
+			if (action === "ASSIGN_LOCKER") {
+				try {
+					if (!uid) return
+					await assignLockerToUser(uid, lockerId)
+					toast.show(t("locker_assigned_success"), { type: "success" })
+				} catch (e: any) {
+					toast.show(t(e.message), { type: "danger" })
+				}
 			}
 
 			onClose()

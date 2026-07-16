@@ -54,7 +54,6 @@ type FormValues = {
 	phoneNumber: string
 	email: string
 	address: string
-	lockerNumber: number
 	gender: Gender
 	birthDate: string
 	bloodType: string
@@ -88,7 +87,6 @@ interface Member {
 	lastName: string
 	phoneNumber: string
 	address?: string
-	lockerNumber?: number
 	totalCheckIns?: number | FieldValue
 	gender: Gender
 	birthDate?: Date
@@ -103,6 +101,13 @@ interface Member {
 	createdAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	createdBy?: string
+}
+
+interface Locker {
+	id: string
+	isOccupied: boolean
+	occupiedByUid: string | null
+	occupiedAt: Date | null
 }
 
 interface MemberCard extends Member {
@@ -141,3 +146,5 @@ interface CheckIn extends CheckInQRData {
 
 type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
+
+type QRScannerAction = "CHECK_IN" | "VIEW_MEMBER" | "ASSIGN_LOCKER"

@@ -12,7 +12,7 @@ import {
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { useSelector } from "react-redux"
-import { useEffect, useState, useRef, useMemo } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useTranslation } from "react-i18next"
 import { nanoid } from "@reduxjs/toolkit"
 
@@ -26,7 +26,7 @@ import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator
 import ThemedButton from "../../components/ui/ThemedButton"
 import ThemedBottomSheet from "../../components/ui/ThemedBottomSheet"
 
-import { addMember, getAllMembers, getMemberById, updateMember } from "../../lib/firebase/firestore/member"
+import { addMember, getMemberById, updateMember } from "../../lib/firebase/firestore/member"
 import { safeTimestampToDateString } from "../../utils/date"
 import { Theme } from "../../utils/theme"
 
@@ -49,16 +49,8 @@ export default function MemberFormScreen() {
 
 	const genderSheetRef = useRef<BottomSheet>(null)
 	const bloodTypeSheetRef = useRef<BottomSheet>(null)
-	const lockerSheetRef = useRef<BottomSheet>(null)
 
 	const [showDatePicker, setShowDatePicker] = useState(false)
-	const [members, setMembers] = useState<Member[]>([])
-
-	useEffect(() => {
-		getAllMembers()
-			.then(setMembers)
-			.catch((e) => console.error("[MemberFormScreen] fetch members:", e))
-	}, [])
 
 	useEffect(() => {
 		const backAction = () => {
@@ -70,16 +62,10 @@ export default function MemberFormScreen() {
 	}, [])
 
 	const goBackNoForce = () => {
-		if (route?.params?.prevScreen === "LockerScreen") {
-			reset()
-			navigation.dispatch(StackActions.replace("Tabs", { screen: "LockerScreen" }))
-			return
-		}
-
 		navigation.goBack()
 	}
 
-	const { control, handleSubmit, reset, setValue, watch } = useForm<FormValues>(
+	const { control, handleSubmit, reset, setValue } = useForm<FormValues>(
 		isNewMember
 			? {
 					defaultValues: {
@@ -104,7 +90,6 @@ export default function MemberFormScreen() {
 						phoneNumber: "",
 						email: "",
 						address: "",
-						lockerNumber: route.params?.prefilledLockerNumber || 0,
 						gender: "UNSPECIFIED",
 						birthDate: "",
 						bloodType: "",
@@ -115,42 +100,6 @@ export default function MemberFormScreen() {
 					},
 				},
 	)
-
-	const currentLockerNumber = watch("lockerNumber")
-
-	const lockerSheetItems = useMemo(() => {
-		const occupiedNumbers: number[] = []
-		members.forEach((m) => {
-			if (m.lockerNumber && m.lockerNumber !== currentLockerNumber) {
-				const n = m.lockerNumber
-				if (!isNaN(n)) occupiedNumbers.push(n)
-			}
-		})
-
-		const items: { text: string; onPress: () => void }[] = [
-			{
-				text: t("cancel"),
-				onPress: () => {
-					setValue("lockerNumber", 0)
-					lockerSheetRef.current?.close()
-				},
-			},
-		]
-
-		for (let i = 1; i <= 100; i++) {
-			if (!occupiedNumbers.includes(i)) {
-				const num = i
-				items.push({
-					text: `Locker ${num}`,
-					onPress: () => {
-						setValue("lockerNumber", num)
-						lockerSheetRef.current?.close()
-					},
-				})
-			}
-		}
-		return items
-	}, [members, currentLockerNumber, t, setValue])
 
 	// If there is a memberId, set loading state to true and fetch the member
 	useEffect(() => {
@@ -166,7 +115,6 @@ export default function MemberFormScreen() {
 							phoneNumber: member.phoneNumber || "",
 							email: member.email || "",
 							address: member.address || "",
-							lockerNumber: member.lockerNumber || 0,
 							gender: member.gender || "UNSPECIFIED",
 							birthDate: safeTimestampToDateString(member.birthDate),
 							bloodType: member.bloodType || "",
@@ -198,7 +146,6 @@ export default function MemberFormScreen() {
 			phoneNumber: data.phoneNumber,
 			email: data.email,
 			address: data.address || "",
-			lockerNumber: data.lockerNumber || 0,
 			gender: data.gender || ("UNSPECIFIED" as Gender),
 			birthDate: data.birthDate ? new Date(data.birthDate) : new Date(),
 			bloodType: data.bloodType || "",
@@ -554,33 +501,6 @@ export default function MemberFormScreen() {
 										)}
 									/>
 
-									{!isNewMember && (
-										<Controller
-											control={control}
-											name="lockerNumber"
-											render={({ field: { value } }) => (
-												<View style={styles.field}>
-													<View style={styles.labelRow}>
-														<ThemedText style={styles.label}>{t("lockerNumber")}</ThemedText>
-														<ThemedIcon
-															name="lock"
-															size={18}
-														/>
-													</View>
-													<TouchableOpacity
-														style={[styles.selectButton, route.params?.prefilledLockerNumber && styles.inputDisabled]}
-														onPress={() => lockerSheetRef.current?.snapToIndex(0)}
-														activeOpacity={0.6}
-													>
-														<ThemedText style={[styles.selectButtonText, !value ? styles.placeholder : null]}>
-															{value || t("selectLocker")}
-														</ThemedText>
-													</TouchableOpacity>
-												</View>
-											)}
-										/>
-									)}
-
 									<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
 
 									<Controller
@@ -735,13 +655,6 @@ export default function MemberFormScreen() {
 									},
 								},
 							]}
-						/>
-
-						<ThemedBottomSheet
-							ref={lockerSheetRef}
-							snapPoints={["50%"]}
-							items={lockerSheetItems}
-							icon="locker"
 						/>
 					</>
 				)}

@@ -12,7 +12,5 @@ export const LangDBList = {
 
 export const BOTTOM_TAB_HEIGHT = 56
 
-export const TOTAL_LOCKERS = 100
-
 export const DEV_MAIL = "support@kaosc.dev"
 export const WEBSITE_URL = "https://kaosc.dev"

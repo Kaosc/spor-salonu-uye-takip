@@ -38,7 +38,7 @@ export default function DashboardScreen() {
 	const [qrModalVisible, setQrModalVisible] = useState(false)
 	const [scannerModalVisible, setScannerModalVisible] = useState(false)
 
-	const checkingIn = useRef(false)
+	const qrAction = useRef<QRScannerAction>("VIEW_MEMBER")
 
 	useEffect(() => {
 		if (!uid) return
@@ -57,7 +57,6 @@ export default function DashboardScreen() {
 	}
 
 	const handleOnQRModalClose = () => {
-		checkingIn.current = false
 		setScannerModalVisible(false)
 	}
 
@@ -88,7 +87,7 @@ export default function DashboardScreen() {
 			{scannerModalVisible && (
 				<QRScannerView
 					onClose={handleOnQRModalClose}
-					checkingIn={checkingIn.current}
+					action={qrAction.current}
 				/>
 			)}
 
@@ -196,7 +195,10 @@ export default function DashboardScreen() {
 					<TouchableOpacity
 						style={styles.qrActionButton}
 						activeOpacity={0.7}
-						onPress={() => setScannerModalVisible(true)}
+						onPress={() => {
+							qrAction.current = "VIEW_MEMBER"
+							setScannerModalVisible(true)
+						}}
 					>
 						<View style={styles.qrCardContent}>
 							<ThemedIcon
@@ -211,7 +213,7 @@ export default function DashboardScreen() {
 						style={styles.qrActionButton}
 						activeOpacity={0.7}
 						onPress={() => {
-							checkingIn.current = true
+							qrAction.current = "CHECK_IN"
 							setScannerModalVisible(true)
 						}}
 					>

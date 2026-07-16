@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
+import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert, Dimensions } from "react-native"
 import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -11,6 +11,7 @@ import ThemedIcon from "../../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../../components/ui/ThemedButton"
 import BMIDisplay from "../../components/BMIDisplay"
+import SubscriptionView from "../../components/SubscriptionView"
 
 import { activateMember, getMemberById, inactivateMember } from "../../lib/firebase/firestore/member"
 import {
@@ -19,11 +20,11 @@ import {
 	pauseSubscription,
 	resumeSubscription,
 } from "../../lib/firebase/firestore/subscriptions"
+import { getLockerByUserUid, removeLockerFromUser } from "../../lib/firebase/firestore/lockers"
 import { safeTimestampToDateString, safeTimestampToDateTimeString } from "../../utils/date"
 import { Theme } from "../../utils/theme"
 
 import { AllIconNames } from "../../types/icon"
-import SubscriptionView from "../../components/SubscriptionView"
 
 interface RouteParams extends RouteProp<ParamListBase> {
 	params: {
@@ -45,12 +46,15 @@ export default function MemberDetailsScreen() {
 
 	const [activePage, setActivePage] = useState(route.params?.initialPage || 0)
 	const pagerRef = useRef<PagerView>(null)
+	const scrollViewRef = useRef<ScrollView>(null)
 
 	const [memberStatus, setMemberStatus] = useState<"idle" | "loading" | "error">("idle")
 	const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "loading" | "error">("idle")
+	const [lockerStatus, setLockerStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	const [member, setMember] = useState<Member | null>(null)
 	const [subscriptions, setSubscriptions] = useState<Subscription[] | null>(null)
+	const [locker, setLocker] = useState<Locker | null>(null)
 	const [activeSubscription, setActiveSubscription] = useState<Subscription | null>(null)
 
 	useEffect(() => {
@@ -90,17 +94,16 @@ export default function MemberDetailsScreen() {
 
 	const fetchMember = async () => {
 		if (!route.params?.memberId) return
-		const t = setTimeout(() => setMemberStatus("loading"), 1000)
+		setMemberStatus("loading")
 		const member = await getMemberById(route.params?.memberId)
 
-		clearTimeout(t)
 		setMember(member)
 		setMemberStatus(member ? "idle" : "error")
 	}
 
 	const fetchSubscription = async () => {
 		if (!route.params?.memberId) return
-		let t = setTimeout(() => setSubscriptionStatus("loading"), 1000)
+		setSubscriptionStatus("loading")
 		const subscriptions = await getSubscriptionsByMemberId(route.params?.memberId)
 
 		if (subscriptions.length > 0) {
@@ -119,13 +122,26 @@ export default function MemberDetailsScreen() {
 			setSubscriptions(null)
 		}
 
-		clearTimeout(t)
 		setSubscriptionStatus(subscriptions.length > 0 ? "idle" : "error")
+	}
+
+	const fetchLocker = async () => {
+		if (!route.params?.memberId) return
+		setLockerStatus("loading")
+
+		try {
+			const lockerData = await getLockerByUserUid(route.params?.memberId)
+			setLocker(lockerData)
+			setLockerStatus(lockerData ? "idle" : "error")
+		} catch (e) {
+			setLockerStatus("error")
+		}
 	}
 
 	useEffect(() => {
 		fetchMember()
 		fetchSubscription()
+		fetchLocker()
 	}, [route.params?.memberId])
 
 	const handleSubCancel = async (alert = true) => {
@@ -270,6 +286,77 @@ export default function MemberDetailsScreen() {
 				onPress: async () => await resumeSub(),
 			},
 		])
+	}
+
+	const handleEmptyLocker = async () => {
+		if (!locker?.id) return
+
+		Alert.alert(t("removeLockerTitle"), t("removeLockerMessage"), [
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+			{
+				text: t("remove"),
+				style: "destructive",
+				onPress: async () => {
+					try {
+						await removeLockerFromUser(locker.id)
+						setLocker(null)
+						toast.show(t("locker_removed_success"), { type: "success" })
+					} catch (e) {
+						console.error("[MemberDetailsScreen] handleEmptyLocker:", e)
+						toast.show(t("locker_assignment_error"), { type: "danger" })
+					}
+				},
+			},
+		])
+	}
+
+	const LockerView = () => {
+		if (lockerStatus === "loading") {
+			return (
+				<View style={{ padding: 40, alignItems: "center" }}>
+					<ThemedActivityIndicator size={50} />
+				</View>
+			)
+		}
+
+		if (locker) {
+			return (
+				<View style={styles.lockerCard}>
+					<View style={styles.lockerIconContainer}>
+						<ThemedIcon
+							name="locker"
+							size={50}
+							color={darkMode ? "#fff" : "#000"}
+						/>
+					</View>
+					<ThemedText style={styles.lockerTitle}>{t("lockerNumber")}</ThemedText>
+					<View style={styles.lockerNumberBadge}>
+						<ThemedText style={styles.lockerNumberText}>#{locker.id}</ThemedText>
+					</View>
+					<ThemedButton
+						style={styles.emptyLockerButton}
+						onPress={handleEmptyLocker}
+					>
+						<ThemedText style={styles.emptyLockerButtonText}>{t("remove")}</ThemedText>
+					</ThemedButton>
+				</View>
+			)
+		}
+
+		return (
+			<View style={styles.noLockerCard}>
+				<ThemedIcon
+					name="locker"
+					size={60}
+					color={theme.text}
+					style={{ opacity: 0.3, alignSelf: "center", marginBottom: 12 }}
+				/>
+				<ThemedText style={styles.noLockerTitle}>{t("noActiveLocker")}</ThemedText>
+			</View>
+		)
 	}
 
 	const SubscriptionDetails = () => {
@@ -522,11 +609,6 @@ export default function MemberDetailsScreen() {
 				</View>
 
 				<DetailsRow
-					label={t("lockerNumber")}
-					value={member.lockerNumber?.toString() || "-"}
-					iconName="lock"
-				/>
-				<DetailsRow
 					label={t("address")}
 					value={member.address || "-"}
 					iconName="home"
@@ -591,16 +673,23 @@ export default function MemberDetailsScreen() {
 		}
 
 		return (
-			<View style={styles.tabBar}>
+			<View
+				style={styles.tabBarContent}
+			>
 				<TabButton
-					label={t("memberDetails")}
+					label={t("member")}
 					iconName="account"
 					pageIndex={0}
 				/>
 				<TabButton
-					label={t("subscriptionInfo")}
+					label={t("subscription")}
 					iconName="card-text"
 					pageIndex={1}
+				/>
+				<TabButton
+					label={t("locker")}
+					iconName="locker"
+					pageIndex={2}
 				/>
 			</View>
 		)
@@ -637,7 +726,6 @@ export default function MemberDetailsScreen() {
 				<MemberNotFoundView />
 			) : (
 				<>
-					{/* Tab Bar */}
 					<TabBar />
 					<PagerView
 						ref={pagerRef}
@@ -661,6 +749,14 @@ export default function MemberDetailsScreen() {
 						>
 							<SubscriptionDetails />
 						</ScrollView>
+						<ScrollView
+							key="3"
+							style={{ flex: 1 }}
+							contentContainerStyle={styles.pageContent}
+							showsVerticalScrollIndicator={false}
+						>
+							<LockerView />
+						</ScrollView>
 					</PagerView>
 				</>
 			)}
@@ -676,8 +772,11 @@ const createStyles = (darkMode: boolean) => {
 			flex: 1,
 		},
 		tabBar: {
-			flexDirection: "row",
+			flexGrow: 0,
 			marginHorizontal: 10,
+		},
+		tabBarContent: {
+			flexDirection: "row",
 			paddingBottom: 10,
 			gap: 8,
 		},
@@ -687,7 +786,8 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			justifyContent: "center",
 			gap: 6,
-			paddingVertical: 9,
+			paddingVertical: 14,
+			paddingHorizontal: 20,
 			opacity: 0.6,
 			marginTop: 10,
 			borderRadius: 40,
@@ -699,7 +799,7 @@ const createStyles = (darkMode: boolean) => {
 			opacity: 1,
 		},
 		tabText: {
-			fontSize: 14,
+			fontSize: 16,
 			fontWeight: "bold",
 		},
 		tabTextActive: {
@@ -941,6 +1041,66 @@ const createStyles = (darkMode: boolean) => {
 			color: theme.orange.foreground,
 			fontSize: 16,
 			fontWeight: "bold",
+		},
+		// Locker styles
+		lockerCard: {
+			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
+			borderRadius: 12,
+			padding: 30,
+			alignItems: "center",
+			marginTop: 20,
+		},
+		lockerIconContainer: {
+			width: 90,
+			height: 90,
+			borderRadius: 45,
+			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			alignItems: "center",
+			justifyContent: "center",
+			marginBottom: 16,
+		},
+		lockerTitle: {
+			fontSize: 18,
+			fontWeight: "700",
+			marginBottom: 16,
+		},
+		lockerNumberBadge: {
+			backgroundColor: darkMode ? "#fff" : "#000",
+			paddingHorizontal: 24,
+			paddingVertical: 10,
+			borderRadius: 30,
+			marginBottom: 24,
+		},
+		lockerNumberText: {
+			fontSize: 20,
+			fontWeight: "800",
+			color: darkMode ? "#000" : "#fff",
+		},
+		emptyLockerButton: {
+			backgroundColor: theme.red.background,
+			paddingVertical: 14,
+			paddingHorizontal: 40,
+			alignItems: "center",
+			borderWidth: 1,
+			borderColor: theme.red.foreground,
+			borderRadius: 12,
+		},
+		emptyLockerButtonText: {
+			color: theme.red.foreground,
+			fontSize: 16,
+			fontWeight: "bold",
+		},
+		noLockerCard: {
+			alignItems: "center",
+			paddingVertical: 60,
+		},
+		noLockerTitle: {
+			fontSize: 16,
+			fontWeight: "700",
+			textAlign: "center",
+			opacity: 0.7,
 		},
 	})
 }

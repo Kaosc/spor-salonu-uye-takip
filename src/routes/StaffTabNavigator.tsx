@@ -88,7 +88,6 @@ export default function StaffTabNavigator() {
 					tabBarLabel: t("dashboard"),
 				}}
 			/>
-
 			<Tabs.Screen
 				name="SubscriptionStack"
 				component={SubscriptionStack}

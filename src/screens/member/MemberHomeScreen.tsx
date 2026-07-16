@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native"
+import { View, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
@@ -9,10 +9,12 @@ import ThemedIcon from "../../components/ui/ThemedIcon"
 import CustomHeader from "../../components/CustomHeader"
 import SettingsButton from "../../components/SettingsButton"
 import QRCodeModal from "../../components/QRCodeModal"
+import QRScannerView from "../../components/QRScannerView"
 
 import { Theme } from "../../utils/theme"
 import { moderateScale } from "../../utils/responsive"
 import { getMemberById } from "../../lib/firebase/firestore/member"
+import { getLockerByUserUid, removeLockerFromUser } from "../../lib/firebase/firestore/lockers"
 
 export default function MemberHomeScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -20,10 +22,14 @@ export default function MemberHomeScreen() {
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 
+	const theme = Theme[darkMode ? "dark" : "light"]
 	const styles = createStyles(darkMode)
 
 	const [qrModalVisible, setQrModalVisible] = useState(false)
+	const [qrLockerModalVisible, setQrLockerModalVisible] = useState(false)
+
 	const [member, setMember] = useState<Member | null>(null)
+	const [locker, setLocker] = useState<Locker | null>(null)
 
 	const QrData: CheckIn = useMemo(() => {
 		if (!member) return {} as CheckIn
@@ -42,9 +48,71 @@ export default function MemberHomeScreen() {
 		setMember(member)
 	}
 
+	const fetchLocker = async () => {
+		if (!uid) return
+
+		const locker = await getLockerByUserUid(uid)
+		setLocker(locker)
+	}
+
 	useEffect(() => {
 		fetchMember()
 	}, [])
+
+	useEffect(() => {
+		fetchLocker()
+	}, [qrLockerModalVisible])
+
+	const LockerCard = () => {
+		return locker ? (
+			<TouchableOpacity
+				onPress={() => {
+					Alert.alert(t("removeLockerTitle"), t("removeLockerMessage"), [
+						{
+							text: t("cancel"),
+							style: "cancel",
+						},
+						{
+							text: t("remove"),
+							style: "destructive",
+							onPress: async () => {
+								try {
+									await removeLockerFromUser(locker.id)
+									setLocker(null)
+									toast.show(t("locker_removed_success"), { type: "success" })
+								} catch (e: any) {
+									toast.show(e.message, { type: "danger" })
+								}
+							},
+						},
+					])
+				}}
+				style={[styles.lockerCard, styles.lockerCardActive]}
+			>
+				<ThemedIcon
+					name="locker"
+					size={50}
+					color={theme.green.foreground}
+				/>
+				<ThemedText style={styles.lockerCardLabel}>
+					{t("myLocker")}: {locker.id}
+				</ThemedText>
+			</TouchableOpacity>
+		) : (
+			<TouchableOpacity
+				style={styles.lockerCard}
+				onPress={() => {
+					setQrLockerModalVisible(true)
+				}}
+			>
+				<ThemedIcon
+					name="locker"
+					size={50}
+				/>
+				<ThemedText style={styles.lockerCardLabel}>{t("noActiveLocker")}</ThemedText>
+			</TouchableOpacity>
+		)
+	}
 
 	return (
 		<View style={styles.container}>
@@ -112,6 +180,8 @@ export default function MemberHomeScreen() {
 						<ThemedText style={styles.infoCardLabel}>{t("profile")}</ThemedText>
 					</TouchableOpacity>
 				</View>
+
+				<LockerCard />
 			</ScrollView>
 
 			{/* QR Code Modal */}
@@ -120,6 +190,13 @@ export default function MemberHomeScreen() {
 				visible={qrModalVisible}
 				onClose={() => setQrModalVisible(false)}
 			/>
+
+			{qrLockerModalVisible && (
+				<QRScannerView
+					action="ASSIGN_LOCKER"
+					onClose={() => setQrLockerModalVisible(false)}
+				/>
+			)}
 		</View>
 	)
 }
@@ -194,6 +271,27 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 15,
 			fontWeight: "bold",
 			opacity: 0.7,
+		},
+		lockerCard: {
+			flexDirection: "row",
+			alignItems: "center",
+			padding: moderateScale(20),
+			backgroundColor: theme.cardBackground,
+			borderRadius: 16,
+			marginHorizontal: moderateScale(16),
+			borderWidth: 1,
+			borderColor: theme.border,
+			gap: 10,
+			marginTop: 20,
+		},
+		lockerCardActive: {
+			borderColor: theme.green.foreground,
+			borderWidth: 1,
+		},
+		lockerCardLabel: {
+			fontSize: 24,
+			fontWeight: "bold",
+			marginLeft: moderateScale(10),
 		},
 	})
 }
