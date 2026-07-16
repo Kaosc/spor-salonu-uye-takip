@@ -74,7 +74,6 @@ export default function MemberDetailsScreen() {
 		}
 
 		if (prevScreen === "SubscriptionsScreen") {
-			console.log("sasd")
 			navigation.navigate("Tabs", { screen: "SubscriptionStack" })
 			return
 		}

@@ -37,7 +37,6 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 	}, [])
 
 	const handleOnQrScanned = async (result: any) => {
-		console.log(result?.data)
 		if (result?.data && !scanned.current) {
 			scanned.current = true
 

@@ -148,6 +148,7 @@ export default function LockerScreen() {
 				data={lockers}
 				renderItem={renderLocker}
 				keyExtractor={keyExtractor}
+				onRefresh={fetchLockerData}
 				numColumns={4}
 				style={{ flex: 1, gap: 10 }}
 				contentContainerStyle={styles.gridContent}
