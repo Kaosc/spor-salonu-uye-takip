@@ -8,6 +8,7 @@ import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
 import CustomHeader from "../../components/CustomHeader"
 import SubscriptionView from "../../components/SubscriptionView"
+import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 
 import { getSubscriptionsByMemberId } from "../../lib/firebase/firestore/subscriptions"
 
@@ -23,6 +24,7 @@ export default function MemberSubscriptionsScreen() {
 	const styles = createStyles(darkMode)
 
 	const [subscription, setSubscription] = useState<Subscription | null>(null)
+	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	useEffect(() => {
 		const backAction = () => {
@@ -36,13 +38,31 @@ export default function MemberSubscriptionsScreen() {
 	const fetchMember = async () => {
 		if (!uid) return
 
+		setStatus("loading")
 		const subscriptions = await getSubscriptionsByMemberId(uid)
 		setSubscription(subscriptions.length > 0 ? subscriptions[0] : null)
+		setStatus("idle")
 	}
 
 	useEffect(() => {
 		fetchMember()
 	}, [])
+
+	if (status === "loading") {
+		return (
+			<View
+				style={[
+					styles.container,
+					{
+						alignItems: "center",
+						justifyContent: "center",
+					},
+				]}
+			>
+				<ThemedActivityIndicator size={60} />
+			</View>
+		)
+	}
 
 	return (
 		<View style={styles.container}>

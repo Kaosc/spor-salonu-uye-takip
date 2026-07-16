@@ -94,9 +94,8 @@ export default function MemberHomeScreen() {
 					size={50}
 					color={theme.green.foreground}
 				/>
-				<ThemedText style={styles.lockerCardLabel}>
-					{t("myLocker")}: {locker.id}
-				</ThemedText>
+				<ThemedText style={styles.lockerCardLabel}>{t("lockerNumber")}</ThemedText>
+				<ThemedText style={styles.lockerNumberLabel}>#{locker?.id}</ThemedText>
 			</TouchableOpacity>
 		) : (
 			<TouchableOpacity
@@ -292,6 +291,15 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 24,
 			fontWeight: "bold",
 			marginLeft: moderateScale(10),
+		},
+		lockerNumberLabel: {
+			fontSize: 18,
+			fontWeight: "bold",
+			backgroundColor: darkMode ? "#fff" : "#000",
+			color: darkMode ? "#000" : "#fff",
+			padding: 5,
+			paddingHorizontal: 10,
+			borderRadius: 99,
 		},
 	})
 }

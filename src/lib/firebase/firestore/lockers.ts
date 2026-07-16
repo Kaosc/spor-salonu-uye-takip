@@ -53,9 +53,9 @@ export const getLockerByUserUid = async (uid: string): Promise<Locker | null> =>
 	}
 }
 
-export const assignLockerToUser = async (uid: string, lockerId: string) => {
+export const assignLockerToUser = async (uid: string, lockerId: number) => {
 	try {
-		const lockerRef = doc(db, COLLECTIONS.LOCKERS, lockerId)
+		const lockerRef = doc(db, COLLECTIONS.LOCKERS, lockerId.toString())
 		const lockerSnap = await getDoc(lockerRef)
 
 		if (!lockerSnap.exists()) {
@@ -91,9 +91,9 @@ export const assignLockerToUser = async (uid: string, lockerId: string) => {
 	}
 }
 
-export const removeLockerFromUser = async (lockerId: string) => {
+export const removeLockerFromUser = async (lockerId: number) => {
 	try {
-		const lockerRef = doc(db, COLLECTIONS.LOCKERS, lockerId)
+		const lockerRef = doc(db, COLLECTIONS.LOCKERS, lockerId.toString())
 		const lockerSnap = await getDoc(lockerRef)
 
 		if (!lockerSnap.exists()) {
@@ -123,16 +123,16 @@ export const removeLockerFromUser = async (lockerId: string) => {
 export const addLocker = async () => {
 	try {
 		let totalLockers = 0
-		let newLockerId = "1"
+		let newLockerId = 1
 
 		try {
 			totalLockers = (await getAllLockers()).length
-			newLockerId = (totalLockers + 1).toString()
+			newLockerId = totalLockers + 1
 		} catch (error) {
 			console.error("[FIRESTORE] addLocker: Error fetching total lockers:", error)
 		}
 
-		await setDoc(doc(db, COLLECTIONS.LOCKERS, newLockerId), {
+		await setDoc(doc(db, COLLECTIONS.LOCKERS, newLockerId.toString()), {
 			id: newLockerId,
 			isOccupied: false,
 			occupiedByUid: null,

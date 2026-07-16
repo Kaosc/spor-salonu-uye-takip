@@ -75,7 +75,7 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 			if (action === "ASSIGN_LOCKER") {
 				try {
 					if (!uid) return
-					await assignLockerToUser(uid, lockerId)
+					await assignLockerToUser(uid, parseInt(lockerId))
 					toast.show(t("locker_assigned_success"), { type: "success" })
 				} catch (e: any) {
 					toast.show(t(e.message), { type: "danger" })

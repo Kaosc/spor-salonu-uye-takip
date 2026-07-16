@@ -104,7 +104,7 @@ interface Member {
 }
 
 interface Locker {
-	id: string
+	id: number
 	isOccupied: boolean
 	occupiedByUid: string | null
 	occupiedAt: Date | null

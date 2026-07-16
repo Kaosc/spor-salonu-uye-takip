@@ -205,7 +205,7 @@ const createStyles = (darkMode: boolean) => {
 		gridContent: {
 			marginLeft: 11,
 			marginTop: 5,
-			paddingBottom: 11,
+			paddingBottom: 100,
 		},
 		lockerCard: {
 			flex: 1,

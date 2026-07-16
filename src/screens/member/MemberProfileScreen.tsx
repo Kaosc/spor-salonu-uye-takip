@@ -18,15 +18,20 @@ import { logout } from "../../store/features/authSlice"
 import { BOTTOM_TAB_HEIGHT } from "../../lib/constants"
 import { moderateScale } from "../../utils/responsive"
 import { Theme } from "../../utils/theme"
+import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 
 export default function MemberProfileScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { uid } = useSelector((state: RootState) => state.auth)
-	const dispatch = useDispatch<any>()
 	const { t } = useTranslation()
-	const styles = createStyles(darkMode)
+
+	const dispatch = useDispatch<any>()
+
 	const theme = Theme[darkMode ? "dark" : "light"]
+	const styles = createStyles(darkMode)
+
+	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	useEffect(() => {
 		const backAction = () => {
@@ -48,13 +53,31 @@ export default function MemberProfileScreen() {
 	const fetchMember = async () => {
 		if (!uid) return
 
+		setStatus("loading")
 		const member = await getMemberById(uid)
 		setMember(member)
+		setStatus("idle")
 	}
 
 	useEffect(() => {
 		fetchMember()
 	}, [])
+
+	if (status === "loading") {
+		return (
+			<View
+				style={[
+					styles.container,
+					{
+						alignItems: "center",
+						justifyContent: "center",
+					},
+				]}
+			>
+				<ThemedActivityIndicator size={60} />
+			</View>
+		)
+	}
 
 	if (!member) {
 		return (
