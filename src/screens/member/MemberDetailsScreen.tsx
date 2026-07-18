@@ -185,7 +185,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		// If the member has an active subscription, show a warning alert to the user that the subscription will be cancelled if they inactivate the member.
-		if (activeSubscription && activeSubscription.status === "ACTIVE") {
+		if (activeSubscription && (activeSubscription.status === "ACTIVE" || activeSubscription.status === "PAUSED")) {
 			Alert.alert(t("inactivateMember"), t("inactivateMemberWithActiveSubscriptionConfirmation"), [
 				{
 					text: t("cancel"),

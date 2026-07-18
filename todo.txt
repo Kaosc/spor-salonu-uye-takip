@@ -1,11 +1,21 @@
-# Maybe
-- Dynamic price selection and changing the price of a subscription
+x (on progress) Statistic screen for the role of "ADMIN"
+   - This screen will show the statistic of the members and subscriptions.
+       x (on progress) - How many members are active or inactive.
+       x (on progress) - How many subscriptions are active, paused, or canceled.
+       x (on progress) - How many members checked-in or checked-out today.
+       x (on progress) - How many members checked-in or checked-out this week.
+       x (on progress) - How many members checked-in or checked-out this month.
+       x (on progress) - How many members checked-in or checked-out this year.
+       x (on progress) - Total income from subscriptions this month.
+       x (on progress) - Total income from subscriptions this year.
+       x (on progress) - Total income from subscriptions this month by subscription type.
+       x (on progress) - Total income
 
-# Check-Ins
-   - Create a Check-ins collection and it will be only incremented when user checks in with qr code. It will have the following fields:
-      interface CheckIn {
-         id: string;
-         memberUid: string;
-         checkInTime: Date;
-         checkOutTime?: Date;
-      }
+# CheckinScreen
+   - Screen will have 2 view, monthly calendar view and a list view (which is the current)
+   - List view will show the list of members who checked-in today and all of the checkins.
+   x (on progress) Calendar view will show the monthly calendar with the number of check-ins for each day. When a day is selected, the list view will show the list of members who checked-in on that day.
+
+# General
+   - Use more expo-linear-gradient for the buttons and other components.
+   - Avoid using to much border

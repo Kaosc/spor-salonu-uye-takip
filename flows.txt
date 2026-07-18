@@ -1,0 +1,35 @@
+# Member
+   - Adding a member
+   - Activating a member
+   - Deactivating a member 
+      ! If member has a "ACTIVE" or "PAUSED" subscription, deactivating it will be turn the "ACTIVE" status of the subscription to "CANCELED".
+
+# Subscription
+   - Adding a subscription
+      ! If the member is not active, app will not allow to add a subscription. Staff will need to activate the member first before adding a subscription.
+   - Canceling a subscription
+   - Pausing a subscription 
+   - Unpausing a subscription
+
+# Check-in / Check-out
+   - Member will have a QR Code created by the uid from the firebase auth.
+   - Staff can scan the QR Code of the member to
+      - Check-in the member
+      x (on progress) - Check-out the member 
+      - View the member's details
+
+# Lockers
+   - Members scan Locker QR code to assign a locker to themselves.
+   - Member unassing the locker by pressing the same button to scan the locker QR code.
+   - Staff can unassing a locker from the member's details screen by pressing the "Remove Locker" button.
+   x (on progress) - members can unassing the locker that bounded to them by checking-out.
+   x (on progress) - Auto assigning lockers to members when they check-in.
+
+x (on progress) # Adding New Staff Member
+   x (on progress) - Only the staff with the "ADMIN" role can add new staff members.
+   x (on progress) - The role of "STAFF" cannot add or remove other staff members.
+
+# Login / Register
+   - When a member added through the web admin panel, member auth account will be created with a email of the member and a random password. member will need to reset their password from login screen to access the app by their email adresses.
+   - If a member added through the mobile app there will be no auth account created for the member. Member will need to go to register screen to create an auth account. When the auth account created & verified by the member, the added member data by the staff will be linked (member & subscription data) to the auth account of the member.
+   - If a member never created an auth account or never added to member collection by the staff, member will need to register first to create an auth account and then the mobile app will navigate user to the "MemberFormScreen" to fill the member details. After the member details filled, the member will be added to the member collection and linked to the auth account of the member.
