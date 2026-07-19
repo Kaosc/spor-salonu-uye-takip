@@ -11,11 +11,6 @@ x (on progress) Statistic screen for the role of "ADMIN"
        x (on progress) - Total income from subscriptions this month by subscription type.
        x (on progress) - Total income
 
-# CheckinScreen
-   - Screen will have 2 view, monthly calendar view and a list view (which is the current)
-   - List view will show the list of members who checked-in today and all of the checkins.
-   x (on progress) Calendar view will show the monthly calendar with the number of check-ins for each day. When a day is selected, the list view will show the list of members who checked-in on that day.
-
 # General
    - Use more expo-linear-gradient for the buttons and other components.
    - Avoid using to much border

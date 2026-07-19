@@ -8,7 +8,7 @@ import ThemedIcon from "./ui/ThemedIcon"
 import { Theme } from "../utils/theme"
 import { safeTimestampToDateTimeString } from "../utils/date"
 
-export default function CheckinListCard({ checkin }: { checkin: CheckIn }) {
+export default function CheckinListCard({ checkin, selectedDate }: { checkin: CheckIn; selectedDate: string }) {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
@@ -16,7 +16,8 @@ export default function CheckinListCard({ checkin }: { checkin: CheckIn }) {
 	const handleOnPress = () => {
 		navigation.navigate("MemberDetailsScreen", {
 			memberId: checkin.memberUid,
-			prevScreen: "CheckinsListScreen",
+			prevScreen: "DailyCheckinsScreen",
+			selectedDate: selectedDate,
 		})
 	}
 

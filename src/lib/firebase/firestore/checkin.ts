@@ -9,6 +9,7 @@ import {
 	query,
 	serverTimestamp,
 	setDoc,
+	where,
 } from "@react-native-firebase/firestore"
 
 import { COLLECTIONS } from "../enums"
@@ -46,6 +47,39 @@ export const getAllCheckIns = async (): Promise<CheckIn[]> => {
 	} catch (e) {
 		console.error("[FIRESTORE] getAllCheckIns:", e)
 		return []
+	}
+}
+
+export const getCheckinsByDate = async (dateString?: string): Promise<CheckIn[] | null> => {
+	if (!dateString) return []
+
+	try {
+		const startDate = new Date(dateString)
+		startDate.setHours(0, 0, 0, 0)
+
+		const endDate = new Date(startDate)
+		endDate.setDate(endDate.getDate() + 1)
+
+		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
+
+		const q = query(checkInsCollection, where("checkInTime", ">=", startDate), where("checkInTime", "<", endDate))
+
+		const querySnapshot = await getDocs(q)
+
+		if (querySnapshot.empty) {
+			return []
+		}
+
+		const checkIns: CheckIn[] = []
+		querySnapshot.forEach((doc) => {
+			const checkInData = doc.data() as CheckIn
+			checkIns.push(checkInData)
+		})
+
+		return checkIns
+	} catch (e) {
+		console.error("[FIRESTORE] getCheckinsByDate:", e)
+		throw e
 	}
 }
 

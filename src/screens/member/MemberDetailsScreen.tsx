@@ -30,8 +30,9 @@ interface RouteParams extends RouteProp<ParamListBase> {
 	params: {
 		memberId: string
 		initialPage?: number
-		prevScreen: "SearchScreen" | "SubscriptionsScreen" | "LockerScreen" | undefined
+		prevScreen: "SearchScreen" | "SubscriptionsScreen" | "LockerScreen" | "DailyCheckinsScreen" | undefined
 		search?: string
+		selectedDate?: string
 	}
 }
 
@@ -83,8 +84,16 @@ export default function MemberDetailsScreen() {
 			return
 		}
 
-		if (prevScreen === "CheckinsListScreen") {
-			navigation.navigate("Tabs", { screen: "CheckinsListScreen" })
+		if (prevScreen === "DailyCheckinsScreen") {
+			navigation.navigate("Tabs", {
+				screen: "CheckinsStack",
+				params: {
+					screen: "DailyCheckinsScreen",
+					params: {
+						selectedDate: route.params?.selectedDate,
+					},
+				},
+			})
 			return
 		}
 
@@ -672,9 +681,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		return (
-			<View
-				style={styles.tabBarContent}
-			>
+			<View style={styles.tabBarContent}>
 				<TabButton
 					label={t("member")}
 					iconName="account"

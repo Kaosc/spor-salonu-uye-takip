@@ -15,7 +15,8 @@
    - Member will have a QR Code created by the uid from the firebase auth.
    - Staff can scan the QR Code of the member to
       - Check-in the member
-      x (on progress) - Check-out the member 
+      x (on progress) - Check-out the member
+         ! Checking-out by member will unassign the locker that bounded to the member. 
       - View the member's details
 
 # Lockers

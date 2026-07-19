@@ -188,5 +188,10 @@
 	"addLockerMessage": "Yeni bir dolap eklemek istediğinizden emin misiniz?",
 	"add": "Ekle",
 	"locker_added_success": "Dolap başarıyla eklendi",
-	"locker": "Dolap"
+	"locker": "Dolap",
+	"noCheckinsFound": "Giriş bulunamadı",
+	"checkinsFor": "Girişler",
+	"goToToday": "Bugüne Git",
+	"scrollToToday": "Bugüne Kaydır",
+	"checkinFetchError": "Girişler alınırken bir hata oluştu. Lütfen tekrar deneyin"
 }

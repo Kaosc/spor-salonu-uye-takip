@@ -100,3 +100,9 @@ export function daysSince(date: Date): number {
 	const diff = now.getTime() - date.getTime()
 	return Math.floor(diff / (1000 * 60 * 60 * 24))
 }
+
+export const formatToYYYYMMDD = (firebaseTimestamp: any) => {
+	if (!firebaseTimestamp) return null
+	const date = firebaseTimestamp.toDate ? firebaseTimestamp.toDate() : new Date(firebaseTimestamp)
+	return date.toISOString().split("T")[0]
+}

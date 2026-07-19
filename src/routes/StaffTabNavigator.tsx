@@ -8,7 +8,7 @@ import MemberStack from "./stacks/MemberStack"
 import DashboardScreen from "../screens/DashboardScreen"
 import SubscriptionStack from "./stacks/SubscriptionStack"
 import LockerScreen from "../screens/LockerScreen"
-import CheckinsListScreen from "../screens/CheckinsListScreen"
+import CheckinsStack from "./stacks/CheckinsStack"
 
 import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 import { moderateScale } from "../utils/responsive"
@@ -103,8 +103,8 @@ export default function StaffTabNavigator() {
 				}}
 			/>
 			<Tabs.Screen
-				name="CheckinsListScreen"
-				component={CheckinsListScreen}
+				name="CheckinsStack"
+				component={CheckinsStack}
 				options={{
 					tabBarIcon: (v) => (
 						<ThemedIcon
