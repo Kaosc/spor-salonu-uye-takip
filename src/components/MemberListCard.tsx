@@ -3,7 +3,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 
 import ThemedText from "./ui/ThemedText"
-import ThemedIcon from "./ui/ThemedIcon"
+import MemberAvatar from "./MemberAvatar"
 
 import { Theme } from "../utils/theme"
 import { useTranslation } from "react-i18next"
@@ -40,12 +40,8 @@ export default function MemberListCard({ member, search }: { member: MemberCard;
 			style={styles.member}
 			onPress={handleNavigate}
 		>
-			<ThemedIcon
-				name={member.gender === "FEMALE" ? "female" : "male"}
-				size={45}
-				style={styles.avatarIcon}
-			/>
-			<View style={{ flex: 1 }}>
+			<MemberAvatar gender={member.gender} />
+			<View style={{ flex: 1, marginLeft: 12 }}>
 				<ThemedText style={styles.itemName}>
 					{member.firstName} {member.lastName}
 				</ThemedText>
@@ -79,7 +75,8 @@ const createStyles = (darkMode: boolean) => {
 			borderColor: theme.border,
 			marginBottom: 10,
 			borderRadius: 12,
-			paddingHorizontal: 15,
+			paddingRight: 15,
+			paddingLeft: 7,
 		},
 		itemName: {
 			fontSize: 16,
@@ -94,11 +91,6 @@ const createStyles = (darkMode: boolean) => {
 			width: 10,
 			height: 10,
 			borderRadius: 5,
-		},
-		avatarIcon: {
-			marginRight: 12,
-			opacity: 0.75,
-			borderRadius: 22.5,
 		},
 		itemSubscriptionLabel: {
 			fontSize: 13,

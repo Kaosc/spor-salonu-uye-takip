@@ -56,9 +56,9 @@
 	"weakPassword": "Password is too weak. Please choose a stronger password",
 	"registrationError": "An error occurred while registering. Please try again",
 	"memberFetchError": "An error occurred while fetching member information. Please try again",
-	"male": "Male",
-	"female": "Female",
-	"unspecified": "Unspecified",
+	"MALE": "Male",
+	"FEMALE": "Female",
+	"UNSPECIFIED": "Unspecified",
 	"memberUpdateSuccess": "Member updated successfully",
 	"memberAddSuccess": "Member added successfully",
 	"memberList": "Members",
@@ -194,5 +194,6 @@
 	"checkinsFor": "Check-ins for",
 	"goToToday": "Go to Today",
 	"scrollToToday": "Scroll to Today",
-	"checkinFetchError": "An error occurred while fetching check-ins. Please try again"
+	"checkinFetchError": "An error occurred while fetching check-ins. Please try again",
+	"update": "Update"
 }

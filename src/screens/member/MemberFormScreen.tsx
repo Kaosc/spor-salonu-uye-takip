@@ -8,6 +8,7 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	BackHandler,
+	Keyboard,
 } from "react-native"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
@@ -32,7 +33,7 @@ import { Theme } from "../../utils/theme"
 
 export default function MemberFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const authEmail = useSelector((state: RootState) => state.auth.email)
+	const { email, role } = useSelector((state: RootState) => state.auth)
 	const newMemberUid = useSelector((state: RootState) => state.auth.uid)
 	const navigation = useNavigation<any>()
 	const { t } = useTranslation()
@@ -72,7 +73,7 @@ export default function MemberFormScreen() {
 						firstName: "",
 						lastName: "",
 						phoneNumber: "",
-						email: authEmail,
+						email: email, // This will be the email of the member cause of the isNewMember prop
 						address: "",
 						gender: "UNSPECIFIED",
 						birthDate: "",
@@ -159,7 +160,7 @@ export default function MemberFormScreen() {
 			isActive: true,
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			createdBy: isNewMember ? t("userItSelf") : authEmail || "unknown",
+			createdBy: isNewMember ? t("userItSelf") : email || "unknown",
 		}
 
 		if (isEditing && memberId) {
@@ -187,6 +188,12 @@ export default function MemberFormScreen() {
 				return
 			}
 
+			if (role === "MEMBER") {
+				navigation.dispatch(StackActions.popToTop())
+				navigation.dispatch(StackActions.replace("MemberTabs", { screen: "MemberProfileScreen", params: { refresh: true } }))
+				return
+			}
+
 			navigation.dispatch(StackActions.popToTop())
 			navigation.dispatch(
 				StackActions.replace("Tabs", {
@@ -198,27 +205,24 @@ export default function MemberFormScreen() {
 	}
 
 	return (
-		<GestureHandlerRootView style={{ flex: 1 }}>
-			<View style={styles.container}>
-				<CustomHeader
-					title={isEditing ? t("memberDetails") : t("newMember")}
-					onBackPress={goBackNoForce}
-				/>
+		<KeyboardAvoidingView
+			style={styles.flex}
+			behavior={Platform.OS === "ios" ? "padding" : undefined}
+		>
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<View style={styles.container}>
+					<CustomHeader
+						title={isEditing ? t("memberDetails") : t("newMember")}
+						onBackPress={goBackNoForce}
+					/>
 
-				{loading ? (
-					<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-						<ThemedActivityIndicator size={70} />
-					</View>
-				) : (
-					<>
-						<KeyboardAvoidingView
-							style={styles.flex}
-							behavior={"padding"}
-						>
-							<ScrollView
-								contentContainerStyle={styles.scrollContent}
-								keyboardShouldPersistTaps="handled"
-							>
+					{loading ? (
+						<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+							<ThemedActivityIndicator size={70} />
+						</View>
+					) : (
+						<>
+							<ScrollView contentContainerStyle={styles.scrollContent}>
 								<View style={styles.form}>
 									<Controller
 										control={control}
@@ -355,11 +359,6 @@ export default function MemberFormScreen() {
 										control={control}
 										name="gender"
 										render={({ field: { value } }) => {
-											const genderLabels: Record<string, string> = {
-												MALE: t("male"),
-												FEMALE: t("female"),
-												UNSPECIFIED: t("unspecified"),
-											}
 											return (
 												<View style={styles.field}>
 													<View style={styles.labelRow}>
@@ -371,13 +370,16 @@ export default function MemberFormScreen() {
 													</View>
 													<TouchableOpacity
 														style={styles.selectButton}
-														onPress={() => genderSheetRef.current?.snapToIndex(0)}
+														onPress={() => {
+															Keyboard.dismiss()
+															genderSheetRef.current?.snapToIndex(0)
+														}}
 														activeOpacity={0.6}
 													>
 														<ThemedText
 															style={[styles.selectButtonText, !value || value === "UNSPECIFIED" ? styles.placeholder : null]}
 														>
-															{genderLabels[value] || t("genderPlaceholder")}
+															{t(value)}
 														</ThemedText>
 													</TouchableOpacity>
 												</View>
@@ -411,9 +413,11 @@ export default function MemberFormScreen() {
 													</TouchableOpacity>
 													{showDatePicker && (
 														<DateTimePicker
+															key={darkMode ? "dark" : "light"}
 															value={value ? new Date(value) : new Date()}
 															mode="date"
 															display="default"
+															themeVariant={darkMode ? "dark" : "light"}
 															maximumDate={new Date()}
 															onChange={(_event: DateTimePickerEvent, selectedDate?: Date) => {
 																setShowDatePicker(Platform.OS === "ios")
@@ -442,7 +446,10 @@ export default function MemberFormScreen() {
 												</View>
 												<TouchableOpacity
 													style={styles.selectButton}
-													onPress={() => bloodTypeSheetRef.current?.snapToIndex(0)}
+													onPress={() => {
+														Keyboard.dismiss()
+														bloodTypeSheetRef.current?.snapToIndex(0)
+													}}
 													activeOpacity={0.6}
 												>
 													<ThemedText style={[styles.selectButtonText, !value ? styles.placeholder : null]}>
@@ -555,111 +562,117 @@ export default function MemberFormScreen() {
 										onPress={handleSubmit(onSubmit)}
 									>
 										<ThemedText style={styles.buttonText}>
-											{isEditing ? (isNewMember ? t("update") : t("updateMember")) : isNewMember ? t("save") : t("saveMember")}
+											{isEditing
+												? isNewMember || role === "MEMBER"
+													? t("update")
+													: t("updateMember")
+												: isNewMember
+													? t("save")
+													: t("saveMember")}
 										</ThemedText>
 									</ThemedButton>
 								</View>
 							</ScrollView>
-						</KeyboardAvoidingView>
 
-						<ThemedBottomSheet
-							ref={genderSheetRef}
-							snapPoints={["30%"]}
-							items={[
-								{
-									text: t("male"),
-									icon: "gender-male",
-									onPress: () => {
-										setValue("gender", "MALE")
-										genderSheetRef.current?.close()
+							<ThemedBottomSheet
+								ref={genderSheetRef}
+								snapPoints={["30%"]}
+								items={[
+									{
+										text: t("male"),
+										icon: "gender-male",
+										onPress: () => {
+											setValue("gender", "MALE")
+											genderSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: t("female"),
-									icon: "gender-female",
-									onPress: () => {
-										setValue("gender", "FEMALE")
-										genderSheetRef.current?.close()
+									{
+										text: t("female"),
+										icon: "gender-female",
+										onPress: () => {
+											setValue("gender", "FEMALE")
+											genderSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: t("unspecified"),
-									icon: "gender-male-female-variant",
-									onPress: () => {
-										setValue("gender", "UNSPECIFIED")
-										genderSheetRef.current?.close()
+									{
+										text: t("unspecified"),
+										icon: "gender-male-female-variant",
+										onPress: () => {
+											setValue("gender", "UNSPECIFIED")
+											genderSheetRef.current?.close()
+										},
 									},
-								},
-							]}
-						/>
+								]}
+							/>
 
-						<ThemedBottomSheet
-							ref={bloodTypeSheetRef}
-							snapPoints={["40%"]}
-							icon="water"
-							items={[
-								{
-									text: "A Rh+",
-									onPress: () => {
-										setValue("bloodType", "A Rh+")
-										bloodTypeSheetRef.current?.close()
+							<ThemedBottomSheet
+								ref={bloodTypeSheetRef}
+								snapPoints={["40%"]}
+								icon="water"
+								items={[
+									{
+										text: "A Rh+",
+										onPress: () => {
+											setValue("bloodType", "A Rh+")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "A Rh-",
-									onPress: () => {
-										setValue("bloodType", "A Rh-")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "A Rh-",
+										onPress: () => {
+											setValue("bloodType", "A Rh-")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "B Rh+",
-									onPress: () => {
-										setValue("bloodType", "B Rh+")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "B Rh+",
+										onPress: () => {
+											setValue("bloodType", "B Rh+")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "B Rh-",
-									onPress: () => {
-										setValue("bloodType", "B Rh-")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "B Rh-",
+										onPress: () => {
+											setValue("bloodType", "B Rh-")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "AB Rh+",
-									onPress: () => {
-										setValue("bloodType", "AB Rh+")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "AB Rh+",
+										onPress: () => {
+											setValue("bloodType", "AB Rh+")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "AB Rh-",
-									onPress: () => {
-										setValue("bloodType", "AB Rh-")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "AB Rh-",
+										onPress: () => {
+											setValue("bloodType", "AB Rh-")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "0 Rh+",
-									onPress: () => {
-										setValue("bloodType", "0 Rh+")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "0 Rh+",
+										onPress: () => {
+											setValue("bloodType", "0 Rh+")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-								{
-									text: "0 Rh-",
-									onPress: () => {
-										setValue("bloodType", "0 Rh-")
-										bloodTypeSheetRef.current?.close()
+									{
+										text: "0 Rh-",
+										onPress: () => {
+											setValue("bloodType", "0 Rh-")
+											bloodTypeSheetRef.current?.close()
+										},
 									},
-								},
-							]}
-						/>
-					</>
-				)}
-			</View>
-		</GestureHandlerRootView>
+								]}
+							/>
+						</>
+					)}
+				</View>
+			</GestureHandlerRootView>
+		</KeyboardAvoidingView>
 	)
 }
 

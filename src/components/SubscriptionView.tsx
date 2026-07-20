@@ -24,7 +24,7 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 			case "CANCELLED":
 				return darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground
 			case "PAUSED":
-				return "#f0ad4e"
+				return darkMode ? Theme.dark.orange.foreground : Theme.light.orange.foreground
 			default:
 				return theme.text
 		}
@@ -126,6 +126,7 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 					label={t("pausedAt")}
 					value={safeTimestampToDateTimeString(subscription.pausedAt)}
 					iconName="clock-outline"
+					textColor={getStatusColor("PAUSED")}
 				/>
 			)}
 			<View style={styles.divider} />
@@ -175,13 +176,6 @@ const createStyles = (darkMode: boolean) => {
 			flexGrow: 1,
 			paddingBottom: 20,
 			paddingHorizontal: 9,
-		},
-		card: {
-			backgroundColor: theme.cardBackground,
-			borderWidth: StyleSheet.hairlineWidth,
-			borderColor: theme.border,
-			borderRadius: 12,
-			padding: 20,
 		},
 		statusBadge: {
 			flexDirection: "row",
@@ -236,171 +230,6 @@ const createStyles = (darkMode: boolean) => {
 		},
 		divider: {
 			marginVertical: 15,
-		},
-		infoRow: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-			paddingVertical: 10,
-		},
-		infoRowLabel: {
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 8,
-		},
-		infoLabel: {
-			fontSize: 13,
-			fontWeight: "600",
-			opacity: 0.7,
-		},
-		infoValue: {
-			fontSize: 14,
-			fontWeight: "600",
-		},
-		notesSection: {
-			paddingVertical: 10,
-			gap: 6,
-		},
-		notesText: {
-			fontSize: 13,
-			opacity: 0.8,
-			lineHeight: 18,
-		},
-		noSubscriptionCard: {
-			alignItems: "center",
-			paddingVertical: 30,
-		},
-		noSubscriptionTitle: {
-			fontSize: 16,
-			fontWeight: "700",
-			textAlign: "center",
-			opacity: 0.7,
-		},
-		noSubscriptionSubtitle: {
-			fontSize: 13,
-			fontWeight: "500",
-			textAlign: "center",
-			opacity: 0.4,
-			marginTop: 4,
-		},
-		title: {
-			fontSize: 22,
-			fontWeight: "700",
-			marginBottom: 20,
-			textAlign: "center",
-		},
-		sectionTitle: {
-			fontSize: 20,
-			fontWeight: "bold",
-			marginBottom: 8,
-			marginTop: 13,
-		},
-		row: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			paddingVertical: 12,
-			borderBottomWidth: StyleSheet.hairlineWidth,
-			borderBottomColor: theme.border,
-		},
-		rowLabel: {
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 8,
-		},
-		label: {
-			fontSize: 14,
-			opacity: 0.8,
-			fontWeight: "bold",
-		},
-		value: {
-			fontSize: 15,
-			fontWeight: "600",
-		},
-		actionRow: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			gap: 20,
-			marginBottom: 30,
-		},
-		noSubscriptionText: {
-			flex: 1,
-			fontSize: 13,
-			fontWeight: "600",
-			color: theme.red.foreground,
-		},
-		sellPackageButton: {
-			paddingVertical: 14,
-			alignItems: "center",
-		},
-		sellPackageButtonText: {
-			color: darkMode ? "#000" : "#fff",
-			fontSize: 16,
-			fontWeight: "bold",
-		},
-		noSubContainer: {
-			flex: 1,
-			flexDirection: "row",
-			gap: 8,
-			alignItems: "center",
-			borderWidth: 1,
-			padding: 12,
-			borderRadius: 8,
-			borderColor: theme.red.foreground,
-		},
-		subButtonsContainer: {
-			gap: 10,
-		},
-		cancelSubscriptionButton: {
-			backgroundColor: theme.red.background,
-			paddingVertical: 14,
-			alignItems: "center",
-			borderWidth: 1,
-			borderColor: theme.red.foreground,
-		},
-		cancelSubscriptionButtonText: {
-			color: theme.red.foreground,
-			fontSize: 16,
-			fontWeight: "bold",
-		},
-		// Body Metrics
-		bodyMetricsContainer: {
-			marginTop: 16,
-			marginBottom: 8,
-			paddingVertical: 16,
-			paddingHorizontal: 12,
-			borderWidth: StyleSheet.hairlineWidth,
-			borderColor: theme.border,
-			borderRadius: 8,
-			backgroundColor: darkMode ? "#111" : "#f8f8f8",
-		},
-		bodyMetricsRow: {
-			flexDirection: "row",
-			justifyContent: "space-around",
-		},
-		bodyMetricItem: {
-			alignItems: "center",
-			gap: 4,
-		},
-		bodyMetricLabel: {
-			fontSize: 12,
-			opacity: 0.6,
-			fontWeight: "600",
-		},
-		bodyMetricValue: {
-			fontSize: 16,
-			fontWeight: "700",
-		},
-		pauseToggleButton: {
-			backgroundColor: theme.orange.background,
-			paddingVertical: 14,
-			alignItems: "center",
-			borderWidth: 1,
-			borderColor: theme.orange.foreground,
-		},
-		pauseButtonText: {
-			color: theme.orange.foreground,
-			fontSize: 16,
-			fontWeight: "bold",
 		},
 	})
 }

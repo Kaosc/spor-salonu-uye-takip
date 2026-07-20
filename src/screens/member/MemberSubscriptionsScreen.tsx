@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react"
-import { View, ScrollView, StyleSheet, BackHandler } from "react-native"
+import { View, ScrollView, StyleSheet } from "react-native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
@@ -14,26 +13,15 @@ import { getSubscriptionsByMemberId } from "../../lib/firebase/firestore/subscri
 
 import { Theme } from "../../utils/theme"
 import { moderateScale } from "../../utils/responsive"
-import { BOTTOM_TAB_HEIGHT } from "../../lib/constants"
 
 export default function MemberSubscriptionsScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const navigation = useNavigation() as NavigationProp<any>
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 	const styles = createStyles(darkMode)
 
 	const [subscription, setSubscription] = useState<Subscription | null>(null)
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
-
-	useEffect(() => {
-		const backAction = () => {
-			navigation.goBack()
-			return true
-		}
-		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
-		return () => backHandler.remove()
-	}, [])
 
 	const fetchMember = async () => {
 		if (!uid) return
@@ -108,15 +96,15 @@ const createStyles = (darkMode: boolean) => {
 		},
 		scrollContentContainer: {
 			flexGrow: 1,
-			paddingBottom: BOTTOM_TAB_HEIGHT + moderateScale(20),
+			paddingBottom: 15,
 		},
 		activePlanCard: {
-			marginHorizontal: moderateScale(16),
-			marginTop: moderateScale(20),
+			marginHorizontal: 10,
+			marginTop: 16,
 			padding: moderateScale(24),
 			borderRadius: 16,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
 			borderWidth: 1,
+			backgroundColor: theme.cardBackground,
 			borderColor: theme.border,
 		},
 		planHeader: {

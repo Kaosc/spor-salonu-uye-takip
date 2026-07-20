@@ -44,6 +44,7 @@ export default function StaffTabNavigator() {
 				headerShown: false,
 				freezeOnBlur: true,
 				lazy: true,
+				animation: "shift",
 			}}
 		>
 			<Tabs.Screen

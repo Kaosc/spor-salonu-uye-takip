@@ -1,28 +1,30 @@
 import { useEffect, useState } from "react"
-import { View, ScrollView, StyleSheet, BackHandler } from "react-native"
+import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native"
 import { useSelector, useDispatch } from "react-redux"
-import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
+import { useNavigation, NavigationProp, StackActions, useRoute } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
 import ThemedButton from "../../components/ui/ThemedButton"
 import CustomHeader from "../../components/CustomHeader"
+import MemberAvatar from "../../components/MemberAvatar"
 import BMIDisplay from "../../components/BMIDisplay"
 import DetailsRow from "../../components/DetailsRow"
+import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 
 import { getMemberById } from "../../lib/firebase/firestore/member"
 import { logoutUser } from "../../lib/firebase/auth"
 import { logout } from "../../store/features/authSlice"
 
-import { BOTTOM_TAB_HEIGHT } from "../../lib/constants"
 import { moderateScale } from "../../utils/responsive"
 import { Theme } from "../../utils/theme"
-import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
+import { safeTimestampToDateString } from "../../utils/date"
 
 export default function MemberProfileScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const route = useRoute<any>()
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 
@@ -32,15 +34,6 @@ export default function MemberProfileScreen() {
 	const styles = createStyles(darkMode)
 
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
-
-	useEffect(() => {
-		const backAction = () => {
-			navigation.goBack()
-			return true
-		}
-		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
-		return () => backHandler.remove()
-	}, [])
 
 	const handleLogout = async () => {
 		await logoutUser()
@@ -60,7 +53,10 @@ export default function MemberProfileScreen() {
 	}
 
 	useEffect(() => {
-		fetchMember()
+		console.log(route.params?.refresh)
+		if (route.params?.refresh || member === null) {
+			fetchMember()
+		}
 	}, [])
 
 	if (status === "loading") {
@@ -101,11 +97,23 @@ export default function MemberProfileScreen() {
 		)
 	}
 
+	const EditButton = () => {
+		return (
+			<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
+				<ThemedIcon
+					name="pen"
+					size={26}
+				/>
+			</TouchableOpacity>
+		)
+	}
+
 	return (
 		<View style={styles.container}>
 			<CustomHeader
 				title={t("myProfile")}
 				showBackButton={false}
+				rightComponent={<EditButton />}
 			/>
 
 			<ScrollView
@@ -116,9 +124,9 @@ export default function MemberProfileScreen() {
 				{/* Profile Card */}
 				<View style={styles.card}>
 					<View style={styles.avatarSection}>
-						<ThemedIcon
-							name="account-circle"
-							size={80}
+						<MemberAvatar
+							gender={member?.gender}
+							size={100}
 						/>
 						<ThemedText style={styles.fullName}>
 							{member.firstName} {member.lastName}
@@ -147,6 +155,40 @@ export default function MemberProfileScreen() {
 						iconName="phone"
 						label={t("phone")}
 						value={member.phoneNumber || "-"}
+					/>
+					<DetailsRow
+						label={t("address")}
+						value={member.address || "-"}
+						iconName="home"
+					/>
+
+					<DetailsRow
+						label={t("birthDate")}
+						value={new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
+						iconName="calendar"
+					/>
+					<DetailsRow
+						label={t("gender")}
+						value={t(member.gender || "UNSPECIFIED")}
+						iconName="gender-male-female"
+					/>
+					<DetailsRow
+						label={t("bloodType")}
+						value={member.bloodType || "-"}
+						iconName="water"
+					/>
+
+					<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+
+					<DetailsRow
+						label={t("name")}
+						value={member.emergencyContact?.name || "-"}
+						iconName="account-star-outline"
+					/>
+					<DetailsRow
+						label={t("phone")}
+						value={member.emergencyContact?.phone || "-"}
+						iconName="phone-forward"
 					/>
 				</View>
 
@@ -210,14 +252,14 @@ const createStyles = (darkMode: boolean) => {
 			flex: 1,
 		},
 		scrollContentContainer: {
-			paddingBottom: BOTTOM_TAB_HEIGHT + moderateScale(20),
+			paddingBottom: 15,
 		},
 		card: {
-			marginHorizontal: moderateScale(16),
-			marginTop: moderateScale(16),
+			marginHorizontal: 10,
+			marginTop: 16,
 			padding: moderateScale(20),
 			borderRadius: 16,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 		},
@@ -236,22 +278,22 @@ const createStyles = (darkMode: boolean) => {
 			paddingHorizontal: 16,
 			paddingVertical: 4,
 			borderRadius: 12,
-			backgroundColor: darkMode ? "#1a1a2e" : "#e0e0ff",
+			backgroundColor: darkMode ? "#fff" : "#000",
 		},
 		roleBadgeText: {
-			fontSize: 12,
-			fontWeight: "600",
-			opacity: 0.7,
+			fontSize: 14,
+			fontWeight: "bold",
+			color: darkMode ? "#000" : "#fff",
 		},
 		divider: {
 			height: 1,
 			backgroundColor: theme.border,
-			marginVertical: moderateScale(16),
+			marginTop: 20,
 		},
 		sectionTitle: {
-			fontSize: 16,
-			fontWeight: "700",
-			marginBottom: moderateScale(12),
+			fontSize: 19,
+			fontWeight: "900",
+			marginVertical: 20,
 		},
 		detailRow: {
 			flexDirection: "row",

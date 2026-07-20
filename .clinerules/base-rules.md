@@ -55,3 +55,4 @@
 
 ## Restrictions
 - Don't run npx expo prebuild in any circumstance, it can override my custom native code and cause issues
+- Don't use moderateScale() function for padding and margin stylings only use it for height and width stylings.

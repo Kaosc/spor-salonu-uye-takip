@@ -1,7 +1,7 @@
 import "react-native-gesture-handler"
 import "react-native-reanimated"
 
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons"
+import { Fontisto, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons"
 import { useEffect } from "react"
 import { useSelector } from "react-redux"
 import { NavigationContainer } from "@react-navigation/native"
@@ -32,6 +32,7 @@ export default function App() {
 			setColdStart(true)
 			await MaterialIcons.loadFont()
 			await MaterialCommunityIcons.loadFont()
+			await Fontisto.loadFont()
 		} catch (e) {
 			console.warn("App.tsx:52", e)
 		}

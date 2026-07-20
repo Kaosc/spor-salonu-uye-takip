@@ -54,9 +54,9 @@
 	"weakPassword": "Şifre çok zayıf. Lütfen daha güçlü bir şifre seçin",
 	"registrationError": "Üye kaydı sırasında bir hata oluştu. Lütfen tekrar deneyin",
 	"memberFetchError": "Üye bilgileri alınırken bir hata oluştu. Lütfen tekrar deneyin",
-	"male": "Erkek",
-	"female": "Kadın",
-	"unspecified": "Belirtilmemiş",
+	"MALE": "Erkek",
+	"FEMALE": "Kadın",
+	"UNSPECIFIED": "Belirtilmemiş",
 	"memberUpdateSuccess": "Üye başarıyla güncellendi",
 	"memberAddSuccess": "Üye başarıyla kaydedildi",
 	"memberList": "Üyeler",
@@ -193,5 +193,6 @@
 	"checkinsFor": "Girişler",
 	"goToToday": "Bugüne Git",
 	"scrollToToday": "Bugüne Kaydır",
-	"checkinFetchError": "Girişler alınırken bir hata oluştu. Lütfen tekrar deneyin"
+	"checkinFetchError": "Girişler alınırken bir hata oluştu. Lütfen tekrar deneyin",
+	"update": "Güncelle"
 }

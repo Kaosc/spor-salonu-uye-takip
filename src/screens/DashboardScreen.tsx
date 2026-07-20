@@ -128,9 +128,7 @@ export default function DashboardScreen() {
 						/>
 						<ThemedText style={styles.infoText}>{staffUser.email}</ThemedText>
 					</View>
-
 					<View style={styles.divider} />
-
 					<View style={styles.infoRow}>
 						<ThemedIcon
 							name="badge-account-outline"
@@ -140,9 +138,7 @@ export default function DashboardScreen() {
 							{staffUser.firstName} {staffUser.lastName}
 						</ThemedText>
 					</View>
-
 					<View style={styles.divider} />
-
 					<View style={styles.infoRow}>
 						<ThemedIcon
 							name="shield-account-outline"
@@ -150,9 +146,7 @@ export default function DashboardScreen() {
 						/>
 						<ThemedText style={styles.infoText}>{staffUser.role}</ThemedText>
 					</View>
-
 					<View style={styles.divider} />
-
 					<View style={styles.infoRow}>
 						<ThemedIcon
 							name={staffUser.isActive ? "check-circle-outline" : "close-circle-outline"}
@@ -170,6 +164,18 @@ export default function DashboardScreen() {
 							{staffUser.isActive ? t("active") : t("inactive")}
 						</ThemedText>
 					</View>
+
+					<TouchableOpacity
+						onPress={handleLogout}
+						style={styles.logoutButton}
+					>
+						<ThemedText style={styles.logoutText}>{t("logout")}</ThemedText>
+						<ThemedIcon
+							name="logout"
+							size={20}
+							color={theme.red.foreground}
+						/>
+					</TouchableOpacity>
 				</View>
 
 				<TouchableOpacity
@@ -202,7 +208,7 @@ export default function DashboardScreen() {
 					>
 						<View style={styles.qrCardContent}>
 							<ThemedIcon
-								name="account-search-outline"
+								name="qrcode-scan"
 								size={moderateScale(40)}
 							/>
 							<ThemedText style={styles.qrCardTitle}>{t("memberDetails")}</ThemedText>
@@ -219,20 +225,13 @@ export default function DashboardScreen() {
 					>
 						<View style={styles.qrCardContent}>
 							<ThemedIcon
-								name="check-circle-outline"
+								name="qrcode-scan"
 								size={moderateScale(40)}
 							/>
 							<ThemedText style={styles.qrCardTitle}>{t("userCheckin")}</ThemedText>
 						</View>
 					</TouchableOpacity>
 				</View>
-
-				<ThemedButton
-					onPress={handleLogout}
-					style={styles.logoutButton}
-				>
-					<ThemedText style={styles.logoutText}>{t("logout")}</ThemedText>
-				</ThemedButton>
 			</ScrollView>
 		</>
 	)
@@ -330,14 +329,12 @@ const createStyles = (darkMode: boolean) => {
 			textAlign: "center",
 		},
 		logoutButton: {
-			marginHorizontal: 20,
-			paddingVertical: 12,
-			borderRadius: 12,
-			backgroundColor: theme.red.background,
+			flexDirection: "row",
 			alignItems: "center",
-			justifyContent: "center",
-			borderWidth: 1,
-			borderColor: theme.red.foreground,
+			justifyContent: "flex-end",
+			gap: 10,
+			marginBottom: -5,
+			marginTop: -10,
 		},
 		logoutText: {
 			fontSize: 16,

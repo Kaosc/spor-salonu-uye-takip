@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, useMemo, useRef } from "react"
-import { View, StyleSheet, BackHandler } from "react-native"
+import { View, StyleSheet, BackHandler, TouchableOpacity } from "react-native"
 import { useSelector } from "react-redux"
 import { CalendarList, DateData } from "react-native-calendars"
 import { useNavigation } from "@react-navigation/native"
@@ -14,6 +14,8 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import { getAllCheckIns } from "../lib/firebase/firestore/checkin"
 import { formatToYYYYMMDD } from "../utils/date"
 import { Theme } from "../utils/theme"
+import { useMMKVObject } from "react-native-mmkv"
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 export default function CheckinsCalendarScreen() {
 	const navigation = useNavigation<any>()
@@ -22,6 +24,8 @@ export default function CheckinsCalendarScreen() {
 	const { t } = useTranslation()
 
 	const [checkins, setCheckins] = useState<CheckIn[]>([])
+	const [prevMarks, setPrevMarks] = useMMKVObject<MarkedDates>("checkinMarks")
+	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	const calendarRef = useRef<any>(null)
 
@@ -43,8 +47,17 @@ export default function CheckinsCalendarScreen() {
 	}
 
 	const fetchCheckins = async () => {
+		setStatus("loading")
+
 		const checkinsData = await getAllCheckIns()
+
+		if (!checkinsData) {
+			setStatus("error")
+			return
+		}
+
 		setCheckins(checkinsData)
+		setStatus("idle")
 	}
 
 	const handleGoToday = useCallback(() => {
@@ -67,7 +80,7 @@ export default function CheckinsCalendarScreen() {
 	}, [])
 
 	const markedDates = useMemo(() => {
-		const marks: MarkedDates = {}
+		const marks: MarkedDates = prevMarks || {}
 
 		checkins.forEach((c) => {
 			const dateString = formatToYYYYMMDD(c.checkInTime)
@@ -81,6 +94,7 @@ export default function CheckinsCalendarScreen() {
 			}
 		})
 
+		setPrevMarks(marks) // Save the marks to MMKV storage
 		return marks
 	}, [checkins, darkMode])
 
@@ -93,9 +107,31 @@ export default function CheckinsCalendarScreen() {
 		[navigation],
 	)
 
+	const RefreshButton = useCallback(() => {
+		return (
+			<TouchableOpacity
+				onPress={fetchCheckins}
+				disabled={status === "loading"}
+			>
+				{status === "loading" ? (
+					<ThemedActivityIndicator size="small" />
+				) : (
+					<ThemedIcon
+						name="refresh"
+						size={27}
+					/>
+				)}
+			</TouchableOpacity>
+		)
+	}, [fetchCheckins, status])
+
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={t("checkins")} onBackPress={handleGoBack} />
+			<CustomHeader
+				title={t("checkins")}
+				onBackPress={handleGoBack}
+				rightComponent={<RefreshButton />}
+			/>
 			<CalendarList
 				key={darkMode ? "dark" : "light"}
 				current={new Date().toISOString().split("T")[0]}

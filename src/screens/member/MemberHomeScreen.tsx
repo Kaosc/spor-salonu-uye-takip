@@ -15,6 +15,7 @@ import { Theme } from "../../utils/theme"
 import { moderateScale } from "../../utils/responsive"
 import { getMemberById } from "../../lib/firebase/firestore/member"
 import { getLockerByUserUid, removeLockerFromUser } from "../../lib/firebase/firestore/lockers"
+import MemberAvatar from "../../components/MemberAvatar"
 
 export default function MemberHomeScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -128,10 +129,9 @@ export default function MemberHomeScreen() {
 			>
 				{/* Welcome Section */}
 				<View style={styles.welcomeSection}>
-					<ThemedIcon
-						name="account-circle"
-						size={80}
-						style={styles.avatarIcon}
+					<MemberAvatar
+						gender={member?.gender}
+						size={100}
 					/>
 					<ThemedText style={styles.welcomeTitle}>
 						{member?.firstName} {member?.lastName}
@@ -216,22 +216,23 @@ const createStyles = (darkMode: boolean) => {
 		},
 		welcomeSection: {
 			alignItems: "center",
-			paddingVertical: moderateScale(40),
-			paddingHorizontal: moderateScale(20),
+			paddingVertical: 35,
+			paddingHorizontal: 20,
+			gap: 15,
 		},
 		avatarIcon: {
 			marginBottom: moderateScale(16),
 			opacity: 0.8,
 		},
 		welcomeTitle: {
-			fontSize: 24,
-			fontWeight: "700",
+			fontSize: 28,
+			fontWeight: "900",
 			textAlign: "center",
 		},
 		welcomeSubtitle: {
-			fontSize: 14,
+			fontSize: 15,
+			fontWeight: "bold",
 			opacity: 0.6,
-			marginTop: moderateScale(4),
 			textAlign: "center",
 		},
 		qrButton: {
@@ -285,6 +286,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		lockerCardActive: {
 			borderColor: theme.green.foreground,
+			backgroundColor: theme.green.background + "77",
 			borderWidth: 1,
 		},
 		lockerCardLabel: {
@@ -294,7 +296,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		lockerNumberLabel: {
 			fontSize: 18,
-			fontWeight: "bold",
+			fontWeight: "900",
 			backgroundColor: darkMode ? "#fff" : "#000",
 			color: darkMode ? "#000" : "#fff",
 			padding: 5,

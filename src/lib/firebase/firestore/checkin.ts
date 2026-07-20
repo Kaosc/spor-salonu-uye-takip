@@ -31,7 +31,7 @@ export const getCheckInByMemberUid = async (memberUid: string): Promise<CheckIn 
 	}
 }
 
-export const getAllCheckIns = async (): Promise<CheckIn[]> => {
+export const getAllCheckIns = async (): Promise<CheckIn[] | null> => {
 	try {
 		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
 		const q = query(checkInsCollection, orderBy("checkInTime", "desc"))
@@ -46,7 +46,7 @@ export const getAllCheckIns = async (): Promise<CheckIn[]> => {
 		return checkIns
 	} catch (e) {
 		console.error("[FIRESTORE] getAllCheckIns:", e)
-		return []
+		return null
 	}
 }
 

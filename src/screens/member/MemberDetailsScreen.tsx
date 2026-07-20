@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert, Dimensions } from "react-native"
+import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
 import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
@@ -12,6 +12,8 @@ import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator
 import ThemedButton from "../../components/ui/ThemedButton"
 import BMIDisplay from "../../components/BMIDisplay"
 import SubscriptionView from "../../components/SubscriptionView"
+import MemberAvatar from "../../components/MemberAvatar"
+import DetailsRow from "../../components/DetailsRow"
 
 import { activateMember, getMemberById, inactivateMember } from "../../lib/firebase/firestore/member"
 import {
@@ -504,21 +506,6 @@ export default function MemberDetailsScreen() {
 		)
 	}
 
-	const DetailsRow = ({ label, value, iconName }: { label: string; value: string; iconName: AllIconNames }) => {
-		return (
-			<View style={styles.row}>
-				<View style={styles.rowLabel}>
-					<ThemedIcon
-						name={iconName}
-						size={18}
-					/>
-					<ThemedText style={styles.label}>{label}</ThemedText>
-				</View>
-				<ThemedText style={styles.value}>{value || "-"}</ThemedText>
-			</View>
-		)
-	}
-
 	const MemberDetails = ({ member }: { member: Member }) => {
 		return (
 			<View style={styles.card}>
@@ -550,12 +537,12 @@ export default function MemberDetailsScreen() {
 					</TouchableOpacity>
 				</View>
 
-				<ThemedIcon
-					name={member?.gender === "FEMALE" ? "female" : "male"}
-					size={80}
-					color={darkMode ? "#fff" : "#000"}
-					style={{ alignSelf: "center", marginBottom: 20 }}
-				/>
+				<View style={styles.avatarContainer}>
+					<MemberAvatar
+						gender={member.gender}
+						size={110}
+					/>
+				</View>
 
 				<ThemedText style={styles.title}>
 					{member.firstName} {member.lastName}
@@ -573,7 +560,7 @@ export default function MemberDetailsScreen() {
 				/>
 				<DetailsRow
 					label={t("gender")}
-					value={member.gender || "-"}
+					value={t(member.gender) || "-"}
 					iconName="gender-male-female"
 				/>
 				<DetailsRow
@@ -824,87 +811,6 @@ const createStyles = (darkMode: boolean) => {
 			borderRadius: 12,
 			padding: 20,
 		},
-		subParentCard: {
-			borderRadius: 12,
-			padding: 20,
-		},
-		statusBadge: {
-			flexDirection: "row",
-			alignItems: "center",
-			alignSelf: "flex-start",
-			gap: 6,
-			borderWidth: 1,
-			borderRadius: 20,
-			paddingHorizontal: 12,
-			paddingVertical: 4,
-			marginBottom: 16,
-		},
-		statusDot: {
-			width: 8,
-			height: 8,
-			borderRadius: 4,
-		},
-		statusBadgeText: {
-			fontSize: 12,
-			fontWeight: "700",
-			textTransform: "uppercase",
-		},
-		subHeader: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-		},
-		packageName: {
-			fontSize: 22,
-			fontWeight: "800",
-		},
-		packagePrice: {
-			fontSize: 20,
-			fontWeight: "700",
-			opacity: 0.8,
-		},
-		daysLeftRow: {
-			flexDirection: "row",
-			alignItems: "baseline",
-			gap: 12,
-			marginTop: 12,
-		},
-		daysLeftNumber: {
-			fontSize: 32,
-			fontWeight: "800",
-		},
-		daysLeftLabel: {
-			fontSize: 16,
-			fontWeight: "600",
-			opacity: 0.8,
-		},
-		divider: {
-			marginVertical: 15,
-		},
-		infoRow: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-			paddingVertical: 10,
-		},
-		infoRowLabel: {
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 8,
-		},
-		infoLabel: {
-			fontSize: 13,
-			fontWeight: "600",
-			opacity: 0.7,
-		},
-		infoValue: {
-			fontSize: 14,
-			fontWeight: "600",
-		},
-		notesSection: {
-			paddingVertical: 10,
-			gap: 6,
-		},
 		notesText: {
 			fontSize: 13,
 			opacity: 0.8,
@@ -938,29 +844,6 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "bold",
 			marginBottom: 8,
 			marginTop: 13,
-		},
-		row: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			paddingVertical: 12,
-			borderBottomWidth: StyleSheet.hairlineWidth,
-			borderBottomColor: theme.border,
-		},
-		rowLabel: {
-			flex: 1,
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 8,
-		},
-		label: {
-			fontSize: 14,
-			opacity: 0.8,
-			fontWeight: "bold",
-		},
-		value: {
-			flex: 1,
-			fontSize: 15,
-			fontWeight: "600",
 		},
 		actionRow: {
 			flexDirection: "row",
@@ -1108,5 +991,6 @@ const createStyles = (darkMode: boolean) => {
 			textAlign: "center",
 			opacity: 0.7,
 		},
+		avatarContainer: { alignItems: "center", justifyContent: "center", marginBottom: 15 },
 	})
 }
