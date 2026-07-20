@@ -53,7 +53,6 @@ export default function MemberProfileScreen() {
 	}
 
 	useEffect(() => {
-		console.log(route.params?.refresh)
 		if (route.params?.refresh || member === null) {
 			fetchMember()
 		}
