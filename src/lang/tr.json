@@ -195,5 +195,12 @@
 	"scrollToToday": "Bugüne Kaydır",
 	"checkinFetchError": "Girişler alınırken bir hata oluştu. Lütfen tekrar deneyin",
 	"update": "Güncelle",
-	"addStaff": "Personel Ekle"
+	"addStaff": "Personel Ekle",
+	"addMember": "Üye Ekle",
+	"staffCreateError": "Personel kaydı sırasında bir hata oluştu. Lütfen tekrar deneyin",
+	"staffCreateSuccess": "Personel başarıyla kaydedildi",
+	"newStaff": "Yeni Personel",
+	"admin": "Yönetici",
+	"staff": "Personel",
+	"createStaff": "Personel Oluştur"
 }

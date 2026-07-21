@@ -29,6 +29,8 @@ import ThemedBottomSheet from "../../components/ui/ThemedBottomSheet"
 
 import { addMember, getMemberById, updateMember } from "../../lib/firebase/firestore/member"
 import { safeTimestampToDateString } from "../../utils/date"
+import { getStaffCredentials } from "../../utils/storage"
+import { createMemberAuthAccount, reAuthStaffUser, logoutUser } from "../../lib/firebase/auth"
 import { Theme } from "../../utils/theme"
 
 export default function MemberFormScreen() {
@@ -139,9 +141,22 @@ export default function MemberFormScreen() {
 	const onSubmit = async (data: FormValues) => {
 		setLoading(true)
 		let success = false
+		let authUid: string | null = null
+
+		// When staff is adding a new member (not editing, not member self-registering)
+		// First create an auth account to get the uid
+		if (!isEditing && !isNewMember && role !== "MEMBER") {
+			authUid = await createMemberAuthAccount(data.email)
+			if (!authUid) {
+				setLoading(false)
+				return
+			}
+		}
+
+		const uid = memberId || authUid || newMemberUid || nanoid()
 
 		const memberData: Member = {
-			uid: memberId || newMemberUid || nanoid(),
+			uid,
 			firstName: data.firstName,
 			lastName: data.lastName,
 			phoneNumber: data.phoneNumber,
@@ -179,6 +194,19 @@ export default function MemberFormScreen() {
 
 		setLoading(false)
 		if (success) {
+			// If staff created this member, sign out from member and re-auth staff
+			if (authUid && !isNewMember && role !== "MEMBER") {
+				try {
+					await logoutUser()
+					const creds = getStaffCredentials()
+					if (creds) {
+						await reAuthStaffUser(creds.email, creds.password)
+					}
+				} catch (e) {
+					console.error("[MemberFormScreen] Re-auth staff failed:", e)
+				}
+			}
+
 			//reset state
 			reset()
 
@@ -579,7 +607,7 @@ export default function MemberFormScreen() {
 								snapPoints={["30%"]}
 								items={[
 									{
-										text: t("male"),
+										text: t("MALE"),
 										icon: "gender-male",
 										onPress: () => {
 											setValue("gender", "MALE")
@@ -587,7 +615,7 @@ export default function MemberFormScreen() {
 										},
 									},
 									{
-										text: t("female"),
+										text: t("FEMALE"),
 										icon: "gender-female",
 										onPress: () => {
 											setValue("gender", "FEMALE")
@@ -595,7 +623,7 @@ export default function MemberFormScreen() {
 										},
 									},
 									{
-										text: t("unspecified"),
+										text: t("UNSPECIFIED"),
 										icon: "gender-male-female-variant",
 										onPress: () => {
 											setValue("gender", "UNSPECIFIED")

@@ -31,6 +31,6 @@ x (on progress) # Adding New Staff Member
    x (on progress) - The role of "STAFF" cannot add or remove other staff members.
 
 # Login / Register
-   - When a member added through the web admin panel, member auth account will be created with a email of the member and a random password. member will need to reset their password from login screen to access the app by their email adresses.
-   - If a member added through the mobile app there will be no auth account created for the member. Member will need to go to register screen to create an auth account. When the auth account created & verified by the member, the added member data by the staff will be linked (member & subscription data) to the auth account of the member.
+   - When a member added through the web admin panel, member auth account will be created with the email of the member and a random password. Member will need to reset their password from login screen to access the app by their email adresses.
+   - When a member added through the mobile app by staff, a Firebase auth account is created first with a random password. A password reset email is sent to the member. The member doc is created in Firestore using the auth uid as the document ID. Staff is then signed out from the member account and re-authenticated automatically.
    - If a member never created an auth account or never added to member collection by the staff, member will need to register first to create an auth account and then the mobile app will navigate user to the "MemberFormScreen" to fill the member details. After the member details filled, the member will be added to the member collection and linked to the auth account of the member.

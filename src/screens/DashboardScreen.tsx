@@ -26,7 +26,7 @@ import { Theme } from "../utils/theme"
 export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const { uid } = useSelector((state: RootState) => state.auth)
+	const { uid, role } = useSelector((state: RootState) => state.auth)
 	const theme = Theme[darkMode ? "dark" : "light"]
 	const dispatch = useDispatch<any>()
 	const { t } = useTranslation()
@@ -234,18 +234,34 @@ export default function DashboardScreen() {
 				</View>
 
 				<ThemedButton
-					style={styles.addMemberButton}
-					onPress={() => navigation.navigate("StaffFormScreen", { returnToDashboard: true })}
+					style={styles.addButton}
+					onPress={() => navigation.navigate("MemberFormScreen")}
 				>
 					<View style={styles.addMemberContent}>
 						<ThemedIcon
 							name="account-plus"
-							size={20}
+							size={24}
 							color={darkMode ? "#000" : "#fff"}
 						/>
-						<ThemedText style={styles.addMemberText}>{t("addStaff")}</ThemedText>
+						<ThemedText style={styles.addMemberText}>{t("addMember")}</ThemedText>
 					</View>
 				</ThemedButton>
+
+				{role === "ADMIN" && (
+					<ThemedButton
+						style={styles.addButton}
+						onPress={() => navigation.navigate("StaffFormScreen")}
+					>
+						<View style={styles.addMemberContent}>
+							<ThemedIcon
+								name="account-plus-outline"
+								size={24}
+								color={darkMode ? "#000" : "#fff"}
+							/>
+							<ThemedText style={styles.addMemberText}>{t("addStaff")}</ThemedText>
+						</View>
+					</ThemedButton>
+				)}
 			</ScrollView>
 		</>
 	)
@@ -257,7 +273,7 @@ const createStyles = (darkMode: boolean) => {
 		container: {
 			flexGrow: 1,
 			gap: 25,
-			paddingBottom: BOTTOM_TAB_HEIGHT,
+			paddingBottom: 20,
 		},
 		centered: {
 			flex: 1,
@@ -369,7 +385,8 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.cardBackground,
 			marginHorizontal: 5,
 		},
-		addMemberButton: {
+		addButton: {
+			flex: 1,
 			borderRadius: 16,
 			paddingVertical: 16,
 			marginHorizontal: 20,
@@ -382,8 +399,8 @@ const createStyles = (darkMode: boolean) => {
 		},
 		addMemberText: {
 			color: darkMode ? "#000" : "#fff",
-			fontSize: 16,
-			fontWeight: "bold",
+			fontSize: 17,
+			fontWeight: "900",
 		},
 	})
 }

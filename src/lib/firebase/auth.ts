@@ -6,12 +6,21 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "@react-native-firebase/auth"
-import { getFirestore, doc, getDoc, collection, query, where, getDocs, writeBatch } from "@react-native-firebase/firestore"
+import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
 import { t } from "i18next"
 import { COLLECTIONS } from "./enums"
 
 const auth = getAuth()
 const db = getFirestore()
+
+export const generatePassword = () => {
+	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+	let password = ""
+	for (let i = 0; i < 8; i++) {
+		password += chars.charAt(Math.floor(Math.random() * chars.length))
+	}
+	return password
+}
 
 export const staffLogin = async (email: string, password: string) => {
 	const userCredential = await signInWithEmailAndPassword(auth, email, password)
@@ -34,57 +43,53 @@ export const memberLogin = async (email: string, password: string) => {
 		const userCredential = await signInWithEmailAndPassword(auth, email, password)
 		const uid = userCredential.user.uid
 
-		// 1. Email must be verified
 		if (!userCredential.user.emailVerified) {
 			await signOut(auth)
 			throw new Error(t("emailNotVerified"))
 		}
 
-		// 2. Check if a member doc exists with this email (query directly to get doc ID)
-		const membersRef = collection(db, COLLECTIONS.MEMBERS)
-		const memberQuery = query(membersRef, where("email", "==", email))
-		const memberSnapshot = await getDocs(memberQuery)
+		// Check if a member doc exists with this uid
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, uid)
+		const memberDoc = await getDoc(memberRef)
 
-		if (!memberSnapshot.empty) {
-			const oldDoc = memberSnapshot.docs[0]
-			const oldDocId = oldDoc.id
-			const oldData = oldDoc.data()
-
-			// Scenario A: Staff created this record — uid missing or doesn't match
-			// We found user by the email and the member collection uid doesn't match the auth uid, so we need to migrate the data to the new uid
-			if (!oldData.uid || oldData.uid !== uid) {
-				const batch = writeBatch(db)
-
-				// Create new member doc with the new Auth UID, copying all old data
-				const newMemberRef = doc(db, COLLECTIONS.MEMBERS, uid)
-				batch.set(newMemberRef, { ...oldData, uid, isActive: true })
-
-				// Reassign all subscriptions from oldDocId to new uid
-				const subsRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
-				const subsQuery = query(subsRef, where("memberUid", "==", oldDocId))
-				const subsSnapshot = await getDocs(subsQuery)
-
-				// Update each subscription's memberUid to the new uid
-				subsSnapshot.forEach((subDoc) => {
-					batch.update(subDoc.ref, { memberUid: uid })
-				})
-
-				// Delete the old member document
-				const oldMemberRef = doc(db, COLLECTIONS.MEMBERS, oldDocId)
-				batch.delete(oldMemberRef)
-
-				await batch.commit()
-			}
-
-			// Scenario B: Regular returning member — uid matches
+		if (memberDoc.exists()) {
 			return { uid, email, role: "MEMBER" as UserRole }
 		}
 
-		// Scenario C: Brand new organic user — no member doc exists
+		// No member doc found — brand new organic user
 		return { isNewMember: true, uid, email, role: "MEMBER" as UserRole } as any
 	} catch (e: any) {
 		console.error("[AUTH] memberLogin:", e?.message || e)
 		throw e
+	}
+}
+
+export const createMemberAuthAccount = async (email: string): Promise<string | null> => {
+	try {
+		const password = generatePassword()
+		const credential = await createUserWithEmailAndPassword(auth, email, password)
+		const uid = credential.user.uid
+
+		// Send password reset email so the member can set their own password
+		await sendPasswordResetEmail(auth, email)
+
+		return uid
+	} catch (error: any) {
+		console.error("[AUTH] createMemberAuthAccount:", error?.message || error)
+		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
+
+		switch (error.code) {
+			case "auth/email-already-in-use":
+				alert(t("emailAlreadyInUse"))
+				break
+			case "auth/invalid-email":
+				alert(t("invalidEmail"))
+				break
+			default:
+				alert(t("registrationError"))
+				break
+		}
+		return null
 	}
 }
 

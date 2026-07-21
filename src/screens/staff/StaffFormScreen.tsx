@@ -21,7 +21,7 @@ import CustomHeader from "../../components/CustomHeader"
 import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../../components/ui/ThemedButton"
 
-import { createStaffUser } from "../../lib/firebase/auth"
+import { createStaffUser, generatePassword } from "../../lib/firebase/auth"
 import { addStaff } from "../../lib/firebase/firestore/staff"
 import { reAuthStaffAction } from "../../store/features/authSlice"
 import { getStaffCredentials } from "../../utils/storage"
@@ -55,12 +55,8 @@ export default function StaffFormScreen() {
 		return () => backHandler.remove()
 	}, [])
 
-	const generatePassword = () => {
-		const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-		let password = ""
-		for (let i = 0; i < 8; i++) {
-			password += chars.charAt(Math.floor(Math.random() * chars.length))
-		}
+	const handlePassword = () => {
+		const password = generatePassword()
 		setValue("password", password)
 	}
 
@@ -244,7 +240,7 @@ export default function StaffFormScreen() {
 												/>
 												<TouchableOpacity
 													style={styles.passwordButton}
-													onPress={generatePassword}
+													onPress={handlePassword}
 													activeOpacity={0.6}
 												>
 													<ThemedIcon
@@ -280,7 +276,7 @@ export default function StaffFormScreen() {
 									onPress={handleSubmit(onSubmit)}
 									disabled={isLoading}
 								>
-									<ThemedText style={styles.buttonText}>{t("saveStaff")}</ThemedText>
+									<ThemedText style={styles.buttonText}>{t("createStaff")}</ThemedText>
 								</ThemedButton>
 							</View>
 						</ScrollView>

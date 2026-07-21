@@ -196,5 +196,12 @@
 	"scrollToToday": "Scroll to Today",
 	"checkinFetchError": "An error occurred while fetching check-ins. Please try again",
 	"update": "Update",
-	"addStaff": "Add Staff"
+	"addStaff": "Add Staff",
+	"addMember": "Add Member",
+	"staffCreateError": "An error occurred while creating the staff. Please try again",
+	"staffCreateSuccess": "Staff created successfully",
+	"newStaff": "New Staff",
+	"admin": "Admin",
+	"staff": "Staff",
+	"createStaff": "Create Staff"
 }
