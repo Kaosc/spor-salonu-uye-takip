@@ -202,5 +202,6 @@
 	"newStaff": "Yeni Personel",
 	"admin": "Yönetici",
 	"staff": "Personel",
-	"createStaff": "Personel Oluştur"
+	"createStaff": "Personel Oluştur",
+	"memberExistsNoAccount": "Bilgileriniz sistemimizde bulunmaktadır ancak henüz bir hesap oluşturmamışsınız. Lütfen kayıt olarak hesabınıza erişin"
 }

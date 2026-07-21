@@ -203,5 +203,6 @@
 	"newStaff": "New Staff",
 	"admin": "Admin",
 	"staff": "Staff",
-	"createStaff": "Create Staff"
+	"createStaff": "Create Staff",
+	"memberExistsNoAccount": "Your information has been found in our system, but you haven't created an account yet. Please register to claim your account"
 }

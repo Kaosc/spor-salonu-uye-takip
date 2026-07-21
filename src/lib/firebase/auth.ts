@@ -6,7 +6,7 @@ import {
 	signInWithEmailAndPassword,
 	signOut,
 } from "@react-native-firebase/auth"
-import { getFirestore, doc, getDoc } from "@react-native-firebase/firestore"
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore"
 import { t } from "i18next"
 import { COLLECTIONS } from "./enums"
 
@@ -56,9 +56,32 @@ export const memberLogin = async (email: string, password: string) => {
 			return { uid, email, role: "MEMBER" as UserRole }
 		}
 
-		// No member doc found — brand new organic user
+		// No member doc found brand new organic user
 		return { isNewMember: true, uid, email, role: "MEMBER" as UserRole } as any
 	} catch (e: any) {
+		// Check if auth account doesn't exist but member data exists in Firestore
+		// Handles the case where a member was created in Firestore but never had an auth account created
+		// Which is likely to happen the member added to collection but auth acc creatiion is failed.
+		if (e?.code === "auth/user-not-found") {
+			try {
+				const membersRef = collection(db, COLLECTIONS.MEMBERS)
+				const q = query(membersRef, where("email", "==", email))
+				const snapshot = await getDocs(q)
+
+				if (!snapshot.empty) {
+					// member data exists but no auth account
+					throw new Error(t("memberExistsNoAccount"))
+				}
+			} catch (innerError: any) {
+				// if its already our custom err throw it
+				if (innerError?.message === t("memberExistsNoAccount")) {
+					throw innerError
+				}
+				// otherwise ignore the firestore err and fall back
+				console.error("[AUTH] memberLogin Firestore check:", innerError?.message || innerError)
+			}
+		}
+
 		console.error("[AUTH] memberLogin:", e?.message || e)
 		throw e
 	}

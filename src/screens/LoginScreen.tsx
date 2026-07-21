@@ -100,7 +100,12 @@ export default function LoginScreen() {
 				navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
 			}
 		} catch (e: any) {
-			setError(t("loginFailed"))
+			const errorMessage = e?.message || ""
+			if (errorMessage === t("memberExistsNoAccount") || errorMessage === t("emailNotVerified")) {
+				setError(errorMessage)
+			} else {
+				setError(t("loginFailed"))
+			}
 		} finally {
 			setIsLoading(false)
 		}
