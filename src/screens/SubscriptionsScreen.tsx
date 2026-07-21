@@ -36,7 +36,7 @@ export default function SubscriptionsScreen() {
 		{ key: "RECENTLY_EXPIRED", label: t("recently_expired") },
 		{ key: "PAUSED", label: t("paused") },
 	]
-	
+
 	useEffect(() => {
 		const backAction = () => {
 			navigation.goBack()
@@ -88,7 +88,7 @@ export default function SubscriptionsScreen() {
 			case "EXPIRING_SOON":
 				return sub.status === "ACTIVE" && endDate && daysUntil(endDate) >= 0 && daysUntil(endDate) <= 7
 			case "RECENTLY_EXPIRED":
-				return sub.status === "EXPIRED" && endDate && daysSince(endDate) >= 0 && daysSince(endDate) <= 15
+				return sub.status === "EXPIRED"
 			case "PAUSED":
 				return sub.status === "PAUSED"
 			default:
@@ -245,7 +245,7 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			marginTop: moderateScale(16),
 			padding: moderateScale(20),
 			borderRadius: 16,
-			backgroundColor: darkMode ? "#1a1a1a" : "#f0f0f0",
+			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 		},

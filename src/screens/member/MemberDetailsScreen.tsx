@@ -632,7 +632,7 @@ export default function MemberDetailsScreen() {
 					<DetailsRow
 						label={t("phone")}
 						value={member.emergencyContact?.phone || "-"}
-						iconName="phone-forward"
+						iconName="phone"
 					/>
 				</View>
 			)
@@ -743,6 +743,21 @@ export default function MemberDetailsScreen() {
 							contentContainerStyle={styles.pageContent}
 							showsVerticalScrollIndicator={false}
 						>
+							<View style={styles.memberInfoCard}>
+								<ThemedIcon
+									name="account"
+									size={20}
+									style={styles.memberInfoIcon}
+								/>
+								<View style={styles.memberInfoTextContainer}>
+									<ThemedText style={styles.memberInfoName}>
+										{member.firstName} {member.lastName}
+									</ThemedText>
+									<ThemedText style={styles.memberInfoPhone}>
+										{member.phoneNumber || "-"}
+									</ThemedText>
+								</View>
+							</View>
 							<LockerView />
 						</ScrollView>
 					</PagerView>
@@ -987,5 +1002,32 @@ const createStyles = (darkMode: boolean) => {
 			opacity: 0.7,
 		},
 		avatarContainer: { alignItems: "center", justifyContent: "center", marginBottom: 15 },
+		// Member info card (locker page)
+		memberInfoCard: {
+			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
+			borderRadius: 12,
+			padding: 16,
+			flexDirection: "row",
+			alignItems: "center",
+			marginTop: 20,
+			marginBottom: 4,
+		},
+		memberInfoIcon: {
+			marginRight: 14,
+		},
+		memberInfoTextContainer: {
+			flex: 1,
+		},
+		memberInfoName: {
+			fontSize: 17,
+			fontWeight: "700",
+		},
+		memberInfoPhone: {
+			fontSize: 14,
+			opacity: 0.6,
+			marginTop: 2,
+		},
 	})
 }

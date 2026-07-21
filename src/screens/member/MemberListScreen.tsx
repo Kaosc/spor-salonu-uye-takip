@@ -124,7 +124,7 @@ const createStyles = (darkMode: boolean) => {
 		},
 		list: {
 			paddingHorizontal: 16,
-			paddingBottom: 80,
+			paddingBottom: 100,
 			marginTop: 10,
 		},
 		fab: {

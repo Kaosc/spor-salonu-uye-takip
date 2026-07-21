@@ -147,7 +147,7 @@ export default function CheckinsCalendarScreen() {
 				ref={calendarRef}
 				contentContainerStyle={{ paddingBottom: 140 }}
 				theme={{
-					calendarBackground: darkMode ? "#0e0e0e" : "#f5f5f5",
+					calendarBackground: theme.cardBackground,
 					textSectionTitleColor: darkMode ? "#b6c1cd" : "#2d4150",
 					selectedDayBackgroundColor: darkMode ? "#fff" : "#000",
 					selectedDayTextColor: darkMode ? "#000" : "#ffffff",
