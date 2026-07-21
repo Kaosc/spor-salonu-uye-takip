@@ -1,9 +1,9 @@
-import React from "react"
+import React, { memo } from "react"
 import { Image } from "expo-image"
 
 import { moderateScale } from "../utils/responsive"
 
-export default function MemberAvatar({ gender, size }: { gender?: Gender, size?: number }) {
+function MemberAvatar({ gender, size }: { gender?: Gender; size?: number }) {
 	return (
 		<Image
 			source={gender === "MALE" ? require("../assets/male.png") : require("../assets/female.png")}
@@ -14,3 +14,5 @@ export default function MemberAvatar({ gender, size }: { gender?: Gender, size?:
 		/>
 	)
 }
+
+export default memo(MemberAvatar)

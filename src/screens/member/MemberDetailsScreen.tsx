@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
 import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
@@ -49,7 +49,6 @@ export default function MemberDetailsScreen() {
 
 	const [activePage, setActivePage] = useState(route.params?.initialPage || 0)
 	const pagerRef = useRef<PagerView>(null)
-	const scrollViewRef = useRef<ScrollView>(null)
 
 	const [memberStatus, setMemberStatus] = useState<"idle" | "loading" | "error">("idle")
 	const [subscriptionStatus, setSubscriptionStatus] = useState<"idle" | "loading" | "error">("idle")
@@ -369,7 +368,7 @@ export default function MemberDetailsScreen() {
 		)
 	}
 
-	const SubscriptionDetails = () => {
+	const SubscriptionDetails = useCallback(() => {
 		const PauseToggleButton = () => {
 			if (activeSubscription && activeSubscription.status === "PAUSED") {
 				return (
@@ -504,146 +503,149 @@ export default function MemberDetailsScreen() {
 				)}
 			</View>
 		)
-	}
+	}, [member?.isActive, subscriptions, activeSubscription, subscriptionStatus, darkMode])
 
-	const MemberDetails = ({ member }: { member: Member }) => {
-		return (
-			<View style={styles.card}>
-				<View style={styles.actionRow}>
-					<View style={{ flexDirection: "row", gap: 20 }}>
-						{member.isActive ? (
-							<TouchableOpacity onPress={handleInactivateMember}>
+	const MemberDetails = useCallback(
+		({ member }: { member: Member }) => {
+			return (
+				<View style={styles.card}>
+					<View style={styles.actionRow}>
+						<View style={{ flexDirection: "row", gap: 20 }}>
+							{member.isActive ? (
+								<TouchableOpacity onPress={handleInactivateMember}>
+									<ThemedIcon
+										name="account-cancel"
+										size={26}
+										color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
+									/>
+								</TouchableOpacity>
+							) : (
+								<TouchableOpacity onPress={handleActivateMember}>
+									<ThemedIcon
+										name="account-check"
+										size={26}
+										color={darkMode ? Theme.dark.green.foreground : Theme.light.green.foreground}
+									/>
+								</TouchableOpacity>
+							)}
+						</View>
+						<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
+							<ThemedIcon
+								name="pen"
+								size={26}
+							/>
+						</TouchableOpacity>
+					</View>
+
+					<View style={styles.avatarContainer}>
+						<MemberAvatar
+							gender={member.gender}
+							size={110}
+						/>
+					</View>
+
+					<ThemedText style={styles.title}>
+						{member.firstName} {member.lastName}
+					</ThemedText>
+
+					<DetailsRow
+						label={t("phone")}
+						value={member.phoneNumber || "-"}
+						iconName="phone"
+					/>
+					<DetailsRow
+						label={t("email")}
+						value={member.email || "-"}
+						iconName="mail"
+					/>
+					<DetailsRow
+						label={t("gender")}
+						value={t(member.gender) || "-"}
+						iconName="gender-male-female"
+					/>
+					<DetailsRow
+						label={t("birthDate")}
+						value={new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
+						iconName="calendar"
+					/>
+					<DetailsRow
+						label={t("bloodType")}
+						value={member.bloodType || "-"}
+						iconName="water"
+					/>
+
+					{/* Body Metrics Card */}
+					<View style={styles.bodyMetricsContainer}>
+						<View style={styles.bodyMetricsRow}>
+							<View style={styles.bodyMetricItem}>
 								<ThemedIcon
-									name="account-cancel"
-									size={26}
-									color={darkMode ? Theme.dark.red.foreground : Theme.light.red.foreground}
+									name="scale-bathroom"
+									size={18}
 								/>
-							</TouchableOpacity>
-						) : (
-							<TouchableOpacity onPress={handleActivateMember}>
+								<ThemedText style={styles.bodyMetricLabel}>{t("weight")}</ThemedText>
+								<ThemedText style={styles.bodyMetricValue}>{member.weight ? `${member.weight} kg` : "-"}</ThemedText>
+							</View>
+							<View style={styles.bodyMetricItem}>
 								<ThemedIcon
-									name="account-check"
-									size={26}
-									color={darkMode ? Theme.dark.green.foreground : Theme.light.green.foreground}
+									name="human-male-height"
+									size={18}
 								/>
-							</TouchableOpacity>
+								<ThemedText style={styles.bodyMetricLabel}>{t("height")}</ThemedText>
+								<ThemedText style={styles.bodyMetricValue}>{member.height ? `${member.height} cm` : "-"}</ThemedText>
+							</View>
+						</View>
+
+						{member.weight && member.height && member.height > 0 && (
+							<BMIDisplay
+								weight={member.weight}
+								height={member.height}
+							/>
 						)}
 					</View>
-					<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
-						<ThemedIcon
-							name="pen"
-							size={26}
-						/>
-					</TouchableOpacity>
-				</View>
 
-				<View style={styles.avatarContainer}>
-					<MemberAvatar
-						gender={member.gender}
-						size={110}
+					<DetailsRow
+						label={t("address")}
+						value={member.address || "-"}
+						iconName="home"
+					/>
+					<DetailsRow
+						label={t("isActive")}
+						value={member.isActive ? t("yes") : t("no")}
+						iconName="check-circle-outline"
+					/>
+					<DetailsRow
+						label={t("createdAt")}
+						value={safeTimestampToDateTimeString(member.createdAt)}
+						iconName="clock-outline"
+					/>
+					<DetailsRow
+						label={t("updatedAt")}
+						value={safeTimestampToDateTimeString(member.updatedAt)}
+						iconName="clock-outline"
+					/>
+					<DetailsRow
+						label={t("createdBy")}
+						value={member.createdBy || "-"}
+						iconName="account-plus-outline"
+					/>
+
+					<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+
+					<DetailsRow
+						label={t("name")}
+						value={member.emergencyContact?.name || "-"}
+						iconName="account-star-outline"
+					/>
+					<DetailsRow
+						label={t("phone")}
+						value={member.emergencyContact?.phone || "-"}
+						iconName="phone-forward"
 					/>
 				</View>
-
-				<ThemedText style={styles.title}>
-					{member.firstName} {member.lastName}
-				</ThemedText>
-
-				<DetailsRow
-					label={t("phone")}
-					value={member.phoneNumber || "-"}
-					iconName="phone"
-				/>
-				<DetailsRow
-					label={t("email")}
-					value={member.email || "-"}
-					iconName="mail"
-				/>
-				<DetailsRow
-					label={t("gender")}
-					value={t(member.gender) || "-"}
-					iconName="gender-male-female"
-				/>
-				<DetailsRow
-					label={t("birthDate")}
-					value={new Date(safeTimestampToDateString(member.birthDate)).toLocaleDateString()}
-					iconName="calendar"
-				/>
-				<DetailsRow
-					label={t("bloodType")}
-					value={member.bloodType || "-"}
-					iconName="water"
-				/>
-
-				{/* Body Metrics Card */}
-				<View style={styles.bodyMetricsContainer}>
-					<View style={styles.bodyMetricsRow}>
-						<View style={styles.bodyMetricItem}>
-							<ThemedIcon
-								name="scale-bathroom"
-								size={18}
-							/>
-							<ThemedText style={styles.bodyMetricLabel}>{t("weight")}</ThemedText>
-							<ThemedText style={styles.bodyMetricValue}>{member.weight ? `${member.weight} kg` : "-"}</ThemedText>
-						</View>
-						<View style={styles.bodyMetricItem}>
-							<ThemedIcon
-								name="human-male-height"
-								size={18}
-							/>
-							<ThemedText style={styles.bodyMetricLabel}>{t("height")}</ThemedText>
-							<ThemedText style={styles.bodyMetricValue}>{member.height ? `${member.height} cm` : "-"}</ThemedText>
-						</View>
-					</View>
-
-					{member.weight && member.height && member.height > 0 && (
-						<BMIDisplay
-							weight={member.weight}
-							height={member.height}
-						/>
-					)}
-				</View>
-
-				<DetailsRow
-					label={t("address")}
-					value={member.address || "-"}
-					iconName="home"
-				/>
-				<DetailsRow
-					label={t("isActive")}
-					value={member.isActive ? t("yes") : t("no")}
-					iconName="check-circle-outline"
-				/>
-				<DetailsRow
-					label={t("createdAt")}
-					value={safeTimestampToDateTimeString(member.createdAt)}
-					iconName="clock-outline"
-				/>
-				<DetailsRow
-					label={t("updatedAt")}
-					value={safeTimestampToDateTimeString(member.updatedAt)}
-					iconName="clock-outline"
-				/>
-				<DetailsRow
-					label={t("createdBy")}
-					value={member.createdBy || "-"}
-					iconName="account-plus-outline"
-				/>
-
-				<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
-
-				<DetailsRow
-					label={t("name")}
-					value={member.emergencyContact?.name || "-"}
-					iconName="account-star-outline"
-				/>
-				<DetailsRow
-					label={t("phone")}
-					value={member.emergencyContact?.phone || "-"}
-					iconName="phone-forward"
-				/>
-			</View>
-		)
-	}
+			)
+		},
+		[member, darkMode],
+	)
 
 	const TabBar = () => {
 		const TabButton = ({ label, iconName, pageIndex }: { label: string; iconName: AllIconNames; pageIndex: number }) => {
@@ -772,6 +774,7 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			paddingBottom: 10,
 			gap: 8,
+			marginHorizontal: 8,
 		},
 		tab: {
 			flex: 1,
