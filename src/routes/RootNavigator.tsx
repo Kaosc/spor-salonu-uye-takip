@@ -29,17 +29,14 @@ export default function RootNavigator() {
 				headerShown: false,
 			}}
 		>
-			{role === "MEMBER" ? (
-				<Stack.Screen
-					name="MemberTabs"
-					component={MemberTabNavigator}
-				/>
-			) : (
-				<Stack.Screen
-					name="Tabs"
-					component={StaffTabNavigator}
-				/>
-			)}
+			<Stack.Screen
+				name="MemberTabs"
+				component={MemberTabNavigator}
+			/>
+			<Stack.Screen
+				name="Tabs"
+				component={StaffTabNavigator}
+			/>
 			<Stack.Screen
 				name="MemberDetailsScreen"
 				component={MemberDetailsScreen}
