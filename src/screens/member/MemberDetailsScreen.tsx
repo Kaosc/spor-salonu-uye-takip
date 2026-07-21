@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { ScrollView, View, TouchableOpacity, StyleSheet, BackHandler, Alert } from "react-native"
-import { ParamListBase, RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { ParamListBase, RouteProp, useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
 import PagerView from "react-native-pager-view"
@@ -97,7 +97,6 @@ export default function MemberDetailsScreen() {
 		if (!route.params?.memberId) return
 		setMemberStatus("loading")
 		const member = await getMemberById(route.params?.memberId)
-
 		setMember(member)
 		setMemberStatus(member ? "idle" : "error")
 	}
@@ -139,11 +138,13 @@ export default function MemberDetailsScreen() {
 		}
 	}
 
-	useEffect(() => {
-		fetchMember()
-		fetchSubscription()
-		fetchLocker()
-	}, [route.params?.memberId])
+	useFocusEffect(
+		useCallback(() => {
+			fetchMember()
+			fetchSubscription()
+			fetchLocker()
+		}, [route.params?.memberId]),
+	)
 
 	const handleSubCancel = async (alert = true) => {
 		const cancelSub = async () => {

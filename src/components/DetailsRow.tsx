@@ -1,4 +1,4 @@
-import { View, StyleSheet } from "react-native"
+import { View, StyleSheet, TouchableOpacity, Linking } from "react-native"
 import { useSelector } from "react-redux"
 
 import ThemedIcon from "./ui/ThemedIcon"
@@ -21,6 +21,13 @@ export default function DetailsRow({
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 	const customColor = textColor ? { color: textColor } : {}
+
+	const handleOnPress = () => {
+		if (iconName === "phone" && value) {
+			Linking.openURL(`tel:${value}`)
+		}
+	}
+
 	return (
 		<View style={styles.row}>
 			<View style={styles.rowLabel}>
@@ -31,7 +38,9 @@ export default function DetailsRow({
 				/>
 				<ThemedText style={[styles.label, customColor]}>{label}</ThemedText>
 			</View>
+			<TouchableOpacity disabled={iconName !== "phone"} onPress={handleOnPress} style={{ flex: 1, alignItems: "flex-end" }}>
 			<ThemedText style={[styles.value, customColor]}>{value || "-"}</ThemedText>
+			</TouchableOpacity>
 		</View>
 	)
 }

@@ -222,6 +222,11 @@ export default function MemberFormScreen() {
 				return
 			}
 
+			if (isEditing) {
+				navigation.goBack()
+				return
+			}
+
 			navigation.dispatch(StackActions.popToTop())
 			navigation.dispatch(
 				StackActions.replace("Tabs", {

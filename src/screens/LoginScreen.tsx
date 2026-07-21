@@ -40,7 +40,6 @@ export default function LoginScreen() {
 	const [error, setError] = useState("")
 
 	useEffect(() => {
-		if (__DEV__) {
 			setTimeout(() => {
 				if (isStaffLogin) {
 					setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
@@ -50,7 +49,6 @@ export default function LoginScreen() {
 					setPassword(process.env.EXPO_PUBLIC_MEMBER_PASSWORD || "")
 				}
 			}, 100)
-		}
 	}, [isStaffLogin])
 
 	const handleForgotPassword = async () => {

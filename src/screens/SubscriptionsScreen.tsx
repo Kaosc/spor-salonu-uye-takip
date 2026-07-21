@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react"
-import { View, TouchableOpacity, ScrollView, StyleSheet } from "react-native"
+import { useState, useCallback, useEffect } from "react"
+import { View, TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native"
 import { FlashList } from "@shopify/flash-list"
@@ -36,6 +36,15 @@ export default function SubscriptionsScreen() {
 		{ key: "RECENTLY_EXPIRED", label: t("recently_expired") },
 		{ key: "PAUSED", label: t("paused") },
 	]
+	
+	useEffect(() => {
+		const backAction = () => {
+			navigation.goBack()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
 
 	const fetchData = useCallback(async () => {
 		try {
