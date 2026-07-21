@@ -6,7 +6,6 @@ import { FlashList } from "@shopify/flash-list"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
-import CustomHeader from "../components/CustomHeader"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 import { daysSince, daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
@@ -154,11 +153,6 @@ export default function SubscriptionsScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader
-				title={t("subscriptions")}
-				showBackButton={false}
-			/>
-
 			<ScrollView
 				style={styles.scrollContent}
 				showsVerticalScrollIndicator={false}

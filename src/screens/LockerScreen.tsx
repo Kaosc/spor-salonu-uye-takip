@@ -8,7 +8,6 @@ import { useTranslation } from "react-i18next"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
-import CustomHeader from "../components/CustomHeader"
 
 import { Theme } from "../utils/theme"
 import { addLocker, getAllLockers } from "../lib/firebase/firestore/lockers"
@@ -109,8 +108,6 @@ export default function LockerScreen() {
 
 	return (
 		<View style={styles.container}>
-			<CustomHeader title={t("lockers")} />
-
 			<View style={styles.summaryRow}>
 				<View style={styles.summaryItem}>
 					<ThemedIcon
