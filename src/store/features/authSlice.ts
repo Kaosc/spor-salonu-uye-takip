@@ -1,29 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { staffLogin, memberLogin, reAuthStaffUser } from "../../lib/firebase/auth"
-
-export const staffLoginAction = createAsyncThunk(
-	"auth/staffLoginAction",
-	async ({ email, password }: { email: string; password: string }) => {
-		const result = await staffLogin(email, password)
-		return { uid: result.uid, email: result.email, role: result.role }
-	},
-)
-
-export const memberLoginAction = createAsyncThunk(
-	"auth/memberLoginAction",
-	async ({ email, password }: { email: string; password: string }) => {
-		const result = await memberLogin(email, password)
-		return { uid: result.uid, email: result.email, role: result.role, isNewMember: result.isNewMember }
-	},
-)
-
-export const reAuthStaffAction = createAsyncThunk(
-	"auth/reAuthStaffAction",
-	async ({ email, password }: { email: string; password: string }) => {
-		const result = await reAuthStaffUser(email, password)
-		return { uid: result.uid, email: result.email, role: result.role }
-	},
-)
+import { createSlice } from "@reduxjs/toolkit"
 
 export const authSlice = createSlice({
 	name: "auth",
@@ -32,65 +7,22 @@ export const authSlice = createSlice({
 		uid: undefined,
 		email: undefined,
 		role: undefined,
-		isLoading: false,
 	} as Auth,
 	reducers: {
+		setAuth: (state, action) => {
+			const settings = {
+				...state,
+				...action.payload,
+			}
+			return settings
+		},
 		logout(state) {
 			state.isAuthenticated = false
 			state.uid = undefined
 			state.email = undefined
 			state.role = undefined
-			state.isLoading = false
 		},
-		toggleLoading(state) {
-			state.isLoading = !state.isLoading
-		},
-	},
-	extraReducers: (builder) => {
-		builder
-			// Staff login actions
-			.addCase(staffLoginAction.pending, (state) => {
-				state.isLoading = true
-			})
-			.addCase(staffLoginAction.fulfilled, (state, action) => {
-				state.isAuthenticated = true
-				state.uid = action.payload.uid
-				state.email = action.payload.email
-				state.role = action.payload.role
-				state.isLoading = false
-			})
-			.addCase(staffLoginAction.rejected, (state) => {
-				state.isLoading = false
-			})
-			// Member login actions
-			.addCase(memberLoginAction.pending, (state) => {
-				state.isLoading = true
-			})
-			.addCase(memberLoginAction.fulfilled, (state, action) => {
-				state.isAuthenticated = true
-				state.uid = action.payload.uid
-				state.email = action.payload.email
-				state.role = action.payload.role
-				state.isLoading = false
-			})
-			.addCase(memberLoginAction.rejected, (state) => {
-				state.isLoading = false
-			})
-			// Re-auth staff actions
-			.addCase(reAuthStaffAction.pending, (state) => {
-				state.isLoading = true
-			})
-			.addCase(reAuthStaffAction.fulfilled, (state, action) => {
-				state.isAuthenticated = true
-				state.uid = action.payload.uid
-				state.email = action.payload.email
-				state.role = action.payload.role
-				state.isLoading = false
-			})
-			.addCase(reAuthStaffAction.rejected, (state) => {
-				state.isLoading = false
-			})
 	},
 })
 
-export const { logout, toggleLoading } = authSlice.actions
+export const { logout, setAuth } = authSlice.actions

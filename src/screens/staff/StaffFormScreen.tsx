@@ -11,7 +11,7 @@ import {
 } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { GestureHandlerRootView } from "react-native-gesture-handler"
-import { useSelector, useDispatch } from "react-redux"
+import { useSelector } from "react-redux"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -21,9 +21,8 @@ import CustomHeader from "../../components/CustomHeader"
 import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../../components/ui/ThemedButton"
 
-import { createStaffUser, generatePassword } from "../../lib/firebase/auth"
+import { createStaffUser, generatePassword, reAuthStaffUser } from "../../lib/firebase/auth"
 import { addStaff } from "../../lib/firebase/firestore/staff"
-import { reAuthStaffAction } from "../../store/features/authSlice"
 import { getStaffCredentials } from "../../utils/storage"
 import { Theme } from "../../utils/theme"
 
@@ -36,8 +35,6 @@ type StaffFormValues = {
 
 export default function StaffFormScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const { isLoading } = useSelector((state: RootState) => state.auth)
-	const dispatch = useDispatch<any>()
 	const navigation = useNavigation<any>()
 	const { t } = useTranslation()
 
@@ -104,7 +101,7 @@ export default function StaffFormScreen() {
 			// Sign out and re-auth with current staff user credentials
 			const credentials = getStaffCredentials()
 			if (credentials) {
-				await dispatch(reAuthStaffAction({ email: credentials.email, password: credentials.password }))
+				await reAuthStaffUser(credentials.email, credentials.password)
 			}
 
 			// Reset form and navigate back
@@ -274,7 +271,7 @@ export default function StaffFormScreen() {
 								<ThemedButton
 									style={styles.button}
 									onPress={handleSubmit(onSubmit)}
-									disabled={isLoading}
+									disabled={loading}
 								>
 									<ThemedText style={styles.buttonText}>{t("createStaff")}</ThemedText>
 								</ThemedButton>

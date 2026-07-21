@@ -17,15 +17,14 @@ import { Image } from "expo-image"
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
 
-import { resetPassword } from "../lib/firebase/auth"
-import { staffLoginAction, memberLoginAction, toggleLoading } from "../store/features/authSlice"
+import { resetPassword, staffLogin, memberLogin } from "../lib/firebase/auth"
+import { setAuth } from "../store/features/authSlice"
 import { setStaffCredentials } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
-	const { isLoading } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 
 	const dispatch = useDispatch<any>()
@@ -34,6 +33,7 @@ export default function LoginScreen() {
 	const styles = createStyles(darkMode)
 	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
 
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
@@ -59,14 +59,14 @@ export default function LoginScreen() {
 			return
 		}
 
-		dispatch(toggleLoading())
+		setIsLoading(true)
 		const success = await resetPassword(email)
 
 		if (success) {
 			setForgotPassword(false)
 		}
 
-		dispatch(toggleLoading())
+		setIsLoading(false)
 	}
 
 	const handleLogin = async () => {
@@ -81,13 +81,14 @@ export default function LoginScreen() {
 		}
 
 		setError("")
+		setIsLoading(true)
 
-		const action = isStaffLogin ? staffLoginAction : memberLoginAction
-		const result = await dispatch(action({ email, password }))
+		try {
+			const result = isStaffLogin ? await staffLogin(email, password) : await memberLogin(email, password)
+			const { uid, role } = result
+			const isNewMember = "isNewMember" in result ? result.isNewMember : false
 
-		if (action.fulfilled.match(result)) {
-			const role = result.payload?.role
-			const isNewMember = "isNewMember" in result.payload ? result.payload.isNewMember : false
+			dispatch(setAuth({ isAuthenticated: true, uid, email, role }))
 
 			if (role === "ADMIN" || role === "STAFF") {
 				setStaffCredentials(email, password)
@@ -98,9 +99,10 @@ export default function LoginScreen() {
 			} else {
 				navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
 			}
-		} else {
-			// Catch redux state error here
+		} catch (e: any) {
 			setError(t("loginFailed"))
+		} finally {
+			setIsLoading(false)
 		}
 	}
 	return (
