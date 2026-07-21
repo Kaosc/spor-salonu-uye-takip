@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react"
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
@@ -27,6 +27,15 @@ export default function MemberListContent() {
 	const [members, setMembers] = useMMKVObject<MemberCard[]>("members")
 	const [coldStart, setColdStart] = useMMKVBoolean("coldStart")
 
+	useEffect(() => {
+		const backAction = () => {
+			navigation.navigate("DashboardScreen")
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+	
 	const fetchMembers = async () => {
 		try {
 			const membersData = await getAllMembers()

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { View, ScrollView, StyleSheet, TouchableOpacity } from "react-native"
 import { useSelector, useDispatch } from "react-redux"
-import { useNavigation, NavigationProp, StackActions, useRoute } from "@react-navigation/native"
+import { useNavigation, NavigationProp, useRoute } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../../components/ui/ThemedText"
@@ -38,7 +38,10 @@ export default function MemberProfileScreen() {
 	const handleLogout = async () => {
 		await logoutUser()
 		dispatch(logout())
-		navigation.dispatch(StackActions.replace("AuthStack"))
+		navigation.reset({
+			index: 0,
+			routes: [{ name: "AuthStack" }],
+		})
 	}
 
 	const [member, setMember] = useState<Member | null>(null)

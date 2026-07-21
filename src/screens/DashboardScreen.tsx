@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react"
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native"
+import { View, StyleSheet, ScrollView, TouchableOpacity, BackHandler } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
 import QRCode from "react-native-qrcode-svg"
 import { useTranslation } from "react-i18next"
-import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
 
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedText from "../components/ui/ThemedText"
@@ -18,7 +18,6 @@ import { logout } from "../store/features/authSlice"
 
 import { logoutUser } from "../lib/firebase/auth"
 import { getStaffUserById } from "../lib/firebase/firestore/users"
-import { BOTTOM_TAB_HEIGHT } from "../lib/constants"
 
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
@@ -41,6 +40,15 @@ export default function DashboardScreen() {
 	const qrAction = useRef<QRScannerAction>("VIEW_MEMBER")
 
 	useEffect(() => {
+		const backAction = () => {
+			BackHandler.exitApp()
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+
+	useEffect(() => {
 		if (!uid) return
 
 		setLoading(true)
@@ -53,7 +61,10 @@ export default function DashboardScreen() {
 	const handleLogout = async () => {
 		await logoutUser()
 		dispatch(logout())
-		navigation.dispatch(StackActions.replace("AuthStack"))
+		navigation.reset({
+			index: 0,
+			routes: [{ name: "AuthStack" }],
+		})
 	}
 
 	const handleOnQRModalClose = () => {

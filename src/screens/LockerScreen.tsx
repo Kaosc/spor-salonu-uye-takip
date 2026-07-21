@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { View, TouchableOpacity, StyleSheet, Alert } from "react-native"
+import { View, TouchableOpacity, StyleSheet, Alert, BackHandler } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { FlashList } from "@shopify/flash-list"
@@ -22,6 +22,16 @@ export default function LockerScreen() {
 
 	const [loading, setLoading] = useState(true)
 	const [lockers, setLockers] = useState<Locker[]>([])
+
+	useEffect(() => {
+		const backAction = () => {
+			navigation.navigate("DashboardScreen")
+			return true
+		}
+		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
+		return () => backHandler.remove()
+	}, [])
+	
 
 	useEffect(() => {
 		fetchLockerData()

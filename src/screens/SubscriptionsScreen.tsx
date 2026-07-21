@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next"
 import ThemedText from "../components/ui/ThemedText"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
-import { daysSince, daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
+import { daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
 import { Theme } from "../utils/theme"
 import { moderateScale } from "../utils/responsive"
 import { getAllSubscriptions } from "../lib/firebase/firestore/subscriptions"

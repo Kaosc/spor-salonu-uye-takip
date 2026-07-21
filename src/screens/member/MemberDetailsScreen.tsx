@@ -689,7 +689,7 @@ export default function MemberDetailsScreen() {
 				{memberStatus === "loading" ? (
 					<ThemedActivityIndicator size={70} />
 				) : (
-					memberStatus === "error" && (
+					memberStatus === "error" || !member && (
 						<View style={{ justifyContent: "center", alignItems: "center", gap: 5 }}>
 							<ThemedIcon
 								name="account-alert-outline"
