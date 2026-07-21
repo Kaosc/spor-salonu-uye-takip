@@ -774,8 +774,8 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			justifyContent: "center",
 			gap: 6,
-			paddingVertical: 14,
-			paddingHorizontal: 20,
+			paddingVertical: 10,
+			paddingHorizontal: 10,
 			opacity: 0.6,
 			marginTop: 10,
 			borderRadius: 40,
@@ -787,8 +787,7 @@ const createStyles = (darkMode: boolean) => {
 			opacity: 1,
 		},
 		tabText: {
-			fontSize: 16,
-			fontWeight: "bold",
+			fontSize: 15,
 		},
 		tabTextActive: {
 			fontWeight: "bold",
