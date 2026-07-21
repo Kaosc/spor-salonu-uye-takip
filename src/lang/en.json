@@ -195,5 +195,6 @@
 	"goToToday": "Go to Today",
 	"scrollToToday": "Scroll to Today",
 	"checkinFetchError": "An error occurred while fetching check-ins. Please try again",
-	"update": "Update"
+	"update": "Update",
+	"addStaff": "Add Staff"
 }

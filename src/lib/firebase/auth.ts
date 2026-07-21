@@ -132,6 +132,48 @@ export const resetPassword = async (email: string): Promise<boolean> => {
 	}
 }
 
+export const createStaffUser = async (email: string, password: string): Promise<string | null> => {
+	try {
+		const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+		return userCredential.user.uid
+	} catch (error: any) {
+		console.error("[AUTH] createStaffUser:", error?.message || error)
+		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
+
+		switch (error.code) {
+			case "auth/email-already-in-use":
+				alert(t("emailAlreadyInUse"))
+				break
+			case "auth/invalid-email":
+				alert(t("invalidEmail"))
+				break
+			case "auth/weak-password":
+				alert(t("weakPassword"))
+				break
+			default:
+				alert(t("registrationError"))
+				break
+		}
+		return null
+	}
+}
+
+export const reAuthStaffUser = async (email: string, password: string) => {
+	const userCredential = await signInWithEmailAndPassword(auth, email, password)
+	const uid = userCredential.user.uid
+
+	const staffRef = doc(db, COLLECTIONS.USERS, uid)
+	const staffDoc = await getDoc(staffRef)
+
+	if (!staffDoc.exists()) {
+		await signOut(auth)
+		throw new Error(t("staffRecordNotFound"))
+	}
+
+	const data = staffDoc.data()
+	return { uid, email, role: data?.role as UserRole }
+}
+
 export const logoutUser = async (): Promise<void> => {
 	try {
 		await signOut(auth)

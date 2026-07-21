@@ -13,6 +13,7 @@ import MemberDetailsScreen from "../screens/member/MemberDetailsScreen"
 
 import { getConsentAccepted } from "../utils/storage"
 import MemberFormScreen from "../screens/member/MemberFormScreen"
+import StaffFormScreen from "../screens/staff/StaffFormScreen"
 
 const Stack = createNativeStackNavigator()
 
@@ -46,6 +47,10 @@ export default function RootNavigator() {
 			<Stack.Screen
 				name="MemberFormScreen"
 				component={MemberFormScreen}
+			/>
+			<Stack.Screen
+				name="StaffFormScreen"
+				component={StaffFormScreen}
 			/>
 			<Stack.Screen
 				name="SearchScreen"

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import { staffLogin, memberLogin } from "../../lib/firebase/auth"
+import { staffLogin, memberLogin, reAuthStaffUser } from "../../lib/firebase/auth"
 
 export const staffLoginAction = createAsyncThunk(
 	"auth/staffLoginAction",
@@ -14,6 +14,14 @@ export const memberLoginAction = createAsyncThunk(
 	async ({ email, password }: { email: string; password: string }) => {
 		const result = await memberLogin(email, password)
 		return { uid: result.uid, email: result.email, role: result.role, isNewMember: result.isNewMember }
+	},
+)
+
+export const reAuthStaffAction = createAsyncThunk(
+	"auth/reAuthStaffAction",
+	async ({ email, password }: { email: string; password: string }) => {
+		const result = await reAuthStaffUser(email, password)
+		return { uid: result.uid, email: result.email, role: result.role }
 	},
 )
 
@@ -66,6 +74,20 @@ export const authSlice = createSlice({
 				state.isLoading = false
 			})
 			.addCase(memberLoginAction.rejected, (state) => {
+				state.isLoading = false
+			})
+			// Re-auth staff actions
+			.addCase(reAuthStaffAction.pending, (state) => {
+				state.isLoading = true
+			})
+			.addCase(reAuthStaffAction.fulfilled, (state, action) => {
+				state.isAuthenticated = true
+				state.uid = action.payload.uid
+				state.email = action.payload.email
+				state.role = action.payload.role
+				state.isLoading = false
+			})
+			.addCase(reAuthStaffAction.rejected, (state) => {
 				state.isLoading = false
 			})
 	},

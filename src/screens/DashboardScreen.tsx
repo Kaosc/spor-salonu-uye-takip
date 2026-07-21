@@ -26,7 +26,7 @@ import { Theme } from "../utils/theme"
 export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
-	const uid = useSelector((state: RootState) => state.auth.uid)
+	const { uid } = useSelector((state: RootState) => state.auth)
 	const theme = Theme[darkMode ? "dark" : "light"]
 	const dispatch = useDispatch<any>()
 	const { t } = useTranslation()
@@ -232,11 +232,24 @@ export default function DashboardScreen() {
 						</View>
 					</TouchableOpacity>
 				</View>
+
+				<ThemedButton
+					style={styles.addMemberButton}
+					onPress={() => navigation.navigate("StaffFormScreen", { returnToDashboard: true })}
+				>
+					<View style={styles.addMemberContent}>
+						<ThemedIcon
+							name="account-plus"
+							size={20}
+							color={darkMode ? "#000" : "#fff"}
+						/>
+						<ThemedText style={styles.addMemberText}>{t("addStaff")}</ThemedText>
+					</View>
+				</ThemedButton>
 			</ScrollView>
 		</>
 	)
 }
-
 const createStyles = (darkMode: boolean) => {
 	const theme = Theme[darkMode ? "dark" : "light"]
 
@@ -355,6 +368,22 @@ const createStyles = (darkMode: boolean) => {
 			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
 			marginHorizontal: 5,
+		},
+		addMemberButton: {
+			borderRadius: 16,
+			paddingVertical: 16,
+			marginHorizontal: 20,
+			alignItems: "center",
+		},
+		addMemberContent: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 10,
+		},
+		addMemberText: {
+			color: darkMode ? "#000" : "#fff",
+			fontSize: 16,
+			fontWeight: "bold",
 		},
 	})
 }

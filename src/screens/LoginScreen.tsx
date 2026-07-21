@@ -19,6 +19,7 @@ import ThemedText from "../components/ui/ThemedText"
 
 import { resetPassword } from "../lib/firebase/auth"
 import { staffLoginAction, memberLoginAction, toggleLoading } from "../store/features/authSlice"
+import { setStaffCredentials } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
 
@@ -87,6 +88,10 @@ export default function LoginScreen() {
 		if (action.fulfilled.match(result)) {
 			const role = result.payload?.role
 			const isNewMember = "isNewMember" in result.payload ? result.payload.isNewMember : false
+
+			if (role === "ADMIN" || role === "STAFF") {
+				setStaffCredentials(email, password)
+			}
 
 			if (isNewMember && role === "MEMBER") {
 				navigation.navigate("MemberFormScreen", { isNewMember: true })

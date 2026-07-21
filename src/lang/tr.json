@@ -194,5 +194,6 @@
 	"goToToday": "Bugüne Git",
 	"scrollToToday": "Bugüne Kaydır",
 	"checkinFetchError": "Girişler alınırken bir hata oluştu. Lütfen tekrar deneyin",
-	"update": "Güncelle"
+	"update": "Güncelle",
+	"addStaff": "Personel Ekle"
 }

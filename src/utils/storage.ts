@@ -22,6 +22,23 @@ export const getSettings = (): Settings => JSON.parse(storage.getString("setting
 
 export const getConsentAccepted = () => storage.getBoolean("consentAccepted") || false
 
+export const setStaffCredentials = (email: string, password: string) => {
+	storage.set("staffEmail", email)
+	storage.set("staffPassword", password)
+}
+
+export const getStaffCredentials = (): { email: string; password: string } | null => {
+	const email = storage.getString("staffEmail")
+	const password = storage.getString("staffPassword")
+	if (email && password) return { email, password }
+	return null
+}
+
+export const clearStaffCredentials = () => {
+	storage.remove("staffEmail")
+	storage.remove("staffPassword")
+}
+
 /////////////////////////////////// DELETE ////////////////////////////////
 
 export const storageRemoveKey = (key: string) => storage.remove(key)
