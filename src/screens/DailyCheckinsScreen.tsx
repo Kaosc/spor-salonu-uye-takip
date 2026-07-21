@@ -39,12 +39,7 @@ export default function DailyCheckinsScreen() {
 	}, [])
 
 	const handleGoBack = () => {
-		navigation.navigate("Tabs", {
-			screen: "CheckinsStack",
-			params: {
-				screen: "CheckinsCalendarScreen",
-			},
-		})
+		navigation.goBack()
 	}
 
 	const fetchCheckins = async () => {

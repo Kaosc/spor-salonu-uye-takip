@@ -23,6 +23,8 @@ export default function CheckinsCalendarScreen() {
 	const styles = createStyles(darkMode)
 	const { t } = useTranslation()
 
+	const theme = Theme[darkMode ? "dark" : "light"]
+
 	const [checkins, setCheckins] = useState<CheckIn[]>([])
 	const [prevMarks, setPrevMarks] = useMMKVObject<MarkedDates>("checkinMarks")
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
@@ -137,17 +139,22 @@ export default function CheckinsCalendarScreen() {
 				current={new Date().toISOString().split("T")[0]}
 				onDayPress={onDayPress}
 				markedDates={markedDates}
+				minDate={new Date(new Date().setFullYear(new Date().getFullYear() - 1)).toISOString().split("T")[0]}
+				maxDate={new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString().split("T")[0]}
+				pastScrollRange={12}
+				futureScrollRange={1}
 				markingType="period"
 				ref={calendarRef}
+				contentContainerStyle={{ paddingBottom: 140 }}
 				theme={{
-					calendarBackground: "transparent",
+					calendarBackground: darkMode ? "#0e0e0e" : "#f5f5f5",
 					textSectionTitleColor: darkMode ? "#b6c1cd" : "#2d4150",
 					selectedDayBackgroundColor: darkMode ? "#fff" : "#000",
 					selectedDayTextColor: darkMode ? "#000" : "#ffffff",
 					todayTextColor: darkMode ? "#fff" : "#000",
 					todayBackgroundColor: darkMode ? "#2d8f24" : "#7bd142",
 					dayTextColor: darkMode ? "#fff" : "#2d4150",
-					textDisabledColor: darkMode ? "#555" : "#d9e1e8",
+					textDisabledColor: darkMode ? "rgb(85, 85, 85)" : "#d9e1e8",
 					dotColor: darkMode ? "#fff" : "#000",
 					selectedDotColor: darkMode ? "#000" : "#ffffff",
 					arrowColor: darkMode ? "#fff" : "#000",

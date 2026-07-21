@@ -2,10 +2,10 @@ x (on progress) Statistic screen for the role of "ADMIN"
    - This screen will show the statistic of the members and subscriptions.
        x (on progress) - How many members are active or inactive.
        x (on progress) - How many subscriptions are active, paused, or canceled.
-       x (on progress) - How many members checked-in or checked-out today.
-       x (on progress) - How many members checked-in or checked-out this week.
-       x (on progress) - How many members checked-in or checked-out this month.
-       x (on progress) - How many members checked-in or checked-out this year.
+       x (on progress) - How many members checked-in today.
+       x (on progress) - How many members checked-in this week.
+       x (on progress) - How many members checked-in this month.
+       x (on progress) - How many members checked-in this year.
        x (on progress) - Total income from subscriptions this month.
        x (on progress) - Total income from subscriptions this year.
        x (on progress) - Total income from subscriptions this month by subscription type.

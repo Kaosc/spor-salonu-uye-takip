@@ -86,15 +86,7 @@ export default function MemberDetailsScreen() {
 		}
 
 		if (prevScreen === "DailyCheckinsScreen") {
-			navigation.navigate("Tabs", {
-				screen: "CheckinsStack",
-				params: {
-					screen: "DailyCheckinsScreen",
-					params: {
-						selectedDate: route.params?.selectedDate,
-					},
-				},
-			})
+			navigation.goBack()
 			return
 		}
 
