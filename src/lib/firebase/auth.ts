@@ -45,6 +45,7 @@ export const memberLogin = async (email: string, password: string) => {
 
 		if (!userCredential.user.emailVerified) {
 			await signOut(auth)
+			await sendEmailVerification(userCredential.user)
 			throw new Error(t("emailNotVerified"))
 		}
 
