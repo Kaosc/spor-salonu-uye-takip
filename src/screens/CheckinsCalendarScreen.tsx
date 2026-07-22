@@ -84,19 +84,22 @@ export default function CheckinsCalendarScreen() {
 	const markedDates = useMemo(() => {
 		const marks: MarkedDates = prevMarks || {}
 
-		checkins.forEach((c) => {
-			const dateString = formatToYYYYMMDD(c.checkInTime)
-			if (dateString) {
-				marks[dateString] = {
-					type: "period",
-					color: darkMode ? "#0f61a3" : "#8ebfff",
-					startingDay: true,
-					endingDay: true,
-				}
-			}
-		})
+	const todayString = formatToYYYYMMDD(new Date())
 
-		setPrevMarks(marks) // Save the marks to MMKV storage
+	checkins.forEach((c) => {
+		const dateString = formatToYYYYMMDD(c.checkInTime)
+		if (dateString) {
+			const isToday = dateString === todayString
+			marks[dateString] = {
+				type: "period",
+				color: isToday ? (darkMode ? "#2d8f24" : "#7bd142") : darkMode ? "#0f61a3" : "#8ebfff",
+				startingDay: true,
+				endingDay: true,
+			}
+		}
+	})
+
+	setPrevMarks(marks) // Save the marks to MMKV storage
 		return marks
 	}, [checkins, darkMode])
 
