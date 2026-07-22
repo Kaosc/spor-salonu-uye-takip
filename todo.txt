@@ -10,3 +10,5 @@ x (on progress) Statistic screen for the role of "ADMIN"
        x (on progress) - Total income from subscriptions this year.
        x (on progress) - Total income from subscriptions this month by subscription type.
        x (on progress) - Total income
+
+- Pagging on members list

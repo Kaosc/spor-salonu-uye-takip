@@ -11,24 +11,20 @@
    - Pausing a subscription 
    - Unpausing a subscription
 
-# Check-in / Check-out
+# Check-in
    - Member will have a QR Code created by the uid from the firebase auth.
    - Staff can scan the QR Code of the member to
       - Check-in the member
-      x (on progress) - Check-out the member
-         ! Checking-out by member will unassign the locker that bounded to the member. 
       - View the member's details
 
 # Lockers
    - Members scan Locker QR code to assign a locker to themselves.
    - Member unassing the locker by pressing the same button to scan the locker QR code.
    - Staff can unassing a locker from the member's details screen by pressing the "Remove Locker" button.
-   x (on progress) - members can unassing the locker that bounded to them by checking-out.
-   x (on progress) - Auto assigning lockers to members when they check-in.
 
-x (on progress) # Adding New Staff Member
-   x (on progress) - Only the staff with the "ADMIN" role can add new staff members.
-   x (on progress) - The role of "STAFF" cannot add or remove other staff members.
+# Adding New Staff
+  - Only the staff with the "ADMIN" role can add new staff members.
+  - The role of "STAFF" cannot add or remove other staff members.
 
 # Login / Register
    - When a member added through the web admin panel, member auth account will be created with the email of the member and a random password. Member will need to reset their password from login screen to access the app by their email adresses.
