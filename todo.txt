@@ -12,3 +12,8 @@ x (on progress) Statistic screen for the role of "ADMIN"
        x (on progress) - Total income
 
 - Pagging on members list
+
+- Don't assign locker to user if user did not checked in today
+
+- Checkout user by letting staff to scan the qr code of the user. If the user is checked in (and checkOutTime is null), then the user will be checked out and the locker will be unlocked. If there is no check-in record for the user today, then add a new check-in record.
+

@@ -140,6 +140,8 @@ interface CheckInQRData {
 
 interface CheckIn extends CheckInQRData {
 	checkInTime: Date | FieldValue
+	checkOutTime: Date | FieldValue | null
+	lockerIdAtCheckout: number | null
 	lastCheckedInBy: string
 }
 
