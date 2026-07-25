@@ -1,6 +1,30 @@
 /**
- * Converts a timestamp to a date string in the format "YYYY-MM-DD". If the timestamp is invalid or cannot be converted, it returns an empty string.
- * @param timestamp  
+ * Formats a Date to "YYYY-MM-DD" in the device's local timezone.
+ */
+const formatLocalDate = (date: Date): string => {
+	const year = date.getFullYear()
+	const month = String(date.getMonth() + 1).padStart(2, "0")
+	const day = String(date.getDate()).padStart(2, "0")
+	return `${year}-${month}-${day}`
+}
+
+/**
+ * Formats a Date to "YYYY-MM-DD HH:MM:SS" in the device's local timezone.
+ */
+const formatLocalDateTime = (date: Date): string => {
+	const year = date.getFullYear()
+	const month = String(date.getMonth() + 1).padStart(2, "0")
+	const day = String(date.getDate()).padStart(2, "0")
+	const hours = String(date.getHours()).padStart(2, "0")
+	const minutes = String(date.getMinutes()).padStart(2, "0")
+	const seconds = String(date.getSeconds()).padStart(2, "0")
+	return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
+}
+
+/**
+ * Converts a timestamp to a date string in the format "YYYY-MM-DD" (device local timezone).
+ * If the timestamp is invalid or cannot be converted, it returns an empty string.
+ * @param timestamp
  * @returns
  */
 export const safeTimestampToDateString = (timestamp: unknown): string => {
@@ -10,12 +34,12 @@ export const safeTimestampToDateString = (timestamp: unknown): string => {
 		// Firestore Timestamp has toDate() method
 		if (typeof (timestamp as any).toDate === "function") {
 			const date = (timestamp as any).toDate()
-			return isNaN(date.getTime()) ? "" : date.toISOString().split("T")[0]
+			return isNaN(date.getTime()) ? "" : formatLocalDate(date)
 		}
 
 		// Already a Date object
 		if (timestamp instanceof Date) {
-			return isNaN(timestamp.getTime()) ? "" : timestamp.toISOString().split("T")[0]
+			return isNaN(timestamp.getTime()) ? "" : formatLocalDate(timestamp)
 		}
 
 		return ""
@@ -25,7 +49,8 @@ export const safeTimestampToDateString = (timestamp: unknown): string => {
 }
 
 /**
- * Converts a timestamp to a date-time string in the format "YYYY-MM-DD HH:MM:SS". If the timestamp is invalid or cannot be converted, it returns an empty string.
+ * Converts a timestamp to a date-time string in the format "YYYY-MM-DD HH:MM:SS" (device local timezone).
+ * If the timestamp is invalid or cannot be converted, it returns an empty string.
  * @param timestamp
  * @returns
  */
@@ -35,12 +60,11 @@ export const safeTimestampToDateTimeString = (timestamp: unknown): string => {
 		// Firestore Timestamp has toDate() method
 		if (typeof (timestamp as any).toDate === "function") {
 			const date = (timestamp as any).toDate()
-			return isNaN(date.getTime()) ? "" : date.toISOString().replace("T", " ").split(".")[0]
+			return isNaN(date.getTime()) ? "" : formatLocalDateTime(date)
 		}
 		// Already a Date object
 		if (timestamp instanceof Date) {
-			const dateTimeString = isNaN(timestamp.getTime()) ? "" : timestamp.toISOString().replace("T", " ").split(".")[0]
-			return new Date(dateTimeString).toLocaleString("tr-TR")
+			return isNaN(timestamp.getTime()) ? "" : formatLocalDateTime(timestamp)
 		}
 		return ""
 	} catch {
@@ -104,5 +128,5 @@ export function daysSince(date: Date): number {
 export const formatToYYYYMMDD = (firebaseTimestamp: any) => {
 	if (!firebaseTimestamp) return null
 	const date = firebaseTimestamp.toDate ? firebaseTimestamp.toDate() : new Date(firebaseTimestamp)
-	return date.toISOString().split("T")[0]
+	return formatLocalDate(date)
 }
