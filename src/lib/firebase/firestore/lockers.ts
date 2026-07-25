@@ -12,6 +12,7 @@ import {
 	where,
 } from "@react-native-firebase/firestore"
 import { t } from "i18next"
+
 import { COLLECTIONS } from "../enums"
 
 const db = getFirestore()

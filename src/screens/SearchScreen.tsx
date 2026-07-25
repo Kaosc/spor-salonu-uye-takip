@@ -3,22 +3,25 @@ import { View, TextInput, TouchableOpacity, StyleSheet, BackHandler } from "reac
 import { FlashList } from "@shopify/flash-list"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
-import { useMMKVObject } from "react-native-mmkv"
+import { useTranslation } from "react-i18next"
 import Fuse from "fuse.js"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 import MemberListCard from "../components/MemberListCard"
+import ThemedText from "../components/ui/ThemedText"
 
 import { Theme } from "../utils/theme"
+import { getAllMembers } from "../lib/firebase/firestore/member"
 
 export default function SearchScreen() {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const route = useRoute<any>()
+	const { t } = useTranslation()
 
 	const styles = createStyles(darkMode)
 
-	const [members] = useMMKVObject<Member[]>("members")
+	const [members, setMembers] = useState<Member[]>([])
 	const [search, setSearch] = useState(route.params?.search || "")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
@@ -37,6 +40,16 @@ export default function SearchScreen() {
 	const goBack = () => {
 		navigation.navigate("Tabs", { screen: "MemberStack" })
 	}
+
+	const fetchMembers = useCallback(async () => {
+		console.debug("[SearchScreen] fetchMembers")
+		const fetchedMembers = await getAllMembers()
+		setMembers(fetchedMembers)
+	}, [])
+
+	useEffect(() => {
+		fetchMembers()
+	}, [fetchMembers])
 
 	useEffect(() => {
 		if (timerRef.current) clearTimeout(timerRef.current)
@@ -76,9 +89,24 @@ export default function SearchScreen() {
 
 	const keyExtractor = useCallback((item: Member) => item.uid, [])
 
+	const EmptyComponent = useCallback(() => {
+		return (
+			<View style={styles.emptyPageContainer}>
+				<ThemedIcon
+					name={debouncedQuery && filtered.length === 0 ? "magnify-close" : "magnify"}
+					size={100}
+					style={{ opacity: 0.6 }}
+				/>
+				<ThemedText style={{ opacity: 0.6 }}>
+					{debouncedQuery && filtered.length === 0 ? t("noMembersFound") : t("searchMembers")}
+				</ThemedText>
+			</View>
+		)
+	}, [debouncedQuery, darkMode])
+
 	return (
 		<View style={styles.container}>
-			<View style={{ flexDirection: "row", alignItems: "center", gap: 7, marginHorizontal: 10, marginTop: 12 }}>
+			<View style={styles.searchContainer}>
 				<TouchableOpacity
 					onPress={goBack}
 					style={styles.backButtonContainer}
@@ -91,7 +119,7 @@ export default function SearchScreen() {
 				</TouchableOpacity>
 				<TextInput
 					style={styles.input}
-					placeholder="İsim veya telefon ile ara..."
+					placeholder={t("searchPlaceholder")}
 					placeholderTextColor={darkMode ? "#666" : "#999"}
 					value={search}
 					onChangeText={setSearch}
@@ -104,6 +132,7 @@ export default function SearchScreen() {
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}
 				contentContainerStyle={styles.list}
+				ListEmptyComponent={EmptyComponent}
 			/>
 		</View>
 	)
@@ -121,34 +150,38 @@ const createStyles = (darkMode: boolean) => {
 			paddingHorizontal: 16,
 			paddingVertical: 12,
 			backgroundColor: theme.cardBackground,
+			borderColor: theme.border,
+			borderWidth: StyleSheet.hairlineWidth,
 			borderRadius: 12,
 			fontSize: 15,
 			height: 55,
 			color: darkMode ? "#fff" : "#000",
 		},
 		list: {
+			flexGrow: 1,
 			paddingHorizontal: 16,
 			marginTop: 10,
-		},
-		item: {
-			paddingVertical: 14,
-			borderBottomWidth: 1,
-			borderBottomColor: theme.border,
-		},
-		itemName: {
-			fontSize: 16,
-			fontWeight: "600",
-		},
-		itemPhone: {
-			fontSize: 14,
-			color: darkMode ? "#aaa" : "#666",
-			marginTop: 2,
 		},
 		backButtonContainer: {
 			justifyContent: "center",
 			alignItems: "center",
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
 			borderRadius: 12,
+		},
+		searchContainer: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 10,
+			marginHorizontal: 10,
+			marginTop: 12,
+		},
+		emptyPageContainer: {
+			flex: 1,
+			justifyContent: "center",
+			alignItems: "center",
+			gap: 15,
 		},
 	})
 }

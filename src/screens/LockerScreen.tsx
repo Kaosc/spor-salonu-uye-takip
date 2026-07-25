@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { View, TouchableOpacity, StyleSheet, Alert, BackHandler } from "react-native"
+import { View, TouchableOpacity, StyleSheet, Alert, BackHandler, Dimensions } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { FlashList } from "@shopify/flash-list"
@@ -31,7 +31,6 @@ export default function LockerScreen() {
 		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
 		return () => backHandler.remove()
 	}, [])
-	
 
 	useEffect(() => {
 		fetchLockerData()
@@ -122,7 +121,7 @@ export default function LockerScreen() {
 				<View style={styles.summaryItem}>
 					<ThemedIcon
 						name="locker"
-						size={20}
+						size={19}
 						color={darkMode ? "#e9e9e9" : "#000"}
 					/>
 					<ThemedText style={styles.summaryLabel}>{t("total")}</ThemedText>
@@ -132,7 +131,7 @@ export default function LockerScreen() {
 				<View style={styles.summaryItem}>
 					<ThemedIcon
 						name="lock-open-outline"
-						size={20}
+						size={19}
 						color={theme.green.foreground}
 					/>
 					<ThemedText style={styles.summaryLabel}>{t("empty")}</ThemedText>
@@ -144,7 +143,7 @@ export default function LockerScreen() {
 				<View style={styles.summaryItem}>
 					<ThemedIcon
 						name="lock-outline"
-						size={20}
+						size={19}
 						color={theme.red.foreground}
 					/>
 					<ThemedText style={styles.summaryLabel}>{t("occupied")}</ThemedText>
@@ -196,7 +195,8 @@ const createStyles = (darkMode: boolean) => {
 		summaryRow: {
 			flexDirection: "row",
 			justifyContent: "space-around",
-			paddingVertical: 16,
+			marginTop: 5,
+			paddingBottom: 5,
 			paddingHorizontal: 8,
 			borderBottomWidth: 1,
 			borderBottomColor: darkMode ? "#222" : "#eee",
@@ -204,13 +204,14 @@ const createStyles = (darkMode: boolean) => {
 		summaryItem: {
 			alignItems: "center",
 			gap: 4,
+			width: Dimensions.get("window").width / 3 - 15,
 		},
 		summaryLabel: {
 			fontSize: 12,
 			opacity: 0.7,
 		},
 		summaryValue: {
-			fontSize: 20,
+			fontSize: 18,
 			fontWeight: "bold",
 		},
 		gridContent: {

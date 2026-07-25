@@ -100,7 +100,7 @@ export default function StaffTabNavigator() {
 							color={v.color}
 						/>
 					),
-					tabBarLabel: t("subscriptions"),
+					tabBarLabel: t("subs"),
 				}}
 			/>
 			<Tabs.Screen

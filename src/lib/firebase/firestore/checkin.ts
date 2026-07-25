@@ -87,7 +87,12 @@ export const getCheckinsByDate = async (dateString?: string): Promise<CheckIn[] 
 
 		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
 
-		const q = query(checkInsCollection, where("checkInTime", ">=", startDate), where("checkInTime", "<", endDate), orderBy("checkInTime", "desc"))
+		const q = query(
+			checkInsCollection,
+			where("checkInTime", ">=", startDate),
+			where("checkInTime", "<", endDate),
+			orderBy("checkInTime", "desc"),
+		)
 
 		const querySnapshot = await getDocs(q)
 

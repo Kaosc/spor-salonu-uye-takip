@@ -18,17 +18,23 @@ export default function MemberSubscriptionsScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
+	
 	const styles = createStyles(darkMode)
 
-	const [subscription, setSubscription] = useState<Subscription | null>(null)
+	const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+	const [activeSubscription, setActiveSubscription] = useState<Subscription | null>(null)
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	const fetchMember = async () => {
 		if (!uid) return
-
 		setStatus("loading")
+
 		const subscriptions = await getSubscriptionsByMemberId(uid)
-		setSubscription(subscriptions.length > 0 ? subscriptions[0] : null)
+		const activeSubscription = subscriptions.find((sub) => sub.status === "ACTIVE") || null
+
+		setSubscriptions(subscriptions.filter((sub) => sub.id !== activeSubscription?.id))
+		setActiveSubscription(activeSubscription)
+
 		setStatus("idle")
 	}
 
@@ -64,11 +70,39 @@ export default function MemberSubscriptionsScreen() {
 				contentContainerStyle={styles.scrollContentContainer}
 				showsVerticalScrollIndicator={false}
 			>
-				{subscription ? (
-					<View style={styles.activePlanCard}>
-						{/* Active Plan Card */}
-						<SubscriptionView subscription={subscription} />
-					</View>
+				{subscriptions.length > 0 ? (
+					<>
+						<View style={styles.activePlanCard}>
+							{/* Active Plan Card */}
+							{activeSubscription && <SubscriptionView subscription={activeSubscription} />}
+						</View>
+
+						{subscriptions.length > 0 ? (
+							<>
+								<View style={styles.titleContainer}>
+									<ThemedIcon
+										name="history"
+										size={30}
+										style={{ marginTop: 2.5 }}
+									/>
+									<ThemedText style={styles.sectionTitle}>{t("previousSubscriptions")}</ThemedText>
+								</View>
+								{subscriptions.map((sub) => (
+									<View
+										style={styles.activePlanCard}
+										key={sub.id}
+									>
+										<SubscriptionView
+											key={sub.id}
+											subscription={sub}
+										/>
+									</View>
+								))}
+							</>
+						) : (
+							<></>
+						)}
+					</>
 				) : (
 					<View style={styles.placeholderContainer}>
 						<ThemedIcon
@@ -107,53 +141,6 @@ const createStyles = (darkMode: boolean) => {
 			backgroundColor: theme.cardBackground,
 			borderColor: theme.border,
 		},
-		planHeader: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-			marginBottom: moderateScale(16),
-		},
-		planBadge: {
-			paddingHorizontal: 12,
-			paddingVertical: 4,
-			borderRadius: 12,
-			backgroundColor: darkMode ? "#1f492d" : "#b5ffb3",
-		},
-		planBadgeText: {
-			fontSize: 12,
-			fontWeight: "700",
-			color: darkMode ? "#27f08b" : "#0b8b4b",
-		},
-		planTitle: {
-			fontSize: 14,
-			opacity: 0.6,
-			fontWeight: "500",
-		},
-		planName: {
-			fontSize: 22,
-			fontWeight: "800",
-			marginTop: 4,
-		},
-		planDivider: {
-			height: 1,
-			backgroundColor: theme.border,
-			marginVertical: moderateScale(16),
-		},
-		planInfoRow: {
-			flexDirection: "row",
-			justifyContent: "space-between",
-			alignItems: "center",
-			paddingVertical: moderateScale(8),
-		},
-		planInfoLabel: {
-			fontSize: 14,
-			opacity: 0.6,
-			fontWeight: "500",
-		},
-		planInfoValue: {
-			fontSize: 15,
-			fontWeight: "700",
-		},
 		placeholderContainer: {
 			flexGrow: 1,
 			alignItems: "center",
@@ -164,6 +151,19 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 19,
 			opacity: 0.5,
 			textAlign: "center",
+		},
+		sectionTitle: {
+			fontSize: 20,
+			fontWeight: "bold",
+			marginBottom: 8,
+			marginTop: 13,
+		},
+		titleContainer: {
+			flexDirection: "row",
+			alignItems: "center",
+			gap: 10,
+			marginHorizontal: 15,
+			marginTop: 10,
 		},
 	})
 }

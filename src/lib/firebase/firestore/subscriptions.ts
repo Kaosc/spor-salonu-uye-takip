@@ -133,29 +133,6 @@ export const resumeSubscription = async (subscriptionId: string) => {
 	}
 }
 
-export const getSubscriptionsOfMembers = async (memberUids: string[]): Promise<Subscription[]> => {
-	try {
-		if (memberUids.length === 0) {
-			return []
-		}
-
-		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
-		const q = query(subRef, where("memberUid", "in", memberUids))
-		const snapshot = await getDocs(q)
-
-		const subscriptions: Subscription[] = []
-		snapshot.forEach((doc) => {
-			subscriptions.push({ id: doc.id, ...doc.data() } as Subscription)
-		})
-
-		console.info(`[FIRESTORE] Retrieved ${subscriptions.length} subscriptions for members.`)
-		return subscriptions
-	} catch (e) {
-		console.error("[FIRESTORE] getSubscriptionsOfMembers:", e)
-		return []
-	}
-}
-
 export const getSubscriptionsPaged = async (
 	lastSnapshot?: any,
 ): Promise<{ subscriptions: Subscription[]; lastSnapshot: any }> => {
@@ -193,10 +170,11 @@ export const getSubscriptionsPaged = async (
 export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Subscription[]> => {
 	try {
 		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)
-		const q = query(subRef, where("memberUid", "==", memberUid))
+		const q = query(subRef, where("memberUid", "==", memberUid), orderBy("startDate", "desc"))
 		const subscriptionDocs = await getDocs(q)
 
 		const subscriptions: Subscription[] = []
+
 		subscriptionDocs.forEach((doc) => {
 			const data = doc.data() as Subscription
 			subscriptions.push({ ...data, id: doc.id })

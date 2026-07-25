@@ -98,14 +98,15 @@ export default function MemberListContent() {
 	return (
 		<View style={styles.container}>
 			<TouchableOpacity
-				style={styles.searchBar}
+				style={styles.searchButtonContainer}
 				onPress={() => navigation.navigate("SearchScreen")}
 			>
 				<ThemedIcon
 					name="magnify"
-					size={23}
+					size={25}
+					style={styles.searchIcon}
 				/>
-				<ThemedText style={styles.searchBarText}>{t("searchMembers")}</ThemedText>
+				<ThemedText style={styles.searchText}>{t("searchMembers")}</ThemedText>
 			</TouchableOpacity>
 
 			<FlatList
@@ -140,22 +141,32 @@ const createStyles = (darkMode: boolean) => {
 		container: {
 			flex: 1,
 		},
-		searchBar: {
+		searchButtonContainer: {
 			flexDirection: "row",
 			alignItems: "center",
-			backgroundColor: theme.cardBackground,
-			borderWidth: StyleSheet.hairlineWidth,
-			borderColor: theme.border,
 			borderRadius: 8,
 			marginHorizontal: 15,
 			marginTop: 10,
 			marginBottom: 8,
+			gap: 10,
+		},
+		searchIcon: {
+			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
+			paddingHorizontal: 16,
+			borderRadius: 15,
+			paddingVertical: 16,
+		},
+		searchText: {
+			fontSize: 17,
+			flex: 1,
+			borderRadius: 15,
+			backgroundColor: theme.cardBackground,
+			borderWidth: StyleSheet.hairlineWidth,
+			borderColor: theme.border,
 			paddingHorizontal: 16,
 			paddingVertical: 16,
-			gap: 15,
-		},
-		searchBarText: {
-			fontSize: 17,
 		},
 		list: {
 			paddingHorizontal: 16,

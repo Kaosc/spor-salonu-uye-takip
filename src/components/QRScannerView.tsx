@@ -44,7 +44,6 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 			let checkInSucces = false
 
 			if (action === "CHECK_OUT") {
-				console.log(memberQrData)
 				try {
 					await checkOutMember(memberQrData)
 				} catch (e: any) {

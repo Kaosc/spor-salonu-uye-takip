@@ -454,6 +454,7 @@ export default function MemberDetailsScreen() {
 							{activeSubscription && <SubscriptionView subscription={activeSubscription} />}
 							<ActionButtonsView />
 						</View>
+
 						{/* PREVIOUS SUBSCRIPTIONS (CANCELED OR EXPIRED) */}
 						{subscriptions.length > 0 ? (
 							<>
@@ -827,11 +828,6 @@ const createStyles = (darkMode: boolean) => {
 			borderColor: theme.border,
 			borderRadius: 12,
 			padding: 20,
-		},
-		notesText: {
-			fontSize: 13,
-			opacity: 0.8,
-			lineHeight: 18,
 		},
 		noSubscriptionCard: {
 			alignItems: "center",

@@ -31,7 +31,11 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 	}
 
 	const statusColor = subscription ? getStatusColor(subscription.status) : getStatusColor(undefined)
-	const daysLeft = subscription ? subscription.status === "ACTIVE" || subscription.status === "PAUSED" ? calculateEndDateAsDays(subscription.endDate, subscription.pausedAt) : 0 : null
+	const daysLeft = subscription
+		? subscription.status === "ACTIVE" || subscription.status === "PAUSED"
+			? calculateEndDateAsDays(subscription.endDate, subscription.pausedAt)
+			: 0
+		: null
 
 	const formatPrice = (price: number) => {
 		return `${price.toFixed(2)} ₺`
@@ -60,11 +64,13 @@ export default function SubscriptionView({ subscription }: { subscription: Subsc
 			</View>
 
 			{/* Days Left */}
-			{daysLeft !== null && (
+			{daysLeft !== null && daysLeft !== 0 ? (
 				<View style={styles.daysLeftRow}>
 					<ThemedText style={styles.daysLeftNumber}>{daysLeft}</ThemedText>
 					<ThemedText style={styles.daysLeftLabel}>{t("daysLeft")}</ThemedText>
 				</View>
+			) : (
+				<></>
 			)}
 
 			{/* Divider */}

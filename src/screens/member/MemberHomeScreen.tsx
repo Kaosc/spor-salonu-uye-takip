@@ -64,6 +64,21 @@ export default function MemberHomeScreen() {
 		fetchLocker()
 	}, [qrLockerModalVisible])
 
+	const statusConfig = useMemo(() => {
+		const status = member?.subscriptionStatus
+		switch (status) {
+			case "ACTIVE":
+				return { label: t("active"), color: theme.green.foreground, bg: theme.green.background + "44" }
+			case "EXPIRED":
+			case "CANCELLED":
+				return { label: t("expired"), color: theme.red.foreground, bg: theme.red.background + "44" }
+			case "PAUSED":
+				return { label: t("paused"), color: theme.orange.foreground, bg: theme.orange.background + "44" }
+			default:
+				return null
+		}
+	}, [member?.subscriptionStatus, t, theme])
+
 	const LockerCard = () => {
 		return locker ? (
 			<TouchableOpacity
@@ -90,26 +105,41 @@ export default function MemberHomeScreen() {
 				}}
 				style={[styles.lockerCard, styles.lockerCardActive]}
 			>
+				<View style={styles.lockerCardContent}>
+					<ThemedIcon
+						name="locker"
+						size={40}
+						color={theme.green.foreground}
+					/>
+					<View style={styles.lockerCardTextGroup}>
+						<ThemedText style={styles.lockerCardLabel}>{t("lockerNumber")}</ThemedText>
+						<ThemedText style={styles.lockerNumberLabel}>#{locker?.id}</ThemedText>
+					</View>
+				</View>
 				<ThemedIcon
-					name="locker"
-					size={50}
+					name="chevron-right"
+					size={20}
 					color={theme.green.foreground}
 				/>
-				<ThemedText style={styles.lockerCardLabel}>{t("lockerNumber")}</ThemedText>
-				<ThemedText style={styles.lockerNumberLabel}>#{locker?.id}</ThemedText>
 			</TouchableOpacity>
 		) : (
 			<TouchableOpacity
-				style={styles.lockerCard}
+				style={[styles.lockerCard, styles.lockerCardEmpty]}
+				activeOpacity={0.7}
 				onPress={() => {
 					setQrLockerModalVisible(true)
 				}}
 			>
-				<ThemedIcon
-					name="locker"
-					size={50}
-				/>
-				<ThemedText style={styles.lockerCardLabel}>{t("noActiveLocker")}</ThemedText>
+				<View style={styles.lockerCardEmptyIconRow}>
+					<View style={styles.lockerCardEmptyIconBg}>
+						<ThemedIcon
+							name="qrcode-scan"
+							size={28}
+						/>
+					</View>
+				</View>
+				<ThemedText style={styles.lockerCardEmptyTitle}>{t("noActiveLocker")}</ThemedText>
+				<ThemedText style={styles.lockerCardEmptySubtitle}>{t("tapToScanLocker")}</ThemedText>
 			</TouchableOpacity>
 		)
 	}
@@ -139,6 +169,15 @@ export default function MemberHomeScreen() {
 					<ThemedText style={styles.welcomeSubtitle}>{t("member")}</ThemedText>
 				</View>
 
+				{/* Subscription Status Card */}
+				{statusConfig && (
+					<View style={[styles.statusCard, { backgroundColor: statusConfig.bg, borderColor: statusConfig.color }]}>
+						<View style={[styles.statusDot, { backgroundColor: statusConfig.color }]} />
+						<ThemedText style={styles.statusCardLabel}>{t("subscriptionStatus")}</ThemedText>
+						<ThemedText style={[styles.statusCardValue, { color: statusConfig.color }]}>{statusConfig.label}</ThemedText>
+					</View>
+				)}
+
 				<TouchableOpacity
 					style={styles.qrButton}
 					activeOpacity={0.7}
@@ -154,29 +193,6 @@ export default function MemberHomeScreen() {
 						size={24}
 					/>
 				</TouchableOpacity>
-
-				<View style={styles.quickInfoSection}>
-					<TouchableOpacity
-						onPress={() => navigation.navigate("MemberSubscriptionsScreen")}
-						style={styles.infoCard}
-					>
-						<ThemedIcon
-							name="card-text"
-							size={50}
-						/>
-						<ThemedText style={styles.infoCardLabel}>{t("subscriptions")}</ThemedText>
-					</TouchableOpacity>
-					<TouchableOpacity
-						onPress={() => navigation.navigate("MemberProfileScreen")}
-						style={styles.infoCard}
-					>
-						<ThemedIcon
-							name="account"
-							size={50}
-						/>
-						<ThemedText style={styles.infoCardLabel}>{t("profile")}</ThemedText>
-					</TouchableOpacity>
-				</View>
 
 				<LockerCard />
 			</ScrollView>
@@ -210,11 +226,12 @@ const createStyles = (darkMode: boolean) => {
 			flex: 1,
 		},
 		scrollContentContainer: {
-			paddingBottom: moderateScale(40),
+			paddingBottom: 40,
+			gap: 20,
 		},
 		welcomeSection: {
 			alignItems: "center",
-			paddingVertical: 35,
+			paddingVertical: 20,
 			paddingHorizontal: 20,
 			gap: 15,
 		},
@@ -251,55 +268,108 @@ const createStyles = (darkMode: boolean) => {
 		},
 		quickInfoSection: {
 			flexDirection: "row",
-			marginHorizontal: moderateScale(16),
-			marginTop: moderateScale(20),
+			marginHorizontal: 16,
 			gap: 12,
 		},
-		infoCard: {
-			flex: 1,
+		statusCard: {
+			flexDirection: "row",
 			alignItems: "center",
-			padding: moderateScale(20),
-			borderRadius: 16,
-			backgroundColor: theme.cardBackground,
+			marginHorizontal: moderateScale(16),
+			padding: moderateScale(14),
+			borderRadius: 12,
 			borderWidth: 1,
-			borderColor: theme.border,
+			marginTop: 4,
 			gap: 10,
 		},
-		infoCardLabel: {
-			fontSize: 15,
-			fontWeight: "bold",
-			opacity: 0.7,
+		statusDot: {
+			width: 10,
+			height: 10,
+			borderRadius: 5,
+		},
+		statusCardLabel: {
+			flex: 1,
+			fontSize: 14,
+			fontWeight: "600",
+			opacity: 0.6,
+		},
+		statusCardValue: {
+			fontSize: 14,
+			fontWeight: "800",
 		},
 		lockerCard: {
 			flexDirection: "row",
 			alignItems: "center",
-			padding: moderateScale(20),
+			justifyContent: "space-between",
+			padding: 15,
 			backgroundColor: theme.cardBackground,
 			borderRadius: 16,
 			marginHorizontal: moderateScale(16),
 			borderWidth: 1,
 			borderColor: theme.border,
 			gap: 10,
-			marginTop: 20,
+		},
+		lockerCardContent: {
+			flexDirection: "row",
+			alignItems: "center",
+			flex: 1,
+			gap: 12,
+		},
+		lockerCardTextGroup: {
+			flexDirection: "column",
+			gap: 4,
 		},
 		lockerCardActive: {
 			borderColor: theme.green.foreground,
 			backgroundColor: theme.green.background + "77",
-			borderWidth: 1,
+			borderWidth: 1.5,
 		},
 		lockerCardLabel: {
-			fontSize: 24,
-			fontWeight: "bold",
-			marginLeft: moderateScale(10),
+			fontSize: 14,
+			fontWeight: "600",
+			opacity: 0.6,
 		},
 		lockerNumberLabel: {
-			fontSize: 18,
+			fontSize: 22,
 			fontWeight: "900",
-			backgroundColor: darkMode ? "#fff" : "#000",
-			color: darkMode ? "#000" : "#fff",
-			padding: 5,
-			paddingHorizontal: 10,
-			borderRadius: 99,
+			letterSpacing: 1,
+			color: theme.green.foreground,
+		},
+		lockerCardEmpty: {
+			flexDirection: "column",
+			alignItems: "center",
+			justifyContent: "center",
+			paddingVertical: 25,
+			paddingHorizontal: 15,
+			borderStyle: "dashed",
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
+			borderRadius: 16,
+			marginHorizontal: moderateScale(16),
+			borderWidth: 2,
+			gap: 8,
+		},
+		lockerCardEmptyIconRow: {
+			marginBottom: 8,
+		},
+		lockerCardEmptyIconBg: {
+			width: moderateScale(56),
+			height: moderateScale(56),
+			borderRadius: 28,
+			backgroundColor: theme.cardBackground,
+			alignItems: "center",
+			justifyContent: "center",
+			borderWidth: 1.5,
+			borderColor: theme.border,
+		},
+		lockerCardEmptyTitle: {
+			fontSize: 18,
+			fontWeight: "800",
+		},
+		lockerCardEmptySubtitle: {
+			fontSize: 13,
+			fontWeight: "500",
+			opacity: 0.5,
+			textAlign: "center",
 		},
 	})
 }

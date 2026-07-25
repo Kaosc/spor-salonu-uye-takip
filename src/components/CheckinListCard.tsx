@@ -1,16 +1,18 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp } from "@react-navigation/native"
+import { useTranslation } from "react-i18next"
 
 import ThemedText from "./ui/ThemedText"
 import ThemedIcon from "./ui/ThemedIcon"
 
-import { Theme } from "../utils/theme"
 import { safeTimestampToDateTimeString } from "../utils/date"
+import { Theme } from "../utils/theme"
 
 export default function CheckinListCard({ checkin, selectedDate }: { checkin: CheckIn; selectedDate: string }) {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
+	const { t } = useTranslation()
 	const styles = createStyles(darkMode)
 
 	const hasCheckOut = checkin.checkOutTime !== null
@@ -32,7 +34,7 @@ export default function CheckinListCard({ checkin, selectedDate }: { checkin: Ch
 				<View style={styles.row}>
 					<ThemedIcon
 						name="account-outline"
-						size={20}
+						size={23}
 					/>
 					<ThemedText style={styles.memberUid}>
 						{checkin.firstName} {checkin.lastName}
@@ -40,18 +42,20 @@ export default function CheckinListCard({ checkin, selectedDate }: { checkin: Ch
 				</View>
 				<View style={styles.row}>
 					<ThemedIcon
-						name="calendar-clock-outline"
-						size={20}
+						name="check-circle-outline"
+						size={23}
 					/>
 					<ThemedText style={styles.timeText}>{safeTimestampToDateTimeString(checkin.checkInTime)}</ThemedText>
 				</View>
 				{hasCheckOut && (
 					<View style={styles.row}>
 						<ThemedIcon
-							name="clock-outline"
-							size={20}
+							name="close-circle-outline"
+							size={23}
 						/>
-						<ThemedText style={styles.timeText}>{safeTimestampToDateTimeString(checkin.checkOutTime!)}</ThemedText>
+						<ThemedText style={styles.timeText}>
+							{checkin.checkOutTime ? safeTimestampToDateTimeString(checkin.checkOutTime!) : t("noCheckOutTime")}
+						</ThemedText>
 					</View>
 				)}
 			</View>

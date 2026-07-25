@@ -22,9 +22,9 @@ import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator
 import ThemedButton from "../../components/ui/ThemedButton"
 
 import { createStaffUser, generatePassword, reAuthStaffUser } from "../../lib/firebase/auth"
-import { addStaff } from "../../lib/firebase/firestore/staff"
 import { getStaffCredentials } from "../../utils/storage"
 import { Theme } from "../../utils/theme"
+import { addStaff } from "../../lib/firebase/firestore/users"
 
 type StaffFormValues = {
 	email: string

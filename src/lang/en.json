@@ -183,7 +183,8 @@
 	"locker_already_occupied": "Locker is already occupied",
 	"locker_assignment_error": "An error occurred while assigning the locker. Please try again",
 	"locker_not_occupied": "Locker is not occupied",
-	"noActiveLocker": "No active locker.",
+	"noActiveLocker": "No active locker",
+	"tapToScanLocker": "Tap to scan a locker QR code",
 	"locker_assigned_success": "Locker assigned successfully",
 	"addLocker": "Add Locker",
 	"addLockerMessage": "Are you sure you want to add a new locker?",
@@ -212,5 +213,10 @@
 	"locker_remove_error": "An error occurred while removing the locker. Please try again or remove the locker manually",
 	"checkin_required_for_locker": "You must be checked in to assign a locker. Please check in first",
 	"staffCard": "Staff Card",
-	"totalCheckins": "Total Check-ins"
+	"totalCheckins": "Total Check-ins",
+	"noMembersFound": "No members found",
+	"searchPlaceholder": "Search by name, email, or phone...",
+	"subs": "Subs",
+	"noCheckOutTime": "No Check-out Time",
+	"checkInsAndOuts": "Check-ins and Check-outs"
 }

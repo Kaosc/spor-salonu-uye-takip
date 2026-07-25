@@ -9,7 +9,6 @@ import {
 	serverTimestamp,
 	setDoc,
 	query,
-	where,
 	increment,
 	orderBy,
 	startAfter,
@@ -76,40 +75,16 @@ export const getMembersPaged = async (lastSnapshot?: any): Promise<{ members: Me
 		const snapshot = await getDocs(q)
 
 		if (snapshot.empty) {
-			console.log("All available members are fetched.")
+			console.debug("All available members are fetched.")
 			return { members: [], lastSnapshot: null }
 		}
 
 		const lastDocSnapshot = snapshot.docs[snapshot.docs.length - 1]
+		const members = snapshot.docs.map((docSnap) => docSnap.data()) as Member[]
 
-		const members = snapshot.docs.map((docSnap) => ({
-			uid: docSnap.id,
-			...docSnap.data(),
-		})) as Member[]
-
-		return { members, lastSnapshot: lastDocSnapshot }
+		return { members: members, lastSnapshot: lastDocSnapshot }
 	} catch (e) {
 		console.error("[FIRESTORE] getMembersPaged:", e)
-		throw e
-	}
-}
-
-export const getMembersByIds = async (memberIds: string[]): Promise<Member[]> => {
-	try {
-		if (memberIds.length === 0) {
-			return []
-		}
-
-		const membersRef = collection(db, COLLECTIONS.MEMBERS)
-		const q = query(membersRef, where("uid", "in", memberIds))
-		const snapshot = await getDocs(q)
-
-		return snapshot.docs.map((docSnap) => ({
-			uid: docSnap.id,
-			...docSnap.data(),
-		})) as Member[]
-	} catch (e) {
-		console.error("[FIRESTORE] getMembersByIds:", e)
 		throw e
 	}
 }
@@ -126,24 +101,6 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 		return null
 	} catch (e) {
 		console.error("[FIRESTORE] getMemberById:", e)
-		throw e
-	}
-}
-
-export const getMemberByEmail = async (email: string): Promise<Member | null> => {
-	try {
-		const membersRef = collection(db, COLLECTIONS.MEMBERS)
-		const q = query(membersRef, where("email", "==", email))
-		const snapshot = await getDocs(q)
-
-		if (!snapshot.empty) {
-			const docSnap = snapshot.docs[0]
-			return { ...docSnap.data() } as Member
-		}
-
-		return null
-	} catch (e) {
-		console.error("[FIRESTORE] getMemberByEmail:", e)
 		throw e
 	}
 }
@@ -187,5 +144,23 @@ export const incrementMemberCheckInCount = async (memberId: string): Promise<boo
 	} catch (e) {
 		console.error("[FIRESTORE] incrementMemberCheckInCount:", e)
 		return false
+	}
+}
+
+export const getAllMembers = async (): Promise<Member[]> => {
+	try {
+		const membersRef = collection(db, COLLECTIONS.MEMBERS)
+		const snapshot = await getDocs(membersRef)
+
+		if (snapshot.empty) {
+			return []
+		}
+
+		const members = snapshot.docs.map((docSnap) => docSnap.data()) as Member[]
+
+		return members
+	} catch (e) {
+		console.error("[FIRESTORE] getAllMembers:", e)
+		return []
 	}
 }

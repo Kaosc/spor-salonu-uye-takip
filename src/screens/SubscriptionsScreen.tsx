@@ -166,7 +166,7 @@ export default function SubscriptionsScreen() {
 				</View>
 			</TouchableOpacity>
 		)
-	}, [])
+	}, [darkMode])
 
 	const keyExtractor = useCallback((item: Subscription, index: number) => item.id || index.toString(), [])
 

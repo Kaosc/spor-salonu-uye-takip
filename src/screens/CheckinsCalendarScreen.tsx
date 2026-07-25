@@ -6,6 +6,7 @@ import { useNavigation } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 import { MarkedDates } from "react-native-calendars/src/types"
 
+import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../components/ui/ThemedButton"
 import CustomHeader from "../components/CustomHeader"
 import ThemedText from "../components/ui/ThemedText"
@@ -14,8 +15,6 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import { getAllCheckIns } from "../lib/firebase/firestore/checkin"
 import { formatToYYYYMMDD } from "../utils/date"
 import { Theme } from "../utils/theme"
-import { useMMKVObject } from "react-native-mmkv"
-import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 
 export default function CheckinsCalendarScreen() {
 	const navigation = useNavigation<any>()
@@ -26,7 +25,7 @@ export default function CheckinsCalendarScreen() {
 	const theme = Theme[darkMode ? "dark" : "light"]
 
 	const [checkins, setCheckins] = useState<CheckIn[]>([])
-	const [prevMarks, setPrevMarks] = useMMKVObject<MarkedDates>("checkinMarks")
+	const [prevMarks, setPrevMarks] = useState<MarkedDates>()
 	const [status, setStatus] = useState<"idle" | "loading" | "error">("idle")
 
 	const calendarRef = useRef<any>(null)
@@ -84,22 +83,22 @@ export default function CheckinsCalendarScreen() {
 	const markedDates = useMemo(() => {
 		const marks: MarkedDates = prevMarks || {}
 
-	const todayString = formatToYYYYMMDD(new Date())
+		const todayString = formatToYYYYMMDD(new Date())
 
-	checkins.forEach((c) => {
-		const dateString = formatToYYYYMMDD(c.checkInTime)
-		if (dateString) {
-			const isToday = dateString === todayString
-			marks[dateString] = {
-				type: "period",
-				color: isToday ? (darkMode ? "#2d8f24" : "#7bd142") : darkMode ? "#0f61a3" : "#8ebfff",
-				startingDay: true,
-				endingDay: true,
+		checkins.forEach((c) => {
+			const dateString = formatToYYYYMMDD(c.checkInTime)
+			if (dateString) {
+				const isToday = dateString === todayString
+				marks[dateString] = {
+					type: "period",
+					color: isToday ? (darkMode ? "#2d8f24" : "#7bd142") : darkMode ? "#0f61a3" : "#8ebfff",
+					startingDay: true,
+					endingDay: true,
+				}
 			}
-		}
-	})
+		})
 
-	setPrevMarks(marks) // Save the marks to MMKV storage
+		setPrevMarks(marks) // Save the marks to MMKV storage
 		return marks
 	}, [checkins, darkMode])
 
@@ -133,7 +132,7 @@ export default function CheckinsCalendarScreen() {
 	return (
 		<View style={styles.container}>
 			<CustomHeader
-				title={t("checkins")}
+				title={t("checkInsAndOuts")}
 				onBackPress={handleGoBack}
 				rightComponent={<RefreshButton />}
 			/>

@@ -164,7 +164,7 @@
 	"occupied": "Dolu",
 	"previousSubscriptions": "Önceki Abonelikler",
 	"checkins": "Girişler",
-	"userCheckin": "Üye Girişi",
+	"userCheckin": "Üye Giriş",
 	"checkin_success": "Üye başarıyla giriş yaptı",
 	"checkin_failed": "Üye girişi başarısız. Lütfen tekrar deneyin",
 	"sendResetEmail": "E-posta Gönder",
@@ -183,6 +183,7 @@
 	"locker_assignment_error": "Dolap ataması sırasında bir hata oluştu. Lütfen tekrar deneyin",
 	"locker_not_occupied": "Dolap dolu değil.",
 	"noActiveLocker": "Aktif dolap yok",
+	"tapToScanLocker": "Dolap QR'ını okutmak için dokun",
 	"locker_assigned_success": "Dolap başarıyla atandı",
 	"addLocker": "Dolap Ekle",
 	"addLockerMessage": "Yeni bir dolap eklemek istediğinizden emin misiniz?",
@@ -211,5 +212,10 @@
 	"locker_remove_error": "Dolap kaldırılırken bir hata oluştu. Lütfen tekrar deneyin veya dolabı manuel olarak kaldırın",
 	"checkin_required_for_locker": "Dolap ataması yapılabilmesi için giriş yapmış olmanız gerekmektedir. Lütfen önce giriş yapın",
 	"staffCard": "Personel Kartı",
-	"totalCheckins": "Toplam Giriş"
+	"totalCheckins": "Toplam Giriş",
+	"noMembersFound": "Üye bulunamadı",
+	"searchPlaceholder": "İsim, email veya telefon ile ara...",
+	"subs": "Abonelikler",
+	"noCheckOutTime": "Çıkış bulunamadı",
+	"checkInsAndOuts": "Girişler ve Çıkışlar"
 }

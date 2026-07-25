@@ -99,7 +99,7 @@ export default function DailyCheckinsScreen() {
 	return (
 		<View style={styles.container}>
 			<CustomHeader
-				title={`${t("checkinsFor")} | ${new Date(selectedDate).toLocaleDateString()}`}
+				title={new Date(selectedDate).toLocaleDateString()}
 				onBackPress={handleGoBack}
 			/>
 			<FlashList
