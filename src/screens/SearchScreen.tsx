@@ -18,7 +18,7 @@ export default function SearchScreen() {
 
 	const styles = createStyles(darkMode)
 
-	const [members] = useMMKVObject<MemberCard[]>("members")
+	const [members] = useMMKVObject<Member[]>("members")
 	const [search, setSearch] = useState(route.params?.search || "")
 	const [debouncedQuery, setDebouncedQuery] = useState("")
 
@@ -65,7 +65,7 @@ export default function SearchScreen() {
 		return fuse.search(debouncedQuery).map((r) => r.item)
 	}, [debouncedQuery, fuse])
 
-	const renderItem = useCallback(({ item }: { item: MemberCard }) => {
+	const renderItem = useCallback(({ item }: { item: Member }) => {
 		return (
 			<MemberListCard
 				member={item}
@@ -74,7 +74,7 @@ export default function SearchScreen() {
 		)
 	}, [])
 
-	const keyExtractor = useCallback((item: MemberCard) => item.uid, [])
+	const keyExtractor = useCallback((item: Member) => item.uid, [])
 
 	return (
 		<View style={styles.container}>

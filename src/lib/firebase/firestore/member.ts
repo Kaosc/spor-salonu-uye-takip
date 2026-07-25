@@ -12,6 +12,8 @@ import {
 	where,
 	increment,
 	orderBy,
+	startAfter,
+	limit,
 } from "@react-native-firebase/firestore"
 
 import { COLLECTIONS } from "../enums"
@@ -62,10 +64,44 @@ export const deleteMember = async (memberId: string): Promise<void> => {
 	}
 }
 
-export const getAllMembers = async (): Promise<Member[]> => {
+export const getMembersPaged = async (lastSnapshot?: any): Promise<{ members: Member[]; lastSnapshot: any }> => {
+	const max = 7
+
 	try {
 		const membersRef = collection(db, COLLECTIONS.MEMBERS)
-		const q = query(membersRef, orderBy("createdAt", "desc"))
+		const q = lastSnapshot
+			? query(membersRef, orderBy("createdAt", "desc"), startAfter(lastSnapshot), limit(max))
+			: query(membersRef, orderBy("createdAt", "desc"), limit(max))
+
+		const snapshot = await getDocs(q)
+
+		if (snapshot.empty) {
+			console.log("All available members are fetched.")
+			return { members: [], lastSnapshot: null }
+		}
+
+		const lastDocSnapshot = snapshot.docs[snapshot.docs.length - 1]
+
+		const members = snapshot.docs.map((docSnap) => ({
+			uid: docSnap.id,
+			...docSnap.data(),
+		})) as Member[]
+
+		return { members, lastSnapshot: lastDocSnapshot }
+	} catch (e) {
+		console.error("[FIRESTORE] getMembersPaged:", e)
+		throw e
+	}
+}
+
+export const getMembersByIds = async (memberIds: string[]): Promise<Member[]> => {
+	try {
+		if (memberIds.length === 0) {
+			return []
+		}
+
+		const membersRef = collection(db, COLLECTIONS.MEMBERS)
+		const q = query(membersRef, where("uid", "in", memberIds))
 		const snapshot = await getDocs(q)
 
 		return snapshot.docs.map((docSnap) => ({
@@ -73,7 +109,7 @@ export const getAllMembers = async (): Promise<Member[]> => {
 			...docSnap.data(),
 		})) as Member[]
 	} catch (e) {
-		console.error("[FIRESTORE] getAllMembers:", e)
+		console.error("[FIRESTORE] getMembersByIds:", e)
 		throw e
 	}
 }

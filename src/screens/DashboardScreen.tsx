@@ -201,7 +201,7 @@ export default function DashboardScreen() {
 						/>
 					</TouchableOpacity>
 				</View>
-							
+
 				<View style={styles.qrActionsContainer}>
 					<TouchableOpacity
 						style={[

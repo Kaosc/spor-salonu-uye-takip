@@ -8,7 +8,7 @@ import MemberAvatar from "./MemberAvatar"
 import { Theme } from "../utils/theme"
 import { useTranslation } from "react-i18next"
 
-export default function MemberListCard({ member, search }: { member: MemberCard; search?: string | null }) {
+export default function MemberListCard({ member, search }: { member: Member; search?: string | null }) {
 	const navigation = useNavigation<any>()
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const isScearchScreen = navigation.getState().routes.some((route: any) => route.name === "SearchScreen")

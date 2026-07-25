@@ -1,17 +1,15 @@
-import { useCallback, useEffect } from "react"
-import { View, TouchableOpacity, StyleSheet, BackHandler } from "react-native"
-import { FlashList } from "@shopify/flash-list"
+import { useCallback, useEffect, useRef, useState } from "react"
+import { View, TouchableOpacity, StyleSheet, BackHandler, FlatList } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 import { useTranslation } from "react-i18next"
-import { useMMKVBoolean, useMMKVObject } from "react-native-mmkv"
+import { useMMKVBoolean } from "react-native-mmkv"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
 import MemberListCard from "../../components/MemberListCard"
 
-import { getAllMembers } from "../../lib/firebase/firestore/member"
-import { getAllSubscriptions } from "../../lib/firebase/firestore/subscriptions"
+import { getMembersPaged } from "../../lib/firebase/firestore/member"
 
 import { Theme } from "../../utils/theme"
 
@@ -24,8 +22,13 @@ export default function MemberListContent() {
 
 	const styles = createStyles(darkMode)
 
-	const [members, setMembers] = useMMKVObject<MemberCard[]>("members")
 	const [coldStart, setColdStart] = useMMKVBoolean("coldStart")
+
+	const [members, setMembers] = useState<Member[]>([])
+	const [refreshing, setRefreshing] = useState(false)
+
+	const lastSnapshotRef = useRef<any>(null)
+	const isLoadingMoreRef = useRef(false)
 
 	useEffect(() => {
 		const backAction = () => {
@@ -35,27 +38,47 @@ export default function MemberListContent() {
 		const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction)
 		return () => backHandler.remove()
 	}, [])
-	
-	const fetchMembers = async () => {
+
+	const fetchMembers = async (isRefresh: boolean = false) => {
+		if (isRefresh) {
+			setRefreshing(true)
+			lastSnapshotRef.current = null
+		}
+
 		try {
-			const membersData = await getAllMembers()
-			const subscriptionsData = await getAllSubscriptions()
+			const cursor = isRefresh ? undefined : lastSnapshotRef.current
+			const { members: membersData, lastSnapshot } = await getMembersPaged(cursor)
 
-			const membersWithSubscription = membersData.map((member) => {
-				const memberSubs: Subscription[] = subscriptionsData.filter((sub: Subscription) => sub.memberUid === member.uid)
-				let subscriptionStatus: SubscriptionStatus | "NONE" = "NONE"
+			if (membersData.length === 0) {
+				return
+			}
 
-				if (memberSubs.length > 0) {
-					subscriptionStatus = memberSubs.length > 0 ? memberSubs[0].status : "NONE"
-				}
+			lastSnapshotRef.current = lastSnapshot
 
-				return { ...member, subscriptionStatus }
-			})
-
-			setMembers(membersWithSubscription)
+			if (isRefresh) {
+				setMembers(membersData as Member[])
+			} else {
+				setMembers([...(members || []), ...(membersData as Member[])])
+			}
 		} catch (e) {
 			console.error("Error fetching members:", e)
 		}
+
+		if (isRefresh) {
+			setRefreshing(false)
+		}
+	}
+
+	const onRefresh = () => {
+		fetchMembers(true)
+	}
+
+	const onEndReached = () => {
+		if (isLoadingMoreRef.current) return
+		isLoadingMoreRef.current = true
+		fetchMembers(false).finally(() => {
+			isLoadingMoreRef.current = false
+		})
 	}
 
 	useEffect(() => {
@@ -66,11 +89,11 @@ export default function MemberListContent() {
 		}
 	}, [])
 
-	const renderItem = useCallback(({ item }: { item: MemberCard }) => {
+	const renderItem = useCallback(({ item }: { item: Member }) => {
 		return <MemberListCard member={item} />
 	}, [])
 
-	const keyExtractor = useCallback((item: MemberCard) => item.uid, [])
+	const keyExtractor = useCallback((item: Member) => item.uid, [])
 
 	return (
 		<View style={styles.container}>
@@ -85,12 +108,15 @@ export default function MemberListContent() {
 				<ThemedText style={styles.searchBarText}>{t("searchMembers")}</ThemedText>
 			</TouchableOpacity>
 
-			<FlashList
+			<FlatList
 				data={members}
 				renderItem={renderItem}
 				keyExtractor={keyExtractor}
 				contentContainerStyle={styles.list}
-				onRefresh={fetchMembers}
+				onRefresh={onRefresh}
+				onEndReached={onEndReached}
+				refreshing={refreshing}
+				onEndReachedThreshold={0.1}
 			/>
 
 			<TouchableOpacity

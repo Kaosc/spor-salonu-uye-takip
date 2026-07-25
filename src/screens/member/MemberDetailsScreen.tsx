@@ -153,6 +153,7 @@ export default function MemberDetailsScreen() {
 
 			if (canceled) {
 				toast.show(t("subscriptionCancelled"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, subscriptionStatus: "NONE" } : prev))
 				setTimeout(() => {
 					fetchSubscription()
 				}, 500)
@@ -246,6 +247,7 @@ export default function MemberDetailsScreen() {
 			const paused = await pauseSubscription(activeSubscription.id)
 			if (paused) {
 				toast.show(t("subscriptionPaused"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, subscriptionStatus: "PAUSED" } : prev))
 				fetchSubscription()
 			} else {
 				toast.show(t("subscriptionPauseError"), { type: "error" })
@@ -271,6 +273,7 @@ export default function MemberDetailsScreen() {
 			const resumed = await resumeSubscription(activeSubscription.id)
 			if (resumed) {
 				toast.show(t("subscriptionResumed"), { type: "success" })
+				setMember((prev) => (prev ? { ...prev, subscriptionStatus: "ACTIVE" } : prev))
 				fetchSubscription()
 			} else {
 				toast.show(t("subscriptionResumeError"), { type: "error" })

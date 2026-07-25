@@ -64,7 +64,7 @@ type FormValues = {
 
 type UserRole = "ADMIN" | "STAFF" | "MEMBER"
 type Gender = "MALE" | "FEMALE" | "OTHER" | "UNSPECIFIED"
-type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "PAUSED"
+type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED" | "PAUSED" | "NONE"
 type PaymentMethod = "CASH" | "CREDIT_CARD" | "TRANSFER"
 
 interface StaffUser {
@@ -97,6 +97,7 @@ interface Member {
 		phone: string
 	}
 	isActive: boolean
+	subscriptionStatus?: SubscriptionStatus
 	createdAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	updatedAt?: Date | import("@react-native-firebase/firestore").FieldValue
 	createdBy?: string
@@ -109,15 +110,13 @@ interface Locker {
 	occupiedAt: Date | null
 }
 
-interface MemberCard extends Member {
-	subscriptionStatus: SubscriptionStatus | "NONE" // ACTIVE, EXPIRED, CANCELLED, PAUSED, NONE
-}
-
 type PackageType = "MONTHLY" | "QUARTERLY" | "YEARLY"
 
 interface Subscription {
 	id?: string
 	memberUid: string // Firebase Auth UID (Cames from Auth when the member registers)
+	firstName?: string
+	lastName?: string
 	packageType: PackageType
 	startDate: Date | FirebaseTimestamp
 	endDate: Date | FirebaseTimestamp

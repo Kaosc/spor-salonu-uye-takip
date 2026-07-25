@@ -107,6 +107,8 @@ export default function SubscriptionFormScreen() {
 
 			const sub: Subscription = {
 				memberUid: member?.uid,
+				firstName: member?.firstName,
+				lastName: member?.lastName,
 				packageType,
 				startDate: Timestamp.fromDate(startDate),
 				endDate: Timestamp.fromDate(endDate),

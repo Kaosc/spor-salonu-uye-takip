@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from "react"
-import { View, TouchableOpacity, ScrollView, StyleSheet, BackHandler } from "react-native"
+import { useState, useCallback, useEffect, useRef } from "react"
+import { View, TouchableOpacity, StyleSheet, BackHandler, FlatList } from "react-native"
 import { useSelector } from "react-redux"
 import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native"
-import { FlashList } from "@shopify/flash-list"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
@@ -11,8 +10,7 @@ import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
 import { daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
 import { Theme } from "../utils/theme"
 import { moderateScale } from "../utils/responsive"
-import { getAllSubscriptions } from "../lib/firebase/firestore/subscriptions"
-import { getAllMembers } from "../lib/firebase/firestore/member"
+import { getSubscriptionsPaged } from "../lib/firebase/firestore/subscriptions"
 
 type FilterType = "ALL" | "EXPIRING_SOON" | "RECENTLY_EXPIRED" | "PAUSED"
 
@@ -26,9 +24,12 @@ export default function SubscriptionsScreen() {
 	const styles = createStyles(darkMode, theme)
 
 	const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
-	const [members, setMembers] = useState<Record<string, Member>>({})
 	const [loading, setLoading] = useState(true)
+	const [refreshing, setRefreshing] = useState(false)
 	const [filter, setFilter] = useState<FilterType>("ALL")
+
+	const lastDocRef = useRef<any>(null)
+	const isLoadingMoreRef = useRef(false)
 
 	const FILTERS: { key: FilterType; label: string }[] = [
 		{ key: "ALL", label: t("all") },
@@ -46,32 +47,53 @@ export default function SubscriptionsScreen() {
 		return () => backHandler.remove()
 	}, [])
 
-	const fetchData = useCallback(async () => {
+	const fetchData = useCallback(async (isRefresh: boolean = false) => {
+		if (isRefresh) {
+			setRefreshing(true)
+			lastDocRef.current = null
+		}
+
 		try {
-			setLoading(true)
+			const cursor = isRefresh ? undefined : lastDocRef.current
+			const { subscriptions: subscriptionsData, lastSnapshot } = await getSubscriptionsPaged(cursor)
 
-			const subscriptions = await getAllSubscriptions()
-			const members = await getAllMembers()
+			if (subscriptionsData.length === 0) {
+				return
+			}
 
-			const membersMap: Record<string, any> = {}
-			members.forEach((member) => {
-				membersMap[member.uid] = member
-			})
+			lastDocRef.current = lastSnapshot
 
-			setSubscriptions(subscriptions)
-			setMembers(membersMap)
+			if (isRefresh) {
+				setSubscriptions(subscriptionsData)
+			} else {
+				setSubscriptions((prev) => [...prev, ...subscriptionsData])
+			}
 		} catch (e) {
 			console.error("[SubscriptionsScreen] fetchData:", e)
 		} finally {
 			setLoading(false)
+			if (isRefresh) {
+				setRefreshing(false)
+			}
 		}
 	}, [])
 
 	useFocusEffect(
 		useCallback(() => {
+			setLoading(true)
+			lastDocRef.current = null
+			setSubscriptions([])
 			fetchData()
 		}, [fetchData]),
 	)
+
+	const onEndReached = () => {
+		if (isLoadingMoreRef.current) return
+		isLoadingMoreRef.current = true
+		fetchData(false).finally(() => {
+			isLoadingMoreRef.current = false
+		})
+	}
 
 	const totalRevenueThisMonth = subscriptions.reduce((sum, sub) => {
 		if (isThisMonth(sub.createdAt)) {
@@ -96,76 +118,61 @@ export default function SubscriptionsScreen() {
 		}
 	})
 
-	const renderItem = useCallback(
-		({ item }: { item: Subscription }) => {
-			const member = members[item.memberUid]
-			const memberName = member ? `${member.firstName} ${member.lastName}` : "Bilinmeyen Üye"
-			const endDate = safeTimestampToDateString(item.endDate)
+	const renderItem = useCallback(({ item }: { item: Subscription }) => {
+		const memberName = item.firstName && item.lastName ? `${item.firstName} ${item.lastName}` : "Bilinmeyen Üye"
+		const endDate = safeTimestampToDateString(item.endDate)
 
-			let statusColor = theme.green.foreground
-			if (item.status === "PAUSED") statusColor = "#f0a500"
-			if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
+		let statusColor = theme.green.foreground
+		if (item.status === "PAUSED") statusColor = "#f0a500"
+		if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
 
-			const statusLabel =
-				item.status === "ACTIVE"
-					? t("active")
-					: item.status === "PAUSED"
-						? t("paused")
-						: item.status === "EXPIRED"
-							? t("expired")
-							: t("cancelled")
+		const statusLabel =
+			item.status === "ACTIVE"
+				? t("active")
+				: item.status === "PAUSED"
+					? t("paused")
+					: item.status === "EXPIRED"
+						? t("expired")
+						: t("cancelled")
 
-			return (
-				<TouchableOpacity
-					style={styles.listItem}
-					activeOpacity={0.7}
-					onPress={() =>
-						navigation.navigate("MemberDetailsScreen", {
-							memberId: item.memberUid,
-							prevScreen: "SubscriptionsScreen",
-							initialPage: 1,
-						})
-					}
-				>
-					<View style={styles.listItemLeft}>
-						<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-						<View style={styles.listItemInfo}>
-							<ThemedText
-								style={styles.memberName}
-								numberOfLines={1}
-							>
-								{memberName}
-							</ThemedText>
-							<ThemedText style={styles.subscriptionInfo}>
-								{t(item.packageType)} · {endDate || "—"}
-							</ThemedText>
-						</View>
+		return (
+			<TouchableOpacity
+				style={styles.listItem}
+				activeOpacity={0.7}
+				onPress={() =>
+					navigation.navigate("MemberDetailsScreen", {
+						memberId: item.memberUid,
+						prevScreen: "SubscriptionsScreen",
+						initialPage: 1,
+					})
+				}
+			>
+				<View style={styles.listItemLeft}>
+					<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+					<View style={styles.listItemInfo}>
+						<ThemedText
+							style={styles.memberName}
+							numberOfLines={1}
+						>
+							{memberName}
+						</ThemedText>
+						<ThemedText style={styles.subscriptionInfo}>
+							{t(item.packageType)} · {endDate || "—"}
+						</ThemedText>
 					</View>
-					<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-						<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
-					</View>
-				</TouchableOpacity>
-			)
-		},
-		[members],
-	)
+				</View>
+				<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+					<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
+				</View>
+			</TouchableOpacity>
+		)
+	}, [])
 
 	const keyExtractor = useCallback((item: Subscription, index: number) => item.id || index.toString(), [])
 
-	if (loading) {
-		return (
-			<View style={styles.centered}>
-				<ThemedActivityIndicator size="large" />
-			</View>
-		)
-	}
-
-	return (
-		<View style={styles.container}>
-			<ScrollView
-				style={styles.scrollContent}
-				showsVerticalScrollIndicator={false}
-			>
+	const ListHeaderComponent = useCallback(
+		() => (
+			<>
 				{/* Summary Card */}
 				<View style={styles.summaryCard}>
 					<View style={styles.summaryColumn}>
@@ -180,12 +187,7 @@ export default function SubscriptionsScreen() {
 				</View>
 
 				{/* Filter Bar */}
-				<ScrollView
-					horizontal
-					showsHorizontalScrollIndicator={false}
-					style={styles.filterBar}
-					contentContainerStyle={styles.filterBarContent}
-				>
+				<View style={styles.filterBar}>
 					{FILTERS.map((f) => {
 						const isActive = filter === f.key
 						return (
@@ -199,26 +201,34 @@ export default function SubscriptionsScreen() {
 							</TouchableOpacity>
 						)
 					})}
-				</ScrollView>
-
-				{/* List */}
-				<View style={styles.listContainer}>
-					{filteredSubscriptions.length === 0 ? (
-						<View style={styles.emptyState}>
-							<ThemedText style={styles.emptyStateText}>{t("noSubscriptionsFound")}</ThemedText>
-						</View>
-					) : (
-						<FlashList
-							data={filteredSubscriptions}
-							renderItem={renderItem}
-							onRefresh={fetchData}
-							keyExtractor={keyExtractor}
-							showsVerticalScrollIndicator={false}
-							contentContainerStyle={styles.flashListContent}
-						/>
-					)}
 				</View>
-			</ScrollView>
+			</>
+		),
+		[filter, totalRevenueThisMonth, activeSubscriptionsCount],
+	)
+
+	if (loading && subscriptions.length === 0) {
+		return (
+			<View style={styles.centered}>
+				<ThemedActivityIndicator size="large" />
+			</View>
+		)
+	}
+
+	return (
+		<View style={styles.container}>
+			<FlatList
+				data={filteredSubscriptions}
+				renderItem={renderItem}
+				keyExtractor={keyExtractor}
+				showsVerticalScrollIndicator={false}
+				contentContainerStyle={styles.flashListContent}
+				ListHeaderComponent={ListHeaderComponent}
+				onRefresh={() => fetchData(true)}
+				refreshing={refreshing}
+				onEndReached={onEndReached}
+				onEndReachedThreshold={0.1}
+			/>
 		</View>
 	)
 }
@@ -234,9 +244,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			alignItems: "center",
 			justifyContent: "center",
 			backgroundColor: theme.background,
-		},
-		scrollContent: {
-			flex: 1,
 		},
 		// Summary Card
 		summaryCard: {
@@ -271,11 +278,10 @@ const createStyles = (darkMode: boolean, theme: any) => {
 		},
 		// Filter Bar
 		filterBar: {
+			flexDirection: "row",
 			marginTop: moderateScale(16),
-			maxHeight: moderateScale(44),
-		},
-		filterBarContent: {
-			paddingHorizontal: moderateScale(16),
+			marginBottom: moderateScale(12),
+			marginHorizontal: moderateScale(16),
 			gap: 8,
 		},
 		filterButton: {
@@ -299,12 +305,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			fontWeight: "bold",
 		},
 		// List
-		listContainer: {
-			flex: 1,
-			marginTop: moderateScale(12),
-			marginHorizontal: moderateScale(16),
-			minHeight: moderateScale(300),
-		},
 		listItem: {
 			flexDirection: "row",
 			alignItems: "center",
@@ -313,6 +313,7 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			paddingHorizontal: moderateScale(16),
 			borderRadius: 12,
 			marginBottom: 8,
+			marginHorizontal: moderateScale(16),
 			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
@@ -351,7 +352,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			letterSpacing: 0.5,
 		},
 		emptyState: {
-			flex: 1,
 			alignItems: "center",
 			justifyContent: "center",
 			paddingVertical: moderateScale(60),
@@ -361,7 +361,7 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			opacity: 0.6,
 		},
 		flashListContent: {
-			paddingBottom: 10,
+			paddingBottom: 20,
 		},
 	})
 }
