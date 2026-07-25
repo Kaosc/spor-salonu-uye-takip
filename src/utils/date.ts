@@ -119,12 +119,6 @@ export function daysUntil(date: Date): number {
 	return Math.ceil(diff / (1000 * 60 * 60 * 24))
 }
 
-export function daysSince(date: Date): number {
-	const now = new Date()
-	const diff = now.getTime() - date.getTime()
-	return Math.floor(diff / (1000 * 60 * 60 * 24))
-}
-
 export const formatToYYYYMMDD = (firebaseTimestamp: any) => {
 	if (!firebaseTimestamp) return null
 	const date = firebaseTimestamp.toDate ? firebaseTimestamp.toDate() : new Date(firebaseTimestamp)
