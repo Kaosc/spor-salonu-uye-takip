@@ -272,9 +272,6 @@ const createStyles = (darkMode: boolean) => {
 	const theme = Theme[darkMode ? "dark" : "light"]
 
 	return StyleSheet.create({
-		container: {
-			flex: 1,
-		},
 		content: {
 			flex: 1,
 			paddingHorizontal: 15,

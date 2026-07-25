@@ -179,8 +179,6 @@ export default function LockerScreen() {
 }
 
 const createStyles = (darkMode: boolean) => {
-	const theme = Theme[darkMode ? "dark" : "light"]
-
 	return StyleSheet.create({
 		container: {
 			flex: 1,
@@ -230,11 +228,6 @@ const createStyles = (darkMode: boolean) => {
 		lockerNumber: {
 			fontSize: 20,
 			fontWeight: "bold",
-		},
-		memberName: {
-			fontSize: 11,
-			marginTop: 2,
-			textAlign: "center",
 		},
 		fab: {
 			position: "absolute",

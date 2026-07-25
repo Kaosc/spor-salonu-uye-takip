@@ -12,7 +12,6 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import CustomHeader from "../components/CustomHeader"
 
 import { getCheckinsByDate } from "../lib/firebase/firestore/checkin"
-import { Theme } from "../utils/theme"
 
 export default function DailyCheckinsScreen() {
 	const navigation = useNavigation<any>()
@@ -124,8 +123,6 @@ export default function DailyCheckinsScreen() {
 }
 
 const createStyles = (darkMode: boolean) => {
-	const theme = Theme[darkMode ? "dark" : "light"]
-
 	return StyleSheet.create({
 		container: {
 			flex: 1,

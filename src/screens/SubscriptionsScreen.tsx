@@ -351,15 +351,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			fontWeight: "bold",
 			letterSpacing: 0.5,
 		},
-		emptyState: {
-			alignItems: "center",
-			justifyContent: "center",
-			paddingVertical: moderateScale(60),
-		},
-		emptyStateText: {
-			fontSize: 15,
-			opacity: 0.6,
-		},
 		flashListContent: {
 			paddingBottom: 20,
 		},

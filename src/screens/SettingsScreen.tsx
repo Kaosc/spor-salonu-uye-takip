@@ -118,17 +118,6 @@ export default function SettingsScreen() {
 
 const createStyles = (darkMode: boolean) =>
 	StyleSheet.create({
-		headerContainer: {
-			position: "absolute",
-			top: 0,
-			left: 0,
-			right: 0,
-			height: 55,
-			paddingHorizontal: 20,
-			paddingVertical: 10,
-			zIndex: 10,
-			backgroundColor: darkMode ? "#000" : "#fff",
-		},
 		groupContainer: {
 			padding: 5,
 			marginHorizontal: 5,
@@ -147,11 +136,6 @@ const createStyles = (darkMode: boolean) =>
 		settingText: {
 			fontSize: 17,
 			flexShrink: 1,
-		},
-		subSettingText: {
-			fontSize: 13,
-			flexShrink: 1,
-			maxWidth: "95%",
 		},
 		optionText: {
 			fontSize: 17,
