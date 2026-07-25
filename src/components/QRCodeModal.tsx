@@ -50,7 +50,7 @@ const createStyles = (darkMode: boolean) => {
 		// Modal
 		modalOverlay: {
 			flex: 1,
-			backgroundColor: "rgba(0,0,0,0.6)",
+			backgroundColor: "rgba(0, 0, 0, 0.84)",
 			justifyContent: "center",
 			alignItems: "center",
 			padding: moderateScale(15),

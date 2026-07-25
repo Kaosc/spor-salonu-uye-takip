@@ -2,32 +2,57 @@ import { getAuth } from "@react-native-firebase/auth"
 import {
 	collection,
 	doc,
-	getDoc,
 	getDocs,
 	getFirestore,
+	limit,
 	orderBy,
 	query,
 	serverTimestamp,
 	setDoc,
+	updateDoc,
 	where,
 } from "@react-native-firebase/firestore"
+import { t } from "i18next"
 
 import { COLLECTIONS } from "../enums"
+import { getLockerByUserUid } from "./lockers"
+import { toDate } from "../../../utils/date"
 
 const auth = getAuth()
 const db = getFirestore()
 
-export const getCheckInByMemberUid = async (memberUid: string): Promise<CheckIn | null> => {
+export const isMemberCheckedInToday = async (memberUid: string): Promise<boolean> => {
 	try {
-		const checkInRef = doc(db, COLLECTIONS.CHECKINS, memberUid)
-		const docSnap = await getDoc(checkInRef)
-		if (docSnap.exists()) {
-			return docSnap.data() as CheckIn
+		// Q the latest checking time by this user.
+		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
+		const q = query(checkInsCollection, where("memberUid", "==", memberUid), orderBy("checkInTime", "desc"), limit(1))
+		const querySnapshot = await getDocs(q)
+
+		if (querySnapshot.empty) {
+			return false
 		}
-		return null
+
+		const latestCheckInDoc = querySnapshot.docs[0]
+		const latestCheckInData = latestCheckInDoc.data() as CheckIn
+
+		// Check if the member has already checked out
+		if (latestCheckInData.checkOutTime !== null) {
+			return false
+		}
+
+		const checkInDate = toDate(latestCheckInData.checkInTime)
+		if (!checkInDate) {
+			console.error("[FIRESTORE] isMemberCheckedInToday: Invalid check-in time for memberUid:", memberUid)
+			return false
+		}
+
+		const today = new Date()
+		today.setHours(0, 0, 0, 0)
+
+		return checkInDate >= today
 	} catch (e) {
-		console.error("[FIRESTORE] getCheckInByMemberUid:", e)
-		throw e
+		console.error("[FIRESTORE] isMemberCheckedInToday:", e)
+		return false
 	}
 }
 
@@ -62,7 +87,7 @@ export const getCheckinsByDate = async (dateString?: string): Promise<CheckIn[] 
 
 		const checkInsCollection = collection(db, COLLECTIONS.CHECKINS)
 
-		const q = query(checkInsCollection, where("checkInTime", ">=", startDate), where("checkInTime", "<", endDate))
+		const q = query(checkInsCollection, where("checkInTime", ">=", startDate), where("checkInTime", "<", endDate), orderBy("checkInTime", "desc"))
 
 		const querySnapshot = await getDocs(q)
 
@@ -92,6 +117,8 @@ export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean
 			firstName: checkInData.firstName,
 			lastName: checkInData.lastName,
 			checkInTime: serverTimestamp(),
+			checkOutTime: null,
+			lockerIdAtCheckout: null,
 			lastCheckedInBy: auth.currentUser?.email || "unknown",
 		}
 
@@ -100,5 +127,56 @@ export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean
 	} catch (e) {
 		console.error("[FIRESTORE] checkInMember:", e)
 		return false
+	}
+}
+
+export const checkOutMember = async (checkInData: CheckInQRData): Promise<boolean> => {
+	try {
+		// Q the latest check-in
+		const checkInRef = collection(db, COLLECTIONS.CHECKINS)
+		const q = query(checkInRef, where("memberUid", "==", checkInData.memberUid), orderBy("checkInTime", "desc"), limit(1))
+		const querySnapshot = await getDocs(q)
+
+		if (querySnapshot.empty && querySnapshot.docs.length === 0) {
+			console.error("[FIRESTORE] checkOutMember: No check-in record found for memberUid:", checkInData.memberUid)
+			throw new Error(t("checkin_not_found"))
+		}
+
+		// Unassing locker if any
+		let locker
+		try {
+			locker = await getLockerByUserUid(checkInData.memberUid)
+
+			if (locker) {
+				const lockerRef = doc(db, COLLECTIONS.LOCKERS, locker.id.toString())
+				await updateDoc(lockerRef, {
+					isOccupied: false,
+					occupiedByUid: null,
+					occupiedAt: null,
+				})
+				toast.show(t("locker_removed_success"), { type: "success", duration: 7000 })
+			}
+		} catch (e) {
+			console.error("[FIRESTORE] checkOutMember: Error fetching locker for memberUid:", checkInData.memberUid, e)
+			toast.show(t("locker_remove_error"), { type: "danger" })
+		}
+
+		// Checkout
+		const checkInDoc = querySnapshot.docs[0]
+
+		const data: CheckIn = {
+			...(checkInDoc.data() as CheckIn),
+			checkOutTime: serverTimestamp(),
+			lockerIdAtCheckout: locker ? locker.id : null,
+			lastCheckedOutBy: auth.currentUser?.email || "unknown",
+		}
+
+		await updateDoc(checkInDoc.ref, { ...data })
+
+		toast.show(t("checkout_success"), { type: "success", duration: 5000 })
+		return true
+	} catch (e) {
+		console.error("[FIRESTORE] checkOutMember:", e)
+		throw new Error(t("checkin_checkout_failed"))
 	}
 }

@@ -308,7 +308,7 @@ export default function MemberDetailsScreen() {
 						toast.show(t("locker_removed_success"), { type: "success" })
 					} catch (e) {
 						console.error("[MemberDetailsScreen] handleEmptyLocker:", e)
-						toast.show(t("locker_assignment_error"), { type: "danger" })
+						toast.show(t("locker_remove_error"), { type: "danger" })
 					}
 				},
 			},
@@ -542,6 +542,11 @@ export default function MemberDetailsScreen() {
 					</ThemedText>
 
 					<DetailsRow
+						label={t("totalCheckins")}
+						value={member.totalCheckIns?.toString() || "-"}
+						iconName="calendar-check"
+					/>
+					<DetailsRow
 						label={t("phone")}
 						value={member.phoneNumber || "-"}
 						iconName="phone"
@@ -689,7 +694,8 @@ export default function MemberDetailsScreen() {
 				{memberStatus === "loading" ? (
 					<ThemedActivityIndicator size={70} />
 				) : (
-					memberStatus === "error" || !member && (
+					memberStatus === "error" ||
+					(!member && (
 						<View style={{ justifyContent: "center", alignItems: "center", gap: 5 }}>
 							<ThemedIcon
 								name="account-alert-outline"
@@ -698,7 +704,7 @@ export default function MemberDetailsScreen() {
 							/>
 							<ThemedText style={{ textAlign: "center" }}>{t("memberNotFound")}</ThemedText>
 						</View>
-					)
+					))
 				)}
 			</View>
 		)
@@ -753,9 +759,7 @@ export default function MemberDetailsScreen() {
 									<ThemedText style={styles.memberInfoName}>
 										{member.firstName} {member.lastName}
 									</ThemedText>
-									<ThemedText style={styles.memberInfoPhone}>
-										{member.phoneNumber || "-"}
-									</ThemedText>
+									<ThemedText style={styles.memberInfoPhone}>{member.phoneNumber || "-"}</ThemedText>
 								</View>
 							</View>
 							<LockerView />

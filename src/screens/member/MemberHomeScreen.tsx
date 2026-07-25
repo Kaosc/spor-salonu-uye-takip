@@ -139,7 +139,6 @@ export default function MemberHomeScreen() {
 					<ThemedText style={styles.welcomeSubtitle}>{t("member")}</ThemedText>
 				</View>
 
-				{/* QR Code Button */}
 				<TouchableOpacity
 					style={styles.qrButton}
 					activeOpacity={0.7}
@@ -156,7 +155,6 @@ export default function MemberHomeScreen() {
 					/>
 				</TouchableOpacity>
 
-				{/* Quick Info Cards */}
 				<View style={styles.quickInfoSection}>
 					<TouchableOpacity
 						onPress={() => navigation.navigate("MemberSubscriptionsScreen")}

@@ -10,7 +10,6 @@ import ThemedText from "../components/ui/ThemedText"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import CustomHeader from "../components/CustomHeader"
 import QRScannerView from "../components/QRScannerView"
-import ThemedButton from "../components/ui/ThemedButton"
 import SettingsButton from "../components/SettingsButton"
 import QRCodeModal from "../components/QRCodeModal"
 
@@ -26,7 +25,9 @@ export default function DashboardScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { uid, role } = useSelector((state: RootState) => state.auth)
+
 	const theme = Theme[darkMode ? "dark" : "light"]
+
 	const dispatch = useDispatch<any>()
 	const { t } = useTranslation()
 
@@ -131,6 +132,18 @@ export default function DashboardScreen() {
 					</View>
 				</View>
 
+				<TouchableOpacity
+					style={[styles.staffQrCard, {}]}
+					activeOpacity={0.7}
+					onPress={() => setQrModalVisible(true)}
+				>
+					<ThemedText style={styles.qrCardTitle}>{t("staffCard")}</ThemedText>
+					<QRCode
+						value={staffUser.uid}
+						size={moderateScale(35)}
+					/>
+				</TouchableOpacity>
+
 				<View style={styles.infoCard}>
 					<View style={styles.infoRow}>
 						<ThemedIcon
@@ -188,46 +201,16 @@ export default function DashboardScreen() {
 						/>
 					</TouchableOpacity>
 				</View>
-
-				<TouchableOpacity
-					style={[
-						styles.qrCard,
-						{
-							flexDirection: "row",
-							alignItems: "center",
-							justifyContent: "space-between",
-						},
-					]}
-					activeOpacity={0.7}
-					onPress={() => setQrModalVisible(true)}
-				>
-					<ThemedText style={styles.qrCardTitle}>{t("membershipCard")}</ThemedText>
-					<QRCode
-						value={staffUser.uid}
-						size={moderateScale(50)}
-					/>
-				</TouchableOpacity>
-
+							
 				<View style={styles.qrActionsContainer}>
 					<TouchableOpacity
-						style={styles.qrActionButton}
-						activeOpacity={0.7}
-						onPress={() => {
-							qrAction.current = "VIEW_MEMBER"
-							setScannerModalVisible(true)
-						}}
-					>
-						<View style={styles.qrCardContent}>
-							<ThemedIcon
-								name="qrcode-scan"
-								size={moderateScale(40)}
-							/>
-							<ThemedText style={styles.qrCardTitle}>{t("memberDetails")}</ThemedText>
-						</View>
-					</TouchableOpacity>
-
-					<TouchableOpacity
-						style={styles.qrActionButton}
+						style={[
+							styles.qrActionButton,
+							{
+								backgroundColor: theme.green.background,
+								borderColor: theme.green.foreground,
+							},
+						]}
 						activeOpacity={0.7}
 						onPress={() => {
 							qrAction.current = "CHECK_IN"
@@ -237,42 +220,84 @@ export default function DashboardScreen() {
 						<View style={styles.qrCardContent}>
 							<ThemedIcon
 								name="qrcode-scan"
-								size={moderateScale(40)}
+								size={40}
 							/>
 							<ThemedText style={styles.qrCardTitle}>{t("userCheckin")}</ThemedText>
 						</View>
 					</TouchableOpacity>
-				</View>
-
-				<ThemedButton
-					style={styles.addButton}
-					onPress={() => navigation.navigate("MemberFormScreen")}
-				>
-					<View style={styles.addMemberContent}>
-						<ThemedIcon
-							name="account-plus"
-							size={24}
-							color={darkMode ? "#000" : "#fff"}
-						/>
-						<ThemedText style={styles.addMemberText}>{t("addMember")}</ThemedText>
-					</View>
-				</ThemedButton>
-
-				{role === "ADMIN" && (
-					<ThemedButton
-						style={styles.addButton}
-						onPress={() => navigation.navigate("StaffFormScreen")}
+					<TouchableOpacity
+						style={[
+							styles.qrActionButton,
+							{
+								backgroundColor: theme.red.background,
+								borderColor: theme.red.foreground,
+							},
+						]}
+						activeOpacity={0.7}
+						onPress={() => {
+							qrAction.current = "CHECK_OUT"
+							setScannerModalVisible(true)
+						}}
 					>
-						<View style={styles.addMemberContent}>
+						<View style={styles.qrCardContent}>
 							<ThemedIcon
-								name="account-plus-outline"
-								size={24}
-								color={darkMode ? "#000" : "#fff"}
+								name="qrcode-scan"
+								size={40}
 							/>
-							<ThemedText style={styles.addMemberText}>{t("addStaff")}</ThemedText>
+							<ThemedText style={styles.qrCardTitle}>{t("userCheckout")}</ThemedText>
 						</View>
-					</ThemedButton>
-				)}
+					</TouchableOpacity>
+				</View>
+				<TouchableOpacity
+					style={styles.qrCard}
+					activeOpacity={0.7}
+					onPress={() => {
+						qrAction.current = "VIEW_MEMBER"
+						setScannerModalVisible(true)
+					}}
+				>
+					<View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+						<ThemedIcon
+							name="account"
+							size={20}
+						/>
+						<ThemedText style={styles.qrCardTitle}>{t("memberDetails")}</ThemedText>
+					</View>
+					<ThemedIcon
+						name="qrcode-scan"
+						size={40}
+					/>
+				</TouchableOpacity>
+
+				<View style={styles.qrActionsContainer}>
+					<TouchableOpacity
+						style={[styles.qrActionButton]}
+						onPress={() => navigation.navigate("MemberFormScreen")}
+					>
+						<View style={[styles.qrCardContent, { gap: 5 }]}>
+							<ThemedIcon
+								name="account-plus"
+								size={40}
+							/>
+							<ThemedText style={styles.qrCardTitle}>{t("addMember")}</ThemedText>
+						</View>
+					</TouchableOpacity>
+
+					{role === "ADMIN" && (
+						<TouchableOpacity
+							style={[styles.qrActionButton]}
+							onPress={() => navigation.navigate("StaffFormScreen")}
+						>
+							<View style={[styles.qrCardContent, { gap: 5 }]}>
+								<ThemedIcon
+									name="account-plus-outline"
+									size={40}
+								/>
+								<ThemedText style={styles.qrCardTitle}>{t("addStaff")}</ThemedText>
+							</View>
+						</TouchableOpacity>
+					)}
+				</View>
 			</ScrollView>
 		</>
 	)
@@ -283,8 +308,9 @@ const createStyles = (darkMode: boolean) => {
 	return StyleSheet.create({
 		container: {
 			flexGrow: 1,
-			gap: 25,
+			gap: 20,
 			paddingBottom: 20,
+			paddingHorizontal: 10,
 		},
 		centered: {
 			flex: 1,
@@ -334,7 +360,6 @@ const createStyles = (darkMode: boolean) => {
 			borderWidth: 1,
 			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
-			marginHorizontal: 20,
 		},
 		infoRow: {
 			flexDirection: "row",
@@ -350,13 +375,29 @@ const createStyles = (darkMode: boolean) => {
 			height: 1,
 			backgroundColor: theme.border,
 		},
-		qrCard: {
+		staffQrCard: {
+			gap: 10,
 			borderRadius: 16,
-			padding: 20,
+			paddingHorizontal: 20,
+			paddingVertical: 15,
 			borderWidth: 1,
 			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
-			marginHorizontal: 20,
+			flexDirection: "row",
+			alignItems: "center",
+			justifyContent: "space-between",
+		},
+		qrCard: {
+			alignItems: "center",
+			flexDirection: "row",
+			justifyContent: "space-between",
+			borderRadius: 16,
+			paddingHorizontal: 30,
+			paddingLeft: 20,
+			paddingVertical: 20,
+			borderWidth: 1,
+			borderColor: theme.border,
+			backgroundColor: theme.cardBackground,
 		},
 		qrCardContent: {
 			gap: 10,
@@ -384,34 +425,17 @@ const createStyles = (darkMode: boolean) => {
 		qrActionsContainer: {
 			flexDirection: "row",
 			justifyContent: "space-between",
-			marginHorizontal: 15,
-			gap: 5,
+			gap: 20,
 		},
 		qrActionButton: {
 			flex: 1,
+			alignItems: "center",
+			justifyContent: "center",
 			borderRadius: 16,
 			padding: 20,
 			borderWidth: 1,
 			borderColor: theme.border,
 			backgroundColor: theme.cardBackground,
-			marginHorizontal: 5,
-		},
-		addButton: {
-			flex: 1,
-			borderRadius: 16,
-			paddingVertical: 16,
-			marginHorizontal: 20,
-			alignItems: "center",
-		},
-		addMemberContent: {
-			flexDirection: "row",
-			alignItems: "center",
-			gap: 10,
-		},
-		addMemberText: {
-			color: darkMode ? "#000" : "#fff",
-			fontSize: 17,
-			fontWeight: "900",
 		},
 	})
 }

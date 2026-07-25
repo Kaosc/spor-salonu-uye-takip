@@ -13,6 +13,8 @@ export default function CheckinListCard({ checkin, selectedDate }: { checkin: Ch
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const styles = createStyles(darkMode)
 
+	const hasCheckOut = checkin.checkOutTime !== null
+
 	const handleOnPress = () => {
 		navigation.navigate("MemberDetailsScreen", {
 			memberId: checkin.memberUid,
@@ -23,7 +25,7 @@ export default function CheckinListCard({ checkin, selectedDate }: { checkin: Ch
 
 	return (
 		<TouchableOpacity
-			style={styles.card}
+			style={[styles.card, hasCheckOut ? styles.cardCheckedOut : styles.cardCheckedIn]}
 			onPress={handleOnPress}
 		>
 			<View style={{ flex: 1, gap: 6 }}>
@@ -41,11 +43,20 @@ export default function CheckinListCard({ checkin, selectedDate }: { checkin: Ch
 						name="calendar-clock-outline"
 						size={20}
 					/>
-					<ThemedText style={styles.checkedInBy}>{safeTimestampToDateTimeString(checkin.checkInTime)}</ThemedText>
+					<ThemedText style={styles.timeText}>{safeTimestampToDateTimeString(checkin.checkInTime)}</ThemedText>
 				</View>
+				{hasCheckOut && (
+					<View style={styles.row}>
+						<ThemedIcon
+							name="clock-outline"
+							size={20}
+						/>
+						<ThemedText style={styles.timeText}>{safeTimestampToDateTimeString(checkin.checkOutTime!)}</ThemedText>
+					</View>
+				)}
 			</View>
 			<ThemedIcon
-				name="check-circle-outline"
+				name={hasCheckOut ? "check-circle-outline" : "clock-outline"}
 				size={40}
 				style={styles.icon}
 			/>
@@ -61,12 +72,19 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			alignItems: "center",
 			paddingVertical: 15,
-			backgroundColor: theme.cardBackground,
-			borderWidth: StyleSheet.hairlineWidth,
-			borderColor: theme.border,
 			marginBottom: 10,
 			borderRadius: 12,
 			paddingHorizontal: 15,
+		},
+		cardCheckedIn: {
+			backgroundColor: theme.green.background,
+			borderWidth: 1,
+			borderColor: theme.green.foreground,
+		},
+		cardCheckedOut: {
+			backgroundColor: theme.red.background,
+			borderWidth: 1,
+			borderColor: theme.red.foreground,
 		},
 		icon: {
 			marginRight: 12,
@@ -76,7 +94,7 @@ const createStyles = (darkMode: boolean) => {
 			fontSize: 16,
 			fontWeight: "600",
 		},
-		checkedInBy: {
+		timeText: {
 			fontSize: 14,
 			marginTop: 2,
 			opacity: 0.7,

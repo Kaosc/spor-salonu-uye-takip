@@ -11,7 +11,7 @@ import ThemedIcon from "./ui/ThemedIcon"
 import ThemedText from "./ui/ThemedText"
 
 import { Theme } from "../utils/theme"
-import { checkInMember } from "../lib/firebase/firestore/checkin"
+import { checkInMember, checkOutMember, isMemberCheckedInToday } from "../lib/firebase/firestore/checkin"
 import { incrementMemberCheckInCount } from "../lib/firebase/firestore/member"
 import { assignLockerToUser } from "../lib/firebase/firestore/lockers"
 
@@ -42,6 +42,20 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 
 			const memberQrData: CheckInQRData = JSON.parse(result.data)
 			let checkInSucces = false
+
+			if (action === "CHECK_OUT") {
+				console.log(memberQrData)
+				try {
+					await checkOutMember(memberQrData)
+				} catch (e: any) {
+					console.error("[QRScanner] Error checking out member:", e)
+					if (e.message) {
+						toast.show(t(e.message || "checkin_checkout_failed"), {
+							type: "danger",
+						})
+					}
+				}
+			}
 
 			if (action === "CHECK_IN") {
 				const checkedIn = await checkInMember(memberQrData)
@@ -74,8 +88,15 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 			if (action === "ASSIGN_LOCKER") {
 				try {
 					if (!uid) return
-					await assignLockerToUser(uid, parseInt(lockerId))
-					toast.show(t("locker_assigned_success"), { type: "success" })
+					// Check is user has checking for today before assinging a locker
+					const checkin = await isMemberCheckedInToday(uid)
+					
+					if (!checkin) {
+						toast.show(t("checkin_required_for_locker"), { type: "danger", duration: 7000 })
+					} else {
+						await assignLockerToUser(uid, parseInt(lockerId))
+						toast.show(t("locker_assigned_success"), { type: "success" })
+					}
 				} catch (e: any) {
 					if (e.message) {
 						toast.show(t(e.message), { type: "danger", duration: 7000 })

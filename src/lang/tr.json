@@ -203,5 +203,13 @@
 	"admin": "Yönetici",
 	"staff": "Personel",
 	"createStaff": "Personel Oluştur",
-	"memberExistsNoAccount": "Bilgileriniz sistemimizde bulunmaktadır ancak henüz bir hesap oluşturmamışsınız. Lütfen kayıt olarak hesabınıza erişin"
+	"memberExistsNoAccount": "Bilgileriniz sistemimizde bulunmaktadır ancak henüz bir hesap oluşturmamışsınız. Lütfen kayıt olarak hesabınıza erişin",
+	"userCheckout": "Üye Çıkış",
+	"checkin_checkout_failed": "Üye çıkışı başarısız. Lütfen tekrar deneyin",
+	"checkin_not_found": "Üye girişi bulunamadı. Lütfen tekrar deneyin",
+	"checkout_success": "Üye başarıyla çıkış yaptı",
+	"locker_remove_error": "Dolap kaldırılırken bir hata oluştu. Lütfen tekrar deneyin veya dolabı manuel olarak kaldırın",
+	"checkin_required_for_locker": "Dolap ataması yapılabilmesi için giriş yapmış olmanız gerekmektedir. Lütfen önce giriş yapın",
+	"staffCard": "Personel Kartı",
+	"totalCheckins": "Toplam Giriş"
 }

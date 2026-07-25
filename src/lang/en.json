@@ -204,5 +204,13 @@
 	"admin": "Admin",
 	"staff": "Staff",
 	"createStaff": "Create Staff",
-	"memberExistsNoAccount": "Your information has been found in our system, but you haven't created an account yet. Please register to claim your account"
+	"memberExistsNoAccount": "Your information has been found in our system, but you haven't created an account yet. Please register to claim your account",
+	"userCheckout": "Check Out",
+	"checkin_checkout_failed": "Member check-out failed. Please try again",
+	"checkin_not_found": "Check-in record not found for this member",
+	"checkout_success": "Member checked out successfully",
+	"locker_remove_error": "An error occurred while removing the locker. Please try again or remove the locker manually",
+	"checkin_required_for_locker": "You must be checked in to assign a locker. Please check in first",
+	"staffCard": "Staff Card",
+	"totalCheckins": "Total Check-ins"
 }

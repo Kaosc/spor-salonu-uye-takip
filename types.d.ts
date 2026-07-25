@@ -143,9 +143,10 @@ interface CheckIn extends CheckInQRData {
 	checkOutTime: Date | FieldValue | null
 	lockerIdAtCheckout: number | null
 	lastCheckedInBy: string
+	lastCheckedOutBy?: string
 }
 
 type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
 
-type QRScannerAction = "CHECK_IN" | "VIEW_MEMBER" | "ASSIGN_LOCKER"
+type QRScannerAction = "CHECK_IN" | "CHECK_OUT" | "VIEW_MEMBER" | "ASSIGN_LOCKER"
