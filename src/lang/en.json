@@ -218,5 +218,11 @@
 	"searchPlaceholder": "Search by name, email, or phone...",
 	"subs": "Subs",
 	"noCheckOutTime": "No Check-out Time",
-	"checkInsAndOuts": "Check-ins and Check-outs"
+	"checkInsAndOuts": "Check-ins and Check-outs",
+	"dangerZone": "Danger Zone",
+	"dangerZoneDescription": "You can use the button below to delete your account. This will deactivate your account and permanently delete all your personal data. This action cannot be undone.",
+	"deleteMyAccount": "Delete My Account",
+	"deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all your personal data will be permanently deleted.",
+	"accountDeleted": "Your account has been deleted successfully. Please register again to continue using the app.",
+	"delete": "DELETE"
 }

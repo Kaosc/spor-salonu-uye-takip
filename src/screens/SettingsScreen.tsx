@@ -1,8 +1,9 @@
 import i18next from "i18next"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
+import { Alert, ScrollView, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useDispatch, useSelector } from "react-redux"
+import { useNavigation } from "@react-navigation/native"
 
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedText from "../components/ui/ThemedText"
@@ -12,13 +13,22 @@ import { getIsThemeAuto } from "../utils/storage"
 import { setSettings } from "../store/features/settingsSlice"
 import toggleTheme from "../utils/toggleTheme"
 
+import { deleteMemberAccount } from "../lib/firebase/firestore/member"
+import { deleteCurrentAuthAccount } from "../lib/firebase/auth"
+
+import { logout } from "../store/features/authSlice"
 import { AllIconNames } from "../types/icon"
+import { Theme } from "../utils/theme"
 import app from "../../app.json"
 
 export default function SettingsScreen() {
+	const navigation = useNavigation() as any
 	const { darkMode, lang } = useSelector((state: RootState) => state.settings)
 	const dispatch = useDispatch()
+	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
+
+	const theme = Theme[darkMode ? "dark" : "light"]
 
 	const styles = createStyles(darkMode)
 
@@ -34,6 +44,48 @@ export default function SettingsScreen() {
 		const newLang = lang === "en" ? "tr" : "en"
 		i18next.changeLanguage(newLang)
 		dispatch(setSettings({ lang: newLang }))
+	}
+
+	const handleDeleteAccount = async () => {
+		if (!uid) return
+		const isMemberDocDeleted = await deleteMemberAccount(uid)
+
+		if (isMemberDocDeleted) {
+			const authDeleted = await deleteCurrentAuthAccount()
+
+			if (authDeleted) {
+				dispatch(logout())
+
+				toast.show(t("accountDeleted"), {
+					type: "success",
+					duration: 10000,
+				})
+
+				navigation.reset({
+					index: 0,
+					routes: [{ name: "AuthStack" }],
+				})
+			}
+		}
+	}
+
+	const deleteAlert = () => {
+		Alert.alert(
+			t("deleteMyAccount"),
+			t("deleteAccountConfirmation"),
+
+			[
+				{
+					text: t("cancel"),
+					style: "cancel",
+				},
+				{
+					text: t("delete"),
+					style: "destructive",
+					onPress: handleDeleteAccount,
+				},
+			],
+		)
 	}
 
 	//////////////////////////// RENDER ////////////////////////////
@@ -111,13 +163,40 @@ export default function SettingsScreen() {
 						<ThemedText style={styles.settingText}>{app.expo.runtimeVersion}</ThemedText>
 					</View>
 				</View>
+
+				<Title title={t("dangerZone")} />
+
+				<View style={styles.dangerZoneCard}>
+					<View style={{ flexDirection: "row", alignItems: "center", gap: 13, flex: 1 }}>
+						<ThemedIcon
+							name="alert-octagon"
+							size={35}
+							color={theme.red.foreground}
+						/>
+						<View style={{ flex: 1 }}>
+							<ThemedText style={styles.dangerText}>{t("dangerZoneDescription")}</ThemedText>
+						</View>
+					</View>
+					<TouchableOpacity
+						style={styles.dangerButton}
+						onPress={deleteAlert}
+					>
+						<ThemedIcon
+							name="delete"
+							size={20}
+							color={theme.red.foreground}
+						/>
+						<ThemedText style={styles.dangerButtonText}>{t("deleteMyAccount")}</ThemedText>
+					</TouchableOpacity>
+				</View>
 			</ScrollView>
 		</>
 	)
 }
 
-const createStyles = (darkMode: boolean) =>
-	StyleSheet.create({
+const createStyles = (darkMode: boolean) => {
+	const theme = Theme[darkMode ? "dark" : "light"]
+	return StyleSheet.create({
 		groupContainer: {
 			padding: 5,
 			marginHorizontal: 5,
@@ -149,4 +228,36 @@ const createStyles = (darkMode: boolean) =>
 			gap: 10,
 			flex: 1,
 		},
+		dangerZoneCard: {
+			backgroundColor: theme.red.background,
+			borderColor: theme.red.foreground,
+			gap: 20,
+			padding: 25,
+			marginHorizontal: 13,
+			borderRadius: 16,
+			borderWidth: 1,
+		},
+		dangerTitle: {
+			fontSize: 18,
+			fontWeight: "900",
+		},
+		dangerText: {
+			fontSize: 14,
+			flexWrap: "wrap",
+			flex: 1,
+		},
+		dangerButtonText: {
+			fontSize: 16,
+			fontWeight: "900",
+		},
+		dangerButton: {
+			flexDirection: "row",
+			borderWidth: 1,
+			paddingVertical: 10,
+			paddingHorizontal: 16,
+			borderRadius: 99,
+			gap: 10,
+			borderColor: theme.red.foreground,
+		},
 	})
+}

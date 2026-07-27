@@ -88,10 +88,10 @@ interface Member {
 	address?: string
 	totalCheckIns?: number | FieldValue
 	gender: Gender
-	birthDate?: Date
+	birthDate?: Date | null
 	bloodType?: string
-	weight?: number // Kilo as KG
-	height?: number // Boy as CM
+	weight?: number | null // Kilo as KG
+	height?: number | null// Boy as CM
 	emergencyContact?: {
 		name: string
 		phone: string

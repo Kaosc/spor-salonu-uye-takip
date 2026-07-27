@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { View, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native"
 import { useSelector } from "react-redux"
-import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../../components/ui/ThemedText"
@@ -10,15 +9,14 @@ import CustomHeader from "../../components/CustomHeader"
 import SettingsButton from "../../components/SettingsButton"
 import QRCodeModal from "../../components/QRCodeModal"
 import QRScannerView from "../../components/QRScannerView"
+import MemberAvatar from "../../components/MemberAvatar"
 
 import { Theme } from "../../utils/theme"
 import { moderateScale } from "../../utils/responsive"
 import { getMemberById } from "../../lib/firebase/firestore/member"
 import { getLockerByUserUid, removeLockerFromUser } from "../../lib/firebase/firestore/lockers"
-import MemberAvatar from "../../components/MemberAvatar"
 
 export default function MemberHomeScreen() {
-	const navigation = useNavigation() as NavigationProp<any>
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
@@ -75,7 +73,7 @@ export default function MemberHomeScreen() {
 			case "PAUSED":
 				return { label: t("paused"), color: theme.orange.foreground, bg: theme.orange.background + "44" }
 			default:
-				return null
+				return { label: t("none"), color: theme.border, bg: theme.cardBackground }
 		}
 	}, [member?.subscriptionStatus, t, theme])
 

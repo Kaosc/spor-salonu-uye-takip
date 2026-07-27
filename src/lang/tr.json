@@ -217,5 +217,11 @@
 	"searchPlaceholder": "İsim, email veya telefon ile ara...",
 	"subs": "Abonelikler",
 	"noCheckOutTime": "Çıkış bulunamadı",
-	"checkInsAndOuts": "Girişler ve Çıkışlar"
+	"checkInsAndOuts": "Girişler ve Çıkışlar",
+	"dangerZone": "Tehlikeli Bölge",
+	"dangerZoneDescription": "Hesabınızı silmek için aşağıdaki butonu kullanabilirsiniz. Bu işlem hesabınızı pasif hale getirir ve tüm kişisel verilerinizi kalıcı olarak siler. Bu işlem geri alınamaz.",
+	"deleteMyAccount": "Hesabımı Sil",
+	"deleteAccountConfirmation": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve tüm kişisel verileriniz kalıcı olarak silinir.",
+	"accountDeleted": "Hesabınız başarıyla silindi. Uygulamayı kullanmaya devam edebilmek için lütfen tekrar kayıt olun",
+	"delete": "SİL"
 }

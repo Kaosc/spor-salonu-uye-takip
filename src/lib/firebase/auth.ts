@@ -5,9 +5,11 @@ import {
 	sendPasswordResetEmail,
 	signInWithEmailAndPassword,
 	signOut,
+	deleteUser,
 } from "@react-native-firebase/auth"
 import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "@react-native-firebase/firestore"
 import { t } from "i18next"
+
 import { COLLECTIONS } from "./enums"
 
 const auth = getAuth()
@@ -209,5 +211,16 @@ export const logoutUser = async (): Promise<void> => {
 	} catch (e: any) {
 		console.error("[AUTH] logoutUser:", e?.message || e)
 		throw e
+	}
+}
+
+export const deleteCurrentAuthAccount = async (): Promise<boolean> => {
+	try {
+		const auth = getAuth()
+		await deleteUser(auth.currentUser!)
+		return true
+	} catch (e: any) {
+		console.error("[AUTH] deleteMemberAuthAccount:", e?.message || e)
+		return false
 	}
 }

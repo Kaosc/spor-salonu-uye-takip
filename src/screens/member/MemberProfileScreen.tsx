@@ -17,9 +17,8 @@ import { getMemberById } from "../../lib/firebase/firestore/member"
 import { logoutUser } from "../../lib/firebase/auth"
 import { logout } from "../../store/features/authSlice"
 
-import { moderateScale } from "../../utils/responsive"
-import { Theme } from "../../utils/theme"
 import { safeTimestampToDateString } from "../../utils/date"
+import { Theme } from "../../utils/theme"
 
 export default function MemberProfileScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -99,23 +98,19 @@ export default function MemberProfileScreen() {
 		)
 	}
 
-	const EditButton = () => {
-		return (
-			<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
-				<ThemedIcon
-					name="pen"
-					size={26}
-				/>
-			</TouchableOpacity>
-		)
-	}
-
 	return (
 		<View style={styles.container}>
 			<CustomHeader
 				title={t("myProfile")}
 				showBackButton={false}
-				rightComponent={<EditButton />}
+				rightComponent={
+					<TouchableOpacity onPress={() => navigation.navigate("MemberFormScreen", { memberId: member?.uid })}>
+						<ThemedIcon
+							name="pen"
+							size={26}
+						/>
+					</TouchableOpacity>
+				}
 			/>
 
 			<ScrollView
@@ -141,7 +136,7 @@ export default function MemberProfileScreen() {
 					<View style={styles.divider} />
 
 					{/* Contact Information */}
-					<ThemedText style={styles.sectionTitle}>{t("contactInformation")}</ThemedText>
+					<ThemedText style={styles.title}>{t("contactInformation")}</ThemedText>
 
 					<DetailsRow
 						iconName="account"
@@ -180,7 +175,7 @@ export default function MemberProfileScreen() {
 						iconName="water"
 					/>
 
-					<ThemedText style={styles.sectionTitle}>{t("emergencyContact")}</ThemedText>
+					<ThemedText style={styles.title}>{t("emergencyContact")}</ThemedText>
 
 					<DetailsRow
 						label={t("name")}
@@ -195,9 +190,9 @@ export default function MemberProfileScreen() {
 				</View>
 
 				{/* Body Metrics Card */}
-				<View style={styles.card}>
-					<ThemedText style={styles.sectionTitle}>{t("bodyMetrics")}</ThemedText>
+				<ThemedText style={styles.sectionTitle}>{t("bodyMetrics")}</ThemedText>
 
+				<View style={styles.card}>
 					<View style={styles.bodyMetricsRow}>
 						<View style={styles.bodyMetricItem}>
 							<ThemedIcon
@@ -227,6 +222,8 @@ export default function MemberProfileScreen() {
 				</View>
 
 				{/* Sign Out Button */}
+				<ThemedText style={styles.sectionTitle}>{t("logout")}</ThemedText>
+
 				<ThemedButton
 					style={styles.logoutButton}
 					onPress={handleLogout}
@@ -255,11 +252,11 @@ const createStyles = (darkMode: boolean) => {
 		},
 		scrollContentContainer: {
 			paddingBottom: 15,
+			paddingTop: 10,
 		},
 		card: {
-			marginHorizontal: 10,
-			marginTop: 16,
-			padding: moderateScale(20),
+			marginHorizontal: 13,
+			padding: 20,
 			borderRadius: 16,
 			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
@@ -267,16 +264,16 @@ const createStyles = (darkMode: boolean) => {
 		},
 		avatarSection: {
 			alignItems: "center",
-			paddingVertical: moderateScale(8),
+			paddingVertical: 8,
 		},
 		fullName: {
 			fontSize: 22,
 			fontWeight: "700",
-			marginTop: moderateScale(12),
+			marginTop: 12,
 			textAlign: "center",
 		},
 		roleBadge: {
-			marginTop: moderateScale(8),
+			marginTop: 8,
 			paddingHorizontal: 16,
 			paddingVertical: 4,
 			borderRadius: 12,
@@ -295,13 +292,14 @@ const createStyles = (darkMode: boolean) => {
 		sectionTitle: {
 			fontSize: 19,
 			fontWeight: "900",
-			marginVertical: 20,
+			marginVertical: 18,
+			marginHorizontal: 20,
 		},
 		detailRow: {
 			flexDirection: "row",
 			justifyContent: "space-between",
 			alignItems: "center",
-			paddingVertical: moderateScale(10),
+			paddingVertical: 10,
 			borderBottomWidth: StyleSheet.hairlineWidth,
 			borderBottomColor: theme.border,
 		},
@@ -324,7 +322,7 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			justifyContent: "space-around",
 			alignItems: "center",
-			paddingVertical: moderateScale(8),
+			paddingVertical: 8,
 		},
 		bodyMetricItem: {
 			alignItems: "center",
@@ -347,10 +345,9 @@ const createStyles = (darkMode: boolean) => {
 		},
 		// Logout
 		logoutButton: {
-			marginHorizontal: moderateScale(16),
-			marginTop: moderateScale(24),
-			marginBottom: moderateScale(20),
-			paddingVertical: moderateScale(14),
+			marginHorizontal: 16,
+			marginBottom: 20,
+			paddingVertical: 14,
 			flexDirection: "row",
 			alignItems: "center",
 			justifyContent: "center",
@@ -363,6 +360,12 @@ const createStyles = (darkMode: boolean) => {
 			color: theme.red.foreground,
 			fontSize: 16,
 			fontWeight: "bold",
+		},
+		title: {
+			fontSize: 20,
+			fontWeight: "900",
+			marginTop: 20,
+			marginBottom: 10,
 		},
 	})
 }

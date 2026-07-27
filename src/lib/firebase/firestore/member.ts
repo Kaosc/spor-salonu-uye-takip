@@ -164,3 +164,37 @@ export const getAllMembers = async (): Promise<Member[]> => {
 		return []
 	}
 }
+
+/**
+ * Keeps member sub data along with the member data only delete sensitive user personal data from the member's document. This is to comply with GDPR and other privacy regulations.
+ */
+export const deleteMemberAccount = async (memberId: string): Promise<boolean> => {
+	try {
+		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
+
+		const sensitiveFieldsToDelete: Partial<Member> = {
+			address: "",
+			birthDate: null,
+			bloodType: "",
+			email: "",
+			firstName: "",
+			phoneNumber: "",
+			lastName: "",
+			emergencyContact: {
+				name: "",
+				phone: "",
+			},
+			gender: "UNSPECIFIED",
+			weight: null,
+			height: null,
+			isActive: false,
+			updatedAt: serverTimestamp(),
+		}
+
+		await updateDoc(memberRef, sensitiveFieldsToDelete)
+		return true
+	} catch (e) {
+		console.error("[FIRESTORE] deleteMemberAccount:", e)
+		return false
+	}
+}
