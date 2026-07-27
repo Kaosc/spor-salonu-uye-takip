@@ -1,7 +1,6 @@
 import { View, TouchableOpacity, StyleSheet } from "react-native"
 import React from "react"
 import { useSelector } from "react-redux"
-import { MotiView } from "moti"
 
 import ThemedIcon from "./ThemedIcon"
 import { moderateScale } from "../../utils/responsive"
@@ -17,11 +16,7 @@ export default function ThemedCheckBox({ value, onChange, size }: Props) {
 	const styles = createStyles(darkMode, size)
 
 	return (
-		<MotiView
-			animate={{ scale: value ? 1 : 0.9 }}
-			transition={{ type: "spring", duration: 400 }}
-			style={{ alignSelf: "center" }}
-		>
+		<View style={{ alignSelf: "center" }}>
 			<TouchableOpacity
 				style={styles.checkboxContainer}
 				onPress={() => onChange()}
@@ -37,7 +32,7 @@ export default function ThemedCheckBox({ value, onChange, size }: Props) {
 					)}
 				</View>
 			</TouchableOpacity>
-		</MotiView>
+		</View>
 	)
 }
 
@@ -56,7 +51,7 @@ const createStyles = (darkMode: boolean, size?: number) => {
 			borderColor: darkMode ? "#5f5f5f" : "#b1b1b1",
 			alignItems: "center",
 			justifyContent: "center",
-			backgroundColor: "#000"
+			backgroundColor: "#000",
 		},
 		checkboxChecked: {
 			backgroundColor: darkMode ? "#383838" : "#ffffff",

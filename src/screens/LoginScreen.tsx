@@ -16,12 +16,17 @@ import { Image } from "expo-image"
 
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
+import ThemedCheckBox from "../components/ui/ThemedCheckBox"
+import LoadingView from "../components/LoadingView"
 
 import { resetPassword, staffLogin, memberLogin } from "../lib/firebase/auth"
 import { setAuth } from "../store/features/authSlice"
-import { setStaffCredentials } from "../utils/storage"
+import { getRole, getUserAuth, setStaffCredentials } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
+
+const userAuth = getUserAuth()
+const role = getRole()
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
@@ -33,13 +38,16 @@ export default function LoginScreen() {
 	const styles = createStyles(darkMode)
 	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
-	const [isLoading, setIsLoading] = useState(false)
+	const [isLoading, setIsLoading] = useState(userAuth ? true : false)
+	const [remember, setRemember] = useState(false)
 
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [error, setError] = useState("")
 
 	useEffect(() => {
+		if (userAuth) return
+
 		setTimeout(() => {
 			if (isStaffLogin) {
 				setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
@@ -50,6 +58,43 @@ export default function LoginScreen() {
 			}
 		}, 100)
 	}, [isStaffLogin])
+
+	useEffect(() => {
+		if (userAuth && role) {
+			autoLogin()
+		}
+	}, [])
+
+	const autoLogin = async () => {
+		try {
+			if (!role || !userAuth) {
+				setError(t("autoLoginFailed"))
+				return
+			}
+
+			const email = userAuth?.email
+			const password = userAuth?.password
+
+			let user = null
+
+			if (role === "MEMBER") {
+				user = await memberLogin(email || "", password || "")
+			} else {
+				user = await staffLogin(email || "", password || "")
+			}
+
+			if (!user) {
+				setError(t("autoLoginFailed"))
+				return
+			}
+
+			dispatch(setAuth({ isAuthenticated: true, uid: user?.uid, email: user?.email, role: role }))
+			navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
+		} catch (e) {
+			console.warn("App.tsx:50", e)
+			setError(t("autoLoginFailed"))
+		}
+	}
 
 	const handleForgotPassword = async () => {
 		if (!email.trim()) {
@@ -82,7 +127,7 @@ export default function LoginScreen() {
 		setIsLoading(true)
 
 		try {
-			const result = isStaffLogin ? await staffLogin(email, password) : await memberLogin(email, password)
+			const result = isStaffLogin ? await staffLogin(email, password, remember) : await memberLogin(email, password, remember)
 			const { uid, role } = result
 			const isNewMember = "isNewMember" in result ? result.isNewMember : false
 
@@ -108,6 +153,11 @@ export default function LoginScreen() {
 			setIsLoading(false)
 		}
 	}
+
+	if (isLoading && userAuth && !error) {
+		return <LoadingView />
+	}
+
 	return (
 		<KeyboardAvoidingView
 			style={styles.container}
@@ -167,6 +217,15 @@ export default function LoginScreen() {
 				)}
 
 				{error ? <Text style={styles.error}>{error}</Text> : null}
+
+				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end", marginBottom: 16, gap: 10 }}>
+					<ThemedText style={{ fontSize: 15 }}>{t("rememberMe")}</ThemedText>
+					<ThemedCheckBox
+						size={22}
+						value={remember}
+						onChange={() => setRemember(!remember)}
+					/>
+				</View>
 
 				<ThemedButton
 					onPress={handleLogin}

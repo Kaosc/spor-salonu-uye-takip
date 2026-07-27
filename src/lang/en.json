@@ -224,5 +224,7 @@
 	"deleteMyAccount": "Delete My Account",
 	"deleteAccountConfirmation": "Are you sure you want to delete your account? This action cannot be undone and all your personal data will be permanently deleted.",
 	"accountDeleted": "Your account has been deleted successfully. Please register again to continue using the app.",
-	"delete": "DELETE"
+	"delete": "DELETE",
+	"rememberMe": "Remember Me",
+	"autoLoginFailed": "Your previous session has expired or is invalid. Please log in again"
 }

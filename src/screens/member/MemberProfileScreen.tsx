@@ -19,6 +19,7 @@ import { logout } from "../../store/features/authSlice"
 
 import { safeTimestampToDateString } from "../../utils/date"
 import { Theme } from "../../utils/theme"
+import { clearUserAuth } from "../../utils/storage"
 
 export default function MemberProfileScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
@@ -37,6 +38,7 @@ export default function MemberProfileScreen() {
 	const handleLogout = async () => {
 		await logoutUser()
 		dispatch(logout())
+		clearUserAuth()
 		navigation.reset({
 			index: 0,
 			routes: [{ name: "AuthStack" }],

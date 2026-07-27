@@ -149,3 +149,8 @@ type FieldValue = import("@react-native-firebase/firestore").FieldValue
 type FirebaseTimestamp = import("@react-native-firebase/firestore").Timestamp
 
 type QRScannerAction = "CHECK_IN" | "CHECK_OUT" | "VIEW_MEMBER" | "ASSIGN_LOCKER"
+
+interface UserAuth {
+	email: string
+	password: string
+}

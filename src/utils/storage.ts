@@ -39,6 +39,38 @@ export const clearStaffCredentials = () => {
 	storage.remove("staffPassword")
 }
 
+export const storeRole = (role: UserRole) => {
+	storage.set("role", role)
+}
+
+export const getRole = (): UserRole | null => {
+	const role = storage.getString("role")
+	if (!role) return null
+	return role as UserRole
+}
+
+export const storeUserAuth = (auth: UserAuth) => {
+	storage.set("auth", JSON.stringify(auth))
+}
+
+export const getUserAuth = (): UserAuth | null => {
+	const authString = storage.getString("auth")
+	if (!authString) return null
+
+	try {
+		const auth = JSON.parse(authString)
+		return auth
+	} catch (error) {
+		console.error("Error parsing auth from storage:", error)
+		return null
+	}
+}
+
+export const clearUserAuth = () => {
+	storage.remove("auth")
+	storage.remove("role")
+}
+
 /////////////////////////////////// DELETE ////////////////////////////////
 
 export const storageRemoveKey = (key: string) => storage.remove(key)

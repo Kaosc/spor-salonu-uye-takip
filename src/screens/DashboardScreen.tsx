@@ -18,6 +18,7 @@ import { logout } from "../store/features/authSlice"
 import { logoutUser } from "../lib/firebase/auth"
 import { getStaffUserById } from "../lib/firebase/firestore/users"
 
+import { clearUserAuth } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
 
@@ -62,6 +63,7 @@ export default function DashboardScreen() {
 	const handleLogout = async () => {
 		await logoutUser()
 		dispatch(logout())
+		clearUserAuth()
 		navigation.reset({
 			index: 0,
 			routes: [{ name: "AuthStack" }],

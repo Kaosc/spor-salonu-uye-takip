@@ -11,6 +11,7 @@ import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "@r
 import { t } from "i18next"
 
 import { COLLECTIONS } from "./enums"
+import { storeRole, storeUserAuth } from "../../utils/storage"
 
 const auth = getAuth()
 const db = getFirestore()
@@ -24,7 +25,7 @@ export const generatePassword = () => {
 	return password
 }
 
-export const staffLogin = async (email: string, password: string) => {
+export const staffLogin = async (email: string, password: string, remember?: boolean) => {
 	const userCredential = await signInWithEmailAndPassword(auth, email, password)
 	const uid = userCredential.user.uid
 
@@ -36,11 +37,16 @@ export const staffLogin = async (email: string, password: string) => {
 		throw new Error(t("staffRecordNotFound"))
 	}
 
+	if (remember) {
+		storeUserAuth({ email, password })
+		storeRole(staffDoc.data()?.role as UserRole)
+	}
+
 	const data = staffDoc.data()
 	return { uid, email, role: data?.role as UserRole }
 }
 
-export const memberLogin = async (email: string, password: string) => {
+export const memberLogin = async (email: string, password: string, remember?: boolean) => {
 	try {
 		const userCredential = await signInWithEmailAndPassword(auth, email, password)
 		const uid = userCredential.user.uid
@@ -54,6 +60,11 @@ export const memberLogin = async (email: string, password: string) => {
 		// Check if a member doc exists with this uid
 		const memberRef = doc(db, COLLECTIONS.MEMBERS, uid)
 		const memberDoc = await getDoc(memberRef)
+
+		if (remember) {
+			storeUserAuth({ email, password })
+			storeRole("MEMBER" as UserRole)
+		}
 
 		if (memberDoc.exists()) {
 			return { uid, email, role: "MEMBER" as UserRole }

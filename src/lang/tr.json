@@ -223,5 +223,7 @@
 	"deleteMyAccount": "Hesabımı Sil",
 	"deleteAccountConfirmation": "Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve tüm kişisel verileriniz kalıcı olarak silinir.",
 	"accountDeleted": "Hesabınız başarıyla silindi. Uygulamayı kullanmaya devam edebilmek için lütfen tekrar kayıt olun",
-	"delete": "SİL"
+	"delete": "SİL",
+	"rememberMe": "Beni Hatırla",
+	"autoLoginFailed": "Önceki oturumunuzun süresi dolmuş veya geçersiz. Lütfen tekrar giriş yapın"
 }

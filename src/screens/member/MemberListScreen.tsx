@@ -22,8 +22,6 @@ export default function MemberListContent() {
 
 	const styles = createStyles(darkMode)
 
-	const [coldStart, setColdStart] = useMMKVBoolean("coldStart")
-
 	const [members, setMembers] = useState<Member[]>([])
 	const [refreshing, setRefreshing] = useState(false)
 
@@ -82,9 +80,8 @@ export default function MemberListContent() {
 	}
 
 	useEffect(() => {
-		if (route.params?.refresh || members?.length === 0 || coldStart) {
+		if (route.params?.refresh || members?.length === 0) {
 			fetchMembers()
-			if (coldStart) setColdStart(false)
 			setTimeout(() => navigation.setParams({ refresh: false }), 300)
 		}
 	}, [])
