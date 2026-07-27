@@ -219,9 +219,9 @@ export default function LoginScreen() {
 				{error ? <Text style={styles.error}>{error}</Text> : null}
 
 				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end", marginBottom: 16, gap: 10 }}>
-					<ThemedText style={{ fontSize: 15 }}>{t("rememberMe")}</ThemedText>
+					<ThemedText style={{ fontSize: 17, marginBottom: 2, }}>{t("rememberMe")}</ThemedText>
 					<ThemedCheckBox
-						size={22}
+						size={25}
 						value={remember}
 						onChange={() => setRemember(!remember)}
 					/>
