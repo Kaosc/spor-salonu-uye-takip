@@ -12,21 +12,18 @@ import {
 import { useDispatch, useSelector } from "react-redux"
 import { useNavigation, NavigationProp, StackActions } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
+import { useMMKVObject, useMMKVString } from "react-native-mmkv"
 import { Image } from "expo-image"
 
 import ThemedButton from "../components/ui/ThemedButton"
 import ThemedText from "../components/ui/ThemedText"
-import ThemedCheckBox from "../components/ui/ThemedCheckBox"
 import LoadingView from "../components/LoadingView"
 
 import { resetPassword, staffLogin, memberLogin } from "../lib/firebase/auth"
 import { setAuth } from "../store/features/authSlice"
-import { getRole, getUserAuth, setStaffCredentials } from "../utils/storage"
+import { setStaffCredentials } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
-
-const userAuth = getUserAuth()
-const role = getRole()
 
 export default function LoginScreen() {
 	const { darkMode } = useSelector((state: RootState) => state.settings)
@@ -36,10 +33,13 @@ export default function LoginScreen() {
 	const navigation = useNavigation() as NavigationProp<any>
 
 	const styles = createStyles(darkMode)
+
+	const [userAuth] = useMMKVObject<UserAuth | undefined>("auth")
+	const [role] = useMMKVString("role")
+
 	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
 	const [isLoading, setIsLoading] = useState(userAuth ? true : false)
-	const [remember, setRemember] = useState(false)
 
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
@@ -60,15 +60,12 @@ export default function LoginScreen() {
 	}, [isStaffLogin])
 
 	useEffect(() => {
-		if (userAuth && role) {
-			autoLogin()
-		}
+		autoLogin()
 	}, [])
 
 	const autoLogin = async () => {
 		try {
 			if (!role || !userAuth) {
-				setError(t("autoLoginFailed"))
 				return
 			}
 
@@ -127,7 +124,7 @@ export default function LoginScreen() {
 		setIsLoading(true)
 
 		try {
-			const result = isStaffLogin ? await staffLogin(email, password, remember) : await memberLogin(email, password, remember)
+			const result = isStaffLogin ? await staffLogin(email, password) : await memberLogin(email, password)
 			const { uid, role } = result
 			const isNewMember = "isNewMember" in result ? result.isNewMember : false
 
@@ -217,15 +214,6 @@ export default function LoginScreen() {
 				)}
 
 				{error ? <Text style={styles.error}>{error}</Text> : null}
-
-				<View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end", marginBottom: 16, gap: 10 }}>
-					<ThemedText style={{ fontSize: 17, marginBottom: 2, }}>{t("rememberMe")}</ThemedText>
-					<ThemedCheckBox
-						size={25}
-						value={remember}
-						onChange={() => setRemember(!remember)}
-					/>
-				</View>
 
 				<ThemedButton
 					onPress={handleLogin}

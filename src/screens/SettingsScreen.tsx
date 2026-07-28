@@ -9,7 +9,7 @@ import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 
-import { getIsThemeAuto } from "../utils/storage"
+import { clearUserAuth, getIsThemeAuto } from "../utils/storage"
 import { setSettings } from "../store/features/settingsSlice"
 import toggleTheme from "../utils/toggleTheme"
 
@@ -55,6 +55,7 @@ export default function SettingsScreen() {
 
 			if (authDeleted) {
 				dispatch(logout())
+				clearUserAuth()
 
 				toast.show(t("accountDeleted"), {
 					type: "success",

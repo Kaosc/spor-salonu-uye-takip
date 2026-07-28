@@ -25,7 +25,7 @@ export const generatePassword = () => {
 	return password
 }
 
-export const staffLogin = async (email: string, password: string, remember?: boolean) => {
+export const staffLogin = async (email: string, password: string) => {
 	const userCredential = await signInWithEmailAndPassword(auth, email, password)
 	const uid = userCredential.user.uid
 
@@ -37,16 +37,14 @@ export const staffLogin = async (email: string, password: string, remember?: boo
 		throw new Error(t("staffRecordNotFound"))
 	}
 
-	if (remember) {
-		storeUserAuth({ email, password })
-		storeRole(staffDoc.data()?.role as UserRole)
-	}
+	storeUserAuth({ email, password })
+	storeRole(staffDoc.data()?.role as UserRole)
 
 	const data = staffDoc.data()
 	return { uid, email, role: data?.role as UserRole }
 }
 
-export const memberLogin = async (email: string, password: string, remember?: boolean) => {
+export const memberLogin = async (email: string, password: string) => {
 	try {
 		const userCredential = await signInWithEmailAndPassword(auth, email, password)
 		const uid = userCredential.user.uid
@@ -61,10 +59,8 @@ export const memberLogin = async (email: string, password: string, remember?: bo
 		const memberRef = doc(db, COLLECTIONS.MEMBERS, uid)
 		const memberDoc = await getDoc(memberRef)
 
-		if (remember) {
-			storeUserAuth({ email, password })
-			storeRole("MEMBER" as UserRole)
-		}
+		storeUserAuth({ email, password })
+		storeRole("MEMBER" as UserRole)
 
 		if (memberDoc.exists()) {
 			return { uid, email, role: "MEMBER" as UserRole }
