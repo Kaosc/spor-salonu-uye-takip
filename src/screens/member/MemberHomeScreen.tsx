@@ -77,6 +77,20 @@ export default function MemberHomeScreen() {
 		}
 	}, [member?.subscriptionStatus, t, theme])
 
+	const handleLockerPress = () => {
+		if (!member?.isActive) {
+			toast.show(t("memberDeactivated"), { type: "warning", duration: 10000 })
+			return
+		}
+
+		if (member?.subscriptionStatus !== "ACTIVE") {
+			toast.show(t("noActiveSubForLocker"), { type: "warning", duration: 10000 })
+			return
+		}
+
+		setQrModalVisible(true)
+	}
+
 	const LockerCard = () => {
 		return locker ? (
 			<TouchableOpacity
@@ -124,9 +138,7 @@ export default function MemberHomeScreen() {
 			<TouchableOpacity
 				style={[styles.lockerCard, styles.lockerCardEmpty]}
 				activeOpacity={0.7}
-				onPress={() => {
-					setQrLockerModalVisible(true)
-				}}
+				onPress={handleLockerPress}
 			>
 				<View style={styles.lockerCardEmptyIconRow}>
 					<View style={styles.lockerCardEmptyIconBg}>
@@ -179,7 +191,7 @@ export default function MemberHomeScreen() {
 				<TouchableOpacity
 					style={styles.qrButton}
 					activeOpacity={0.7}
-					onPress={() => setQrModalVisible(true)}
+					onPress={handleLockerPress}
 				>
 					<ThemedIcon
 						name="qrcode"

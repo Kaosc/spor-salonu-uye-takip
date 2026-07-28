@@ -2,3 +2,7 @@
    - At the end of the day, all subs needs to be checked for expiration.
    - At the end of the day, all lockers needs to be unassigned from all members.
    - Sending 3 days before expiration email to members with active subscriptions.
+
+# Real-time
+   - Activating / deactivating members should be reflected in the app only for the members navigator 
+   - Chaning  (adding, removing) subscriptions should be reflected in the app only for the members navigator
