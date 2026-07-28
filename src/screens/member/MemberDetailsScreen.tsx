@@ -373,7 +373,6 @@ export default function MemberDetailsScreen() {
 	}
 
 	const SubscriptionDetails = useCallback(() => {
-		console.log(subscriptions)
 		const PauseToggleButton = () => {
 			if (activeSubscription && activeSubscription.status === "PAUSED") {
 				return (

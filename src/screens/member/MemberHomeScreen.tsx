@@ -88,7 +88,7 @@ export default function MemberHomeScreen() {
 			return
 		}
 
-		setQrModalVisible(true)
+		setQrLockerModalVisible(true)
 	}
 
 	const LockerCard = () => {
