@@ -40,3 +40,13 @@
    - Checkins saved in the "checkins" collection in Firestore.
    - Checkins Calendar Screen will display the checkins of the members in a calendar view.
    - Pressing a date in the calendar will display the list of checkins of that date.
+
+# User Account Deletion
+   - Members can delete their own account from the app. When a member deletes their account, the auth account of the member will be deleted and the member document in the firestore will be cleared from the personal and sensitive information. The member document will still exist in the firestore but with the "isActive" : false.
+   - Deleted members' subs will remain in the firestore.
+   - If a Staff set member's "isActive" to false, the member will be deactivated and the member will not be able to login to the app. (This is more like deactivating a member and blocking access) The member's subscriptions will remain in the firestore but the active subscription will be canceled automatically.
+
+# Activating / Deactivating Members
+   - Staff can activate or deactivate a member from the member details screen.
+   - If a member has an active subscription, deactivating the member will pause the active subscription. The member will not be able to login to the app until the member is activated again by the staff.
+   - The sub has to be unpaused by the staff after the member is activated again. The member will not be able to unpause the subscription by themselves.

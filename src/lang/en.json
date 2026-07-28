@@ -116,7 +116,7 @@
 	"activateMember": "Activate Member",
 	"activateMemberConfirmation": "Are you sure you want to activate this member?",
 	"activate": "Activate",
-	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription",
+	"memberIsInactive": "Member is inactive. Please activate the member to assign a subscription or continue an existing subscription",
 	"noActiveSubscription": "No Active Subscription",
 	"sellPackagePrompt": "Sell a package to get started",
 	"runtimeVersion": "Runtime Version",
@@ -125,7 +125,7 @@
 	"subscriptionCancelled": "Subscription cancelled successfully",
 	"cancelSubscription": "Cancel Subscription",
 	"cancelSubscriptionConfirmation": "Are you sure you want to cancel this subscription?",
-	"inactivateMemberWithActiveSubscriptionConfirmation": "This member has an active subscription. Are you sure you want to deactivate the member? This will cancel the active subscription",
+	"inactivateMemberWithActiveSubscriptionConfirmation": "This member has an active subscription. Are you sure you want to deactivate the member? This will pause the subscription.",
 	"address": "Address",
 	"weight": "Weight (KG)",
 	"height": "Height (CM)",
@@ -227,5 +227,7 @@
 	"delete": "DELETE",
 	"rememberMe": "Remember Me",
 	"autoLoginFailed": "Your previous session has expired or is invalid. Please log in again",
-	"deletedUser": "Deleted User"
+	"deletedUser": "Deleted User",
+	"memberDeactivated": "Your membership has been deactivated by staff. Please contact staff for more information.",
+	"couldNotFetchSubscription": "Could not fetch subscription information. Please try again later."
 }

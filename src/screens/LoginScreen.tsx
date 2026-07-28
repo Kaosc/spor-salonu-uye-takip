@@ -21,7 +21,7 @@ import LoadingView from "../components/LoadingView"
 
 import { resetPassword, staffLogin, memberLogin } from "../lib/firebase/auth"
 import { setAuth } from "../store/features/authSlice"
-import { setStaffCredentials } from "../utils/storage"
+import { clearUserAuth, setStaffCredentials } from "../utils/storage"
 import { moderateScale } from "../utils/responsive"
 import { Theme } from "../utils/theme"
 
@@ -39,15 +39,13 @@ export default function LoginScreen() {
 
 	const [isStaffLogin, setIsStaffLogin] = useState(false)
 	const [forgotPassword, setForgotPassword] = useState(false)
-	const [isLoading, setIsLoading] = useState(userAuth ? true : false)
+	const [isLoading, setIsLoading] = useState(false)
 
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [error, setError] = useState("")
 
 	useEffect(() => {
-		if (userAuth) return
-
 		setTimeout(() => {
 			if (isStaffLogin) {
 				setEmail(process.env.EXPO_PUBLIC_ADMIN_EMAIL || "")
@@ -65,6 +63,8 @@ export default function LoginScreen() {
 
 	const autoLogin = async () => {
 		try {
+			setIsLoading(true)
+
 			if (!role || !userAuth) {
 				return
 			}
@@ -89,7 +89,10 @@ export default function LoginScreen() {
 			navigation.dispatch(StackActions.replace(role === "MEMBER" ? "MemberTabs" : "Tabs"))
 		} catch (e) {
 			console.warn("App.tsx:50", e)
+			clearUserAuth()
 			setError(t("autoLoginFailed"))
+		} finally {
+			setIsLoading(false)
 		}
 	}
 
@@ -312,8 +315,9 @@ const createStyles = (darkMode: boolean) => {
 			fontWeight: "bold",
 		},
 		error: {
-			color: "red",
-			marginBottom: 8,
+			color: theme.red.foreground,
+			marginBottom: 15,
+			fontSize: 15,
 			textAlign: "center",
 		},
 		logo: {

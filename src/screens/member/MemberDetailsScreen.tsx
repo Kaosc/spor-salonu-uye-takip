@@ -188,8 +188,12 @@ export default function MemberDetailsScreen() {
 			}
 		}
 
-		// If the member has an active subscription, show a warning alert to the user that the subscription will be cancelled if they inactivate the member.
-		if (activeSubscription && (activeSubscription.status === "ACTIVE" || activeSubscription.status === "PAUSED")) {
+		if (!activeSubscription?.status) {
+			toast.show(t("couldNotFetchSubscription"), { type: "danger" })
+		}
+
+		// If the member has an active subscription, show a warning alert to the user that the subscription will be paused if they inactivate the member.
+		if (activeSubscription && activeSubscription.status === "ACTIVE") {
 			Alert.alert(t("inactivateMember"), t("inactivateMemberWithActiveSubscriptionConfirmation"), [
 				{
 					text: t("cancel"),
@@ -199,7 +203,7 @@ export default function MemberDetailsScreen() {
 					text: t("inactivate"),
 					style: "destructive",
 					onPress: async () => {
-						await handleSubCancel(false)
+						await handleSubPause(false)
 						await inactivate()
 					},
 				},
@@ -241,7 +245,7 @@ export default function MemberDetailsScreen() {
 		])
 	}
 
-	const handleSubPause = async () => {
+	const handleSubPause = async (alert = true) => {
 		const pauseSub = async () => {
 			if (!activeSubscription?.id) return
 			const paused = await pauseSubscription(activeSubscription.id)
@@ -254,17 +258,21 @@ export default function MemberDetailsScreen() {
 			}
 		}
 
-		Alert.alert(t("pauseSubscription"), t("pauseSubscriptionConfirmation"), [
-			{
-				text: t("cancel"),
-				style: "cancel",
-			},
-			{
-				text: t("pauseSubscription"),
-				style: "default",
-				onPress: async () => await pauseSub(),
-			},
-		])
+		if (alert) {
+			Alert.alert(t("pauseSubscription"), t("pauseSubscriptionConfirmation"), [
+				{
+					text: t("cancel"),
+					style: "cancel",
+				},
+				{
+					text: t("pauseSubscription"),
+					style: "default",
+					onPress: async () => await pauseSub(),
+				},
+			])
+		} else {
+			await pauseSub()
+		}
 	}
 
 	const handleSubResume = async () => {

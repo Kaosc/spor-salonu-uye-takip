@@ -115,7 +115,7 @@
 	"activateMember": "Üyeyi Etkin Hale Getir",
 	"activateMemberConfirmation": "Bu üyeyi etkin hale getirmek istediğinizden emin misiniz?",
 	"activate": "Etkin Hale Getir",
-	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek için lütfen üyeyi aktif hale getirin",
+	"memberIsInactive": "Üye pasif durumda. Abonelik tanımlayabilmek veya devam ettirmek için lütfen üyeyi aktif hale getirin",
 	"noActiveSubscription": "Aktif Abonelik Yok",
 	"sellPackagePrompt": "Başlamak için bir paket satın alın",
 	"runtimeVersion": "Runtime Sürümü",
@@ -124,7 +124,7 @@
 	"subscriptionCancelled": "Abonelik başarıyla iptal edildi",
 	"cancelSubscription": "Aboneliği İptal Et",
 	"cancelSubscriptionConfirmation": "Bu aboneliği iptal etmek istediğinizden emin misiniz?",
-	"inactivateMemberWithActiveSubscriptionConfirmation": "Bu üye aktif bir aboneliğe sahip. Üyeyi pasif hale getirmek istediğinizden emin misiniz? Bu işlem, aktif aboneliği iptal edecektir",
+	"inactivateMemberWithActiveSubscriptionConfirmation": "Bu üye aktif bir aboneliğe sahip. Üyeyi pasif hale getirmek istediğinizden emin misiniz? Bu işlem, aktif aboneliği durduracaktır.",
 	"address": "Adres",
 	"weight": "Kilo (KG)",
 	"height": "Boy (CM)",
@@ -226,5 +226,7 @@
 	"delete": "SİL",
 	"rememberMe": "Beni Hatırla",
 	"autoLoginFailed": "Önceki oturumunuzun süresi dolmuş veya geçersiz. Lütfen tekrar giriş yapın",
-	"deletedUser": "Silinmiş Kullanıcı"
+	"deletedUser": "Silinmiş Kullanıcı",
+	"memberDeactivated": "Üyeliğiniz personel tarafından pasif hale getirilmiştir. Lütfen daha fazla bilgi için personel ile iletişime geçin",
+	"couldNotFetchSubscription": "Abonelik bilgisi alınamadı. Lütfen daha sonra tekrar deneyin"
 }

@@ -63,6 +63,12 @@ export const memberLogin = async (email: string, password: string) => {
 		storeRole("MEMBER" as UserRole)
 
 		if (memberDoc.exists()) {
+			if (memberDoc.data()?.isActive === false) {
+				await signOut(auth)
+				toast.show(t("memberDeactivated"), { duration: 10000, type: "danger" })
+				throw new Error(t("memberDeactivated"))
+			}
+
 			return { uid, email, role: "MEMBER" as UserRole }
 		}
 
