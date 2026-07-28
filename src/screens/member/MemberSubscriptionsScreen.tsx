@@ -18,7 +18,7 @@ export default function MemberSubscriptionsScreen() {
 	const darkMode = useSelector((state: RootState) => state.settings.darkMode)
 	const { uid } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
-	
+
 	const styles = createStyles(darkMode)
 
 	const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
@@ -74,7 +74,18 @@ export default function MemberSubscriptionsScreen() {
 					<>
 						<View style={styles.activePlanCard}>
 							{/* Active Plan Card */}
-							{activeSubscription && <SubscriptionView subscription={activeSubscription} />}
+							{activeSubscription ? (
+								<SubscriptionView subscription={activeSubscription} />
+							) : (
+								<View style={styles.placeholderContainer}>
+									<ThemedIcon
+										name="alert"
+										size={50}
+										style={{ opacity: 0.7 }}
+									/>
+									<ThemedText style={styles.placeholderText}>{t("noActiveSubscription")}</ThemedText>
+								</View>
+							)}
 						</View>
 
 						{subscriptions.length > 0 ? (
