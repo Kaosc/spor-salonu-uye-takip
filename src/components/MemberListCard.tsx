@@ -18,6 +18,8 @@ export default function MemberListCard({ member, search }: { member: Member; sea
 
 	const thene = Theme[darkMode ? "dark" : "light"]
 
+	const memberFullName = member?.firstName || member?.lastName ? `${member.firstName} ${member.lastName}` : t("deletedUser")
+	const memberEmail = member?.email || "---"
 	const memberStatusColor = member.isActive ? thene.green.foreground : thene.red.foreground
 
 	const subStatusColor =
@@ -37,15 +39,18 @@ export default function MemberListCard({ member, search }: { member: Member; sea
 
 	return (
 		<TouchableOpacity
-			style={styles.member}
+			style={[
+				styles.member,
+				{
+					opacity: member.isActive ? 1 : 0.8,
+				},
+			]}
 			onPress={handleNavigate}
 		>
 			<MemberAvatar gender={member.gender} />
 			<View style={{ flex: 1, marginLeft: 12 }}>
-				<ThemedText style={styles.itemName}>
-					{member.firstName} {member.lastName}
-				</ThemedText>
-				<ThemedText style={styles.itemPhone}>{member.email}</ThemedText>
+				<ThemedText style={styles.itemName}>{memberFullName}</ThemedText>
+				<ThemedText style={styles.itemPhone}>{memberEmail}</ThemedText>
 				<View style={{ flexDirection: "row", alignItems: "center", marginTop: 2 }}>
 					<ThemedText style={styles.itemSubscriptionLabel}>{t("subscription") + ": "}</ThemedText>
 					<ThemedText style={[styles.itemSubscription, { color: subStatusColor }]}>

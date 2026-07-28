@@ -365,6 +365,7 @@ export default function MemberDetailsScreen() {
 	}
 
 	const SubscriptionDetails = useCallback(() => {
+		console.log(subscriptions)
 		const PauseToggleButton = () => {
 			if (activeSubscription && activeSubscription.status === "PAUSED") {
 				return (
@@ -761,9 +762,9 @@ export default function MemberDetailsScreen() {
 								/>
 								<View style={styles.memberInfoTextContainer}>
 									<ThemedText style={styles.memberInfoName}>
-										{member.firstName} {member.lastName}
+										{member?.firstName} {member?.lastName}
 									</ThemedText>
-									<ThemedText style={styles.memberInfoPhone}>{member.phoneNumber || "-"}</ThemedText>
+									<ThemedText style={styles.memberInfoPhone}>{member?.phoneNumber}</ThemedText>
 								</View>
 							</View>
 							<LockerView />

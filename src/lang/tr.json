@@ -225,5 +225,6 @@
 	"accountDeleted": "Hesabınız başarıyla silindi. Uygulamayı kullanmaya devam edebilmek için lütfen tekrar kayıt olun",
 	"delete": "SİL",
 	"rememberMe": "Beni Hatırla",
-	"autoLoginFailed": "Önceki oturumunuzun süresi dolmuş veya geçersiz. Lütfen tekrar giriş yapın"
+	"autoLoginFailed": "Önceki oturumunuzun süresi dolmuş veya geçersiz. Lütfen tekrar giriş yapın",
+	"deletedUser": "Silinmiş Kullanıcı"
 }

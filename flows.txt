@@ -2,25 +2,30 @@
    - Adding a member
    - Activating a member
    - Deactivating a member 
-      ! If member has a "ACTIVE" or "PAUSED" subscription, deactivating it will be turn the "ACTIVE" status of the subscription to "CANCELED".
+      - If member has a "ACTIVE" or "PAUSED" subscription, deactivating it will be turn the "ACTIVE" status of the subscription to "CANCELED".
 
 # Subscription
    - Adding a subscription
-      ! If the member is not active, app will not allow to add a subscription. Staff will need to activate the member first before adding a subscription.
+      - If the member is not active, app will not allow to add a subscription. Staff will need to activate the member first before adding a subscription.
    - Canceling a subscription
    - Pausing a subscription 
    - Unpausing a subscription
 
-# Check-in
+# Check-in /  Check-out
    - Member will have a QR Code created by the uid from the firebase auth.
    - Staff can scan the QR Code of the member to
       - Check-in the member
+      - Check-out the member
+         - Checking-out a member will automatically unassing the locker assigned to the member.
       - View the member's details
 
 # Lockers
    - Members scan Locker QR code to assign a locker to themselves.
+   - Order to members to assign a locker, member should be check-in first.
+   - When a member checked-out by the staff, the locker will be unassigned automatically.
    - Member unassing the locker by pressing the same button to scan the locker QR code.
    - Staff can unassing a locker from the member's details screen by pressing the "Remove Locker" button.
+   - Staff can add a new locker by pressing the "Add Locker" button in the locker screen
 
 # Adding New Staff
   - Only the staff with the "ADMIN" role can add new staff members.
@@ -30,3 +35,8 @@
    - When a member added through the web admin panel, member auth account will be created with the email of the member and a random password. Member will need to reset their password from login screen to access the app by their email adresses.
    - When a member added through the mobile app by staff, a Firebase auth account is created first with a random password. A password reset email is sent to the member. The member doc is created in Firestore using the auth uid as the document ID. Staff is then signed out from the member account and re-authenticated automatically.
    - If a member never created an auth account or never added to member collection by the staff, member will need to register first to create an auth account and then the mobile app will navigate user to the "MemberFormScreen" to fill the member details. After the member details filled, the member will be added to the member collection and linked to the auth account of the member.
+
+# Checkins
+   - Checkins saved in the "checkins" collection in Firestore.
+   - Checkins Calendar Screen will display the checkins of the members in a calendar view.
+   - Pressing a date in the calendar will display the list of checkins of that date.

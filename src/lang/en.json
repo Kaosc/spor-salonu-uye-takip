@@ -226,5 +226,6 @@
 	"accountDeleted": "Your account has been deleted successfully. Please register again to continue using the app.",
 	"delete": "DELETE",
 	"rememberMe": "Remember Me",
-	"autoLoginFailed": "Your previous session has expired or is invalid. Please log in again"
+	"autoLoginFailed": "Your previous session has expired or is invalid. Please log in again",
+	"deletedUser": "Deleted User"
 }
