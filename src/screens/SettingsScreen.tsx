@@ -25,7 +25,7 @@ export default function SettingsScreen() {
 	const navigation = useNavigation() as any
 	const { darkMode, lang } = useSelector((state: RootState) => state.settings)
 	const dispatch = useDispatch()
-	const { uid } = useSelector((state: RootState) => state.auth)
+	const { uid, role } = useSelector((state: RootState) => state.auth)
 	const { t } = useTranslation()
 
 	const theme = Theme[darkMode ? "dark" : "light"]
@@ -165,31 +165,37 @@ export default function SettingsScreen() {
 					</View>
 				</View>
 
-				<Title title={t("dangerZone")} />
+				{role === "MEMBER" ? (
+					<>
+						<Title title={t("dangerZone")} />
 
-				<View style={styles.dangerZoneCard}>
-					<View style={{ flexDirection: "row", alignItems: "center", gap: 13, flex: 1 }}>
-						<ThemedIcon
-							name="alert-octagon"
-							size={35}
-							color={theme.red.foreground}
-						/>
-						<View style={{ flex: 1 }}>
-							<ThemedText style={styles.dangerText}>{t("dangerZoneDescription")}</ThemedText>
+						<View style={styles.dangerZoneCard}>
+							<View style={{ flexDirection: "row", alignItems: "center", gap: 13, flex: 1 }}>
+								<ThemedIcon
+									name="alert-octagon"
+									size={35}
+									color={theme.red.foreground}
+								/>
+								<View style={{ flex: 1 }}>
+									<ThemedText style={styles.dangerText}>{t("dangerZoneDescription")}</ThemedText>
+								</View>
+							</View>
+							<TouchableOpacity
+								style={styles.dangerButton}
+								onPress={deleteAlert}
+							>
+								<ThemedIcon
+									name="delete"
+									size={20}
+									color={theme.red.foreground}
+								/>
+								<ThemedText style={styles.dangerButtonText}>{t("deleteMyAccount")}</ThemedText>
+							</TouchableOpacity>
 						</View>
-					</View>
-					<TouchableOpacity
-						style={styles.dangerButton}
-						onPress={deleteAlert}
-					>
-						<ThemedIcon
-							name="delete"
-							size={20}
-							color={theme.red.foreground}
-						/>
-						<ThemedText style={styles.dangerButtonText}>{t("deleteMyAccount")}</ThemedText>
-					</TouchableOpacity>
-				</View>
+					</>
+				) : (
+					<></>
+				)}
 			</ScrollView>
 		</>
 	)

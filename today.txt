@@ -1,0 +1,19 @@
+- added checkout option for staff to check-out a member. Checking-out a member will automatically unassign the locker assigned to the member.
+
+- Members cannot assign a locker to themselves if they dont have an active subscription.
+
+- Members also cannot assign a locker to themselves if they are not checked-in first.
+
+- Members that inactivated by the staff will not be able to login to the app. The member will need to contact the staff to activate their acc again.
+
+- Member can delete their account. This will remove the auth acc and clear up the personal data from the member document in firestore. The member document with their old uid will still exist along with the subscriptions of the member.
+
+- Now staff or member loggedin one it will remember the user and will not ask for password or email again.
+
+- The members list and subs list now fetches data as the user scrolls down the list.
+
+- CheckinsCalendarScreen now displays checkouts along with checkins. 
+
+- Members now can see their previous subscriptions.
+
+- Pressing a phone number in the app will now open the phone app with the number prefilled.

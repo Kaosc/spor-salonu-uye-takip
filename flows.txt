@@ -26,6 +26,8 @@
    - Member unassing the locker by pressing the same button to scan the locker QR code.
    - Staff can unassing a locker from the member's details screen by pressing the "Remove Locker" button.
    - Staff can add a new locker by pressing the "Add Locker" button in the locker screen
+   - Members cannot assign a locker to themselves if they dont have an active subscription.
+   - Members also cannot assign a locker to themselves if they are not checked-in first.
 
 # Adding New Staff
   - Only the staff with the "ADMIN" role can add new staff members.
@@ -35,6 +37,7 @@
    - When a member added through the web admin panel, member auth account will be created with the email of the member and a random password. Member will need to reset their password from login screen to access the app by their email adresses.
    - When a member added through the mobile app by staff, a Firebase auth account is created first with a random password. A password reset email is sent to the member. The member doc is created in Firestore using the auth uid as the document ID. Staff is then signed out from the member account and re-authenticated automatically.
    - If a member never created an auth account or never added to member collection by the staff, member will need to register first to create an auth account and then the mobile app will navigate user to the "MemberFormScreen" to fill the member details. After the member details filled, the member will be added to the member collection and linked to the auth account of the member.
+   - Members that inactivated by the staff will not be able to login to the app. The member will need to contact the staff to activate their acc again
 
 # Checkins
    - Checkins saved in the "checkins" collection in Firestore.
