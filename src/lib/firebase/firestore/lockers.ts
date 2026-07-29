@@ -31,7 +31,7 @@ export const getAllLockers = async (): Promise<Locker[]> => {
 
 		return lockers
 	} catch (e) {
-		console.error("[FIRESTORE] getAllLockers:", e)
+		console.debug("[FIRESTORE] getAllLockers:", e)
 		return []
 	}
 }
@@ -49,7 +49,7 @@ export const getLockerByUserUid = async (uid: string): Promise<Locker | null> =>
 
 		return null
 	} catch (e) {
-		console.error("[FIRESTORE] getLockerByUserUid: ", e)
+		console.debug("[FIRESTORE] getLockerByUserUid: ", e)
 		throw e
 	}
 }
@@ -77,7 +77,7 @@ export const assignLockerToUser = async (uid: string, lockerId: number) => {
 				occupiedAt: serverTimestamp(),
 			})
 		} catch (e) {
-			console.error("[FIRESTORE] assignLockerToUser: ", e)
+			console.debug("[FIRESTORE] assignLockerToUser: ", e)
 			throw new Error(t("locker_assignment_error"))
 		}
 
@@ -87,7 +87,7 @@ export const assignLockerToUser = async (uid: string, lockerId: number) => {
 			occupiedByUid: uid,
 		}
 	} catch (e) {
-		console.error("[FIRESTORE] assignLockerToUser: ", e)
+		console.debug("[FIRESTORE] assignLockerToUser: ", e)
 		throw e
 	}
 }
@@ -116,7 +116,7 @@ export const removeLockerFromUser = async (lockerId: number) => {
 
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] removeLockerFromUser: ", e)
+		console.debug("[FIRESTORE] removeLockerFromUser: ", e)
 		throw e
 	}
 }
@@ -130,7 +130,7 @@ export const addLocker = async () => {
 			totalLockers = (await getAllLockers()).length
 			newLockerId = totalLockers + 1
 		} catch (error) {
-			console.error("[FIRESTORE] addLocker: Error fetching total lockers:", error)
+			console.debug("[FIRESTORE] addLocker: Error fetching total lockers:", error)
 		}
 
 		await setDoc(doc(db, COLLECTIONS.LOCKERS, newLockerId.toString()), {
@@ -142,7 +142,7 @@ export const addLocker = async () => {
 
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] addLocker: ", e)
+		console.debug("[FIRESTORE] addLocker: ", e)
 		throw e
 	}
 }

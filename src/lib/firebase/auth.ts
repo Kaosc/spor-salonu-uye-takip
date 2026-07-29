@@ -94,11 +94,11 @@ export const memberLogin = async (email: string, password: string) => {
 					throw innerError
 				}
 				// otherwise ignore the firestore err and fall back
-				console.error("[AUTH] memberLogin Firestore check:", innerError?.message || innerError)
+				console.debug("[AUTH] memberLogin Firestore check:", innerError?.message || innerError)
 			}
 		}
 
-		console.error("[AUTH] memberLogin:", e?.message || e)
+		console.debug("[AUTH] memberLogin:", e?.message || e)
 		throw e
 	}
 }
@@ -114,7 +114,7 @@ export const createMemberAuthAccount = async (email: string): Promise<string | n
 
 		return uid
 	} catch (error: any) {
-		console.error("[AUTH] createMemberAuthAccount:", error?.message || error)
+		console.debug("[AUTH] createMemberAuthAccount:", error?.message || error)
 		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
 
 		switch (error.code) {
@@ -142,7 +142,7 @@ export const registerMember = async (email: string, password: string) => {
 		toast.show(t("registerSuccess"), { duration: 10000, type: "success" })
 		uid = credential.user.uid
 	} catch (error: any) {
-		console.error("[AUTH] registerMember:", error?.message || error)
+		console.debug("[AUTH] registerMember:", error?.message || error)
 		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
 
 		switch (error.code) {
@@ -170,7 +170,7 @@ export const resetPassword = async (email: string): Promise<boolean> => {
 		toast.show(t("resetEmailSent"), { duration: 6000, type: "success" })
 		return true
 	} catch (error: any) {
-		console.error("[AUTH] sendPasswordResetEmail:", error?.message || error)
+		console.debug("[AUTH] sendPasswordResetEmail:", error?.message || error)
 		toast.show(t("resetEmailError"), { duration: 10000, type: "danger" })
 		return false
 	}
@@ -181,7 +181,7 @@ export const createStaffUser = async (email: string, password: string): Promise<
 		const userCredential = await createUserWithEmailAndPassword(auth, email, password)
 		return userCredential.user.uid
 	} catch (error: any) {
-		console.error("[AUTH] createStaffUser:", error?.message || error)
+		console.debug("[AUTH] createStaffUser:", error?.message || error)
 		const alert = (m: string) => toast.show(m, { duration: 6000, type: "danger" })
 
 		switch (error.code) {
@@ -222,7 +222,7 @@ export const logoutUser = async (): Promise<void> => {
 	try {
 		await signOut(auth)
 	} catch (e: any) {
-		console.error("[AUTH] logoutUser:", e?.message || e)
+		console.debug("[AUTH] logoutUser:", e?.message || e)
 		throw e
 	}
 }
@@ -233,7 +233,7 @@ export const deleteCurrentAuthAccount = async (): Promise<boolean> => {
 		await deleteUser(auth.currentUser!)
 		return true
 	} catch (e: any) {
-		console.error("[AUTH] deleteMemberAuthAccount:", e?.message || e)
+		console.debug("[AUTH] deleteMemberAuthAccount:", e?.message || e)
 		return false
 	}
 }

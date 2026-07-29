@@ -28,7 +28,7 @@ export const addSubscription = async (subscription: Subscription) => {
 		console.info(`[FIRESTORE] Subscription added with ID: ${docRef.id}`)
 		return !!docRef.id
 	} catch (e) {
-		console.error("[FIRESTORE] addSubscription:", e)
+		console.debug("[FIRESTORE] addSubscription:", e)
 		throw e
 	}
 }
@@ -53,7 +53,7 @@ export const cancelSubscription = async (subscriptionId: string) => {
 		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been cancelled.`)
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] cancelSubscription:", e)
+		console.debug("[FIRESTORE] cancelSubscription:", e)
 		throw e
 	}
 }
@@ -78,7 +78,7 @@ export const pauseSubscription = async (subscriptionId: string) => {
 		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been paused.`)
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] pauseSubscription:", e)
+		console.debug("[FIRESTORE] pauseSubscription:", e)
 		throw e
 	}
 }
@@ -128,7 +128,7 @@ export const resumeSubscription = async (subscriptionId: string) => {
 		console.info(`[FIRESTORE] Subscription with ID ${subscriptionId} has been resumed. New end date: ${newEndDate.toISOString()}`)
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] resumeSubscription:", e)
+		console.debug("[FIRESTORE] resumeSubscription:", e)
 		throw e
 	}
 }
@@ -162,7 +162,7 @@ export const getSubscriptionsPaged = async (
 		console.info(`[FIRESTORE] Retrieved ${subscriptions.length} subscriptions.`)
 		return { subscriptions, lastSnapshot: lastDocSnapshot }
 	} catch (e) {
-		console.error("[FIRESTORE] getSubscriptionsPaged:", e)
+		console.debug("[FIRESTORE] getSubscriptionsPaged:", e)
 		return { subscriptions: [], lastSnapshot: null }
 	}
 }
@@ -183,7 +183,7 @@ export const getSubscriptionsByMemberId = async (memberUid: string): Promise<Sub
 		console.info(`[FIRESTORE] Retrieved ${subscriptions.length} subscriptions for member UID: ${memberUid}.`)
 		return subscriptions
 	} catch (e) {
-		console.error("[FIRESTORE] getSubscriptionsByMemberId:", e)
+		console.debug("[FIRESTORE] getSubscriptionsByMemberId:", e)
 		return []
 	}
 }

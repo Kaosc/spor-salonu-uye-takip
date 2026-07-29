@@ -230,5 +230,6 @@
 	"deletedUser": "Deleted User",
 	"memberDeactivated": "Your membership has been deactivated by staff. Please contact staff for more information.",
 	"couldNotFetchSubscription": "Could not fetch subscription information. Please try again later.",
-	"noActiveSubForLocker": "You need an active subscription to assign a locker. Please contact staff to start an active subscription or renew your current one."
+	"noActiveSubForLocker": "You need an active subscription to assign a locker. Please contact staff to start an active subscription or renew your current one.",
+	"checkin_already_checked_out": "Member has already checked out"
 }

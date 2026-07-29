@@ -47,10 +47,10 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 				try {
 					await checkOutMember(memberQrData)
 				} catch (e: any) {
-					console.error("[QRScanner] Error checking out member:", e)
 					if (e.message) {
-						toast.show(t(e.message || "checkin_checkout_failed"), {
+						toast.show(t(e.message), {
 							type: "danger",
+							duration: 7000,
 						})
 					}
 				}
@@ -89,7 +89,7 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 					if (!uid) return
 					// Check is user has checking for today before assinging a locker
 					const checkin = await isMemberCheckedInToday(uid)
-					
+
 					if (!checkin) {
 						toast.show(t("checkin_required_for_locker"), { type: "danger", duration: 7000 })
 					} else {

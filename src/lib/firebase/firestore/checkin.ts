@@ -42,7 +42,7 @@ export const isMemberCheckedInToday = async (memberUid: string): Promise<boolean
 
 		const checkInDate = toDate(latestCheckInData.checkInTime)
 		if (!checkInDate) {
-			console.error("[FIRESTORE] isMemberCheckedInToday: Invalid check-in time for memberUid:", memberUid)
+			console.debug("[FIRESTORE] isMemberCheckedInToday: Invalid check-in time for memberUid:", memberUid)
 			return false
 		}
 
@@ -51,7 +51,7 @@ export const isMemberCheckedInToday = async (memberUid: string): Promise<boolean
 
 		return checkInDate >= today
 	} catch (e) {
-		console.error("[FIRESTORE] isMemberCheckedInToday:", e)
+		console.debug("[FIRESTORE] isMemberCheckedInToday:", e)
 		return false
 	}
 }
@@ -70,7 +70,7 @@ export const getAllCheckIns = async (): Promise<CheckIn[] | null> => {
 
 		return checkIns
 	} catch (e) {
-		console.error("[FIRESTORE] getAllCheckIns:", e)
+		console.debug("[FIRESTORE] getAllCheckIns:", e)
 		return null
 	}
 }
@@ -108,7 +108,7 @@ export const getCheckinsByDate = async (dateString?: string): Promise<CheckIn[] 
 
 		return checkIns
 	} catch (e) {
-		console.error("[FIRESTORE] getCheckinsByDate:", e)
+		console.debug("[FIRESTORE] getCheckinsByDate:", e)
 		throw e
 	}
 }
@@ -130,7 +130,7 @@ export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean
 		await setDoc(checkInRef, data)
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] checkInMember:", e)
+		console.debug("[FIRESTORE] checkInMember:", e)
 		return false
 	}
 }
@@ -143,7 +143,7 @@ export const checkOutMember = async (checkInData: CheckInQRData): Promise<boolea
 		const querySnapshot = await getDocs(q)
 
 		if (querySnapshot.empty && querySnapshot.docs.length === 0) {
-			console.error("[FIRESTORE] checkOutMember: No check-in record found for memberUid:", checkInData.memberUid)
+			console.debug("[FIRESTORE] checkOutMember: No check-in record found for memberUid:", checkInData.memberUid)
 			throw new Error(t("checkin_not_found"))
 		}
 
@@ -162,8 +162,16 @@ export const checkOutMember = async (checkInData: CheckInQRData): Promise<boolea
 				toast.show(t("locker_removed_success"), { type: "success", duration: 7000 })
 			}
 		} catch (e) {
-			console.error("[FIRESTORE] checkOutMember: Error fetching locker for memberUid:", checkInData.memberUid, e)
-			toast.show(t("locker_remove_error"), { type: "danger" })
+			console.info("[FIRESTORE] checkOutMember: Error fetching locker for memberUid:", checkInData.memberUid, e)
+		}
+
+		// Check if the member has already checked out
+		const latestCheckInDoc = querySnapshot.docs[0]
+		const latestCheckInData = latestCheckInDoc.data() as CheckIn
+
+		if (latestCheckInData.checkOutTime !== null) {
+			console.debug("[FIRESTORE] checkOutMember: Member has already checked out for memberUid:", checkInData.memberUid)
+			throw new Error(t("checkin_already_checked_out"))
 		}
 
 		// Checkout
@@ -180,8 +188,7 @@ export const checkOutMember = async (checkInData: CheckInQRData): Promise<boolea
 
 		toast.show(t("checkout_success"), { type: "success", duration: 5000 })
 		return true
-	} catch (e) {
-		console.error("[FIRESTORE] checkOutMember:", e)
-		throw new Error(t("checkin_checkout_failed"))
+	} catch (e: any) {
+		throw new Error(e?.message || t("checkin_checkout_failed"))
 	}
 }

@@ -31,7 +31,7 @@ export const addMember = async (memberData: Member): Promise<boolean> => {
 
 		return !!docRef.id
 	} catch (e) {
-		console.error("[FIRESTORE] addMember:", e)
+		console.debug("[FIRESTORE] addMember:", e)
 		throw e
 	}
 }
@@ -48,7 +48,7 @@ export const updateMember = async (updatedMemberData: Member): Promise<boolean> 
 
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] updateMember:", e)
+		console.debug("[FIRESTORE] updateMember:", e)
 		return false
 	}
 }
@@ -58,7 +58,7 @@ export const deleteMember = async (memberId: string): Promise<void> => {
 		const memberRef = doc(db, COLLECTIONS.MEMBERS, memberId)
 		await deleteDoc(memberRef)
 	} catch (e) {
-		console.error("[FIRESTORE] deleteMember:", e)
+		console.debug("[FIRESTORE] deleteMember:", e)
 		throw e
 	}
 }
@@ -84,7 +84,7 @@ export const getMembersPaged = async (lastSnapshot?: any): Promise<{ members: Me
 
 		return { members: members, lastSnapshot: lastDocSnapshot }
 	} catch (e) {
-		console.error("[FIRESTORE] getMembersPaged:", e)
+		console.debug("[FIRESTORE] getMembersPaged:", e)
 		throw e
 	}
 }
@@ -100,7 +100,7 @@ export const getMemberById = async (memberId: string): Promise<Member | null> =>
 
 		return null
 	} catch (e) {
-		console.error("[FIRESTORE] getMemberById:", e)
+		console.debug("[FIRESTORE] getMemberById:", e)
 		throw e
 	}
 }
@@ -114,7 +114,7 @@ export const inactivateMember = async (memberId: string): Promise<boolean> => {
 		})
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] inactivateMember:", e)
+		console.debug("[FIRESTORE] inactivateMember:", e)
 		return false
 	}
 }
@@ -128,7 +128,7 @@ export const activateMember = async (memberId: string): Promise<boolean> => {
 		})
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] activateMember:", e)
+		console.debug("[FIRESTORE] activateMember:", e)
 		return false
 	}
 }
@@ -142,7 +142,7 @@ export const incrementMemberCheckInCount = async (memberId: string): Promise<boo
 		})
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] incrementMemberCheckInCount:", e)
+		console.debug("[FIRESTORE] incrementMemberCheckInCount:", e)
 		return false
 	}
 }
@@ -160,7 +160,7 @@ export const getAllMembers = async (): Promise<Member[]> => {
 
 		return members
 	} catch (e) {
-		console.error("[FIRESTORE] getAllMembers:", e)
+		console.debug("[FIRESTORE] getAllMembers:", e)
 		return []
 	}
 }
@@ -194,7 +194,7 @@ export const deleteMemberAccount = async (memberId: string): Promise<boolean> =>
 		await updateDoc(memberRef, sensitiveFieldsToDelete)
 		return true
 	} catch (e) {
-		console.error("[FIRESTORE] deleteMemberAccount:", e)
+		console.debug("[FIRESTORE] deleteMemberAccount:", e)
 		return false
 	}
 }
