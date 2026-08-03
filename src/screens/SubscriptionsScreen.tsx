@@ -96,7 +96,7 @@ export default function SubscriptionsScreen() {
 	}
 
 	const totalRevenueThisMonth = subscriptions.reduce((sum, sub) => {
-		if (isThisMonth(sub.createdAt)) {
+		if (sub?.price) {
 			return sum + (sub.price || 0)
 		}
 		return sum
@@ -106,6 +106,7 @@ export default function SubscriptionsScreen() {
 
 	const filteredSubscriptions = subscriptions.filter((sub: Subscription) => {
 		const endDate = toDate(sub.endDate)
+
 		switch (filter) {
 			case "EXPIRING_SOON":
 				return sub.status === "ACTIVE" && endDate && daysUntil(endDate) >= 0 && daysUntil(endDate) <= 7
@@ -116,57 +117,60 @@ export default function SubscriptionsScreen() {
 			default:
 				return true
 		}
-	})
+	}).filter((sub) => sub?.memberUid)
 
-	const renderItem = useCallback(({ item }: { item: Subscription }) => {
-		const memberName = item.firstName && item.lastName ? `${item.firstName} ${item.lastName}` : "Bilinmeyen Üye"
-		const endDate = safeTimestampToDateString(item.endDate)
+	const renderItem = useCallback(
+		({ item }: { item: Subscription }) => {
+			const memberName = item.firstName && item.lastName ? `${item.firstName} ${item.lastName}` : "Bilinmeyen Üye"
+			const endDate = safeTimestampToDateString(item.endDate)
 
-		let statusColor = theme.green.foreground
-		if (item.status === "PAUSED") statusColor = "#f0a500"
-		if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
+			let statusColor = theme.green.foreground
+			if (item.status === "PAUSED") statusColor = "#f0a500"
+			if (item.status === "EXPIRED" || item.status === "CANCELLED") statusColor = theme.red.foreground
 
-		const statusLabel =
-			item.status === "ACTIVE"
-				? t("active")
-				: item.status === "PAUSED"
-					? t("paused")
-					: item.status === "EXPIRED"
-						? t("expired")
-						: t("cancelled")
+			const statusLabel =
+				item.status === "ACTIVE"
+					? t("active")
+					: item.status === "PAUSED"
+						? t("paused")
+						: item.status === "EXPIRED"
+							? t("expired")
+							: t("cancelled")
 
-		return (
-			<TouchableOpacity
-				style={styles.listItem}
-				activeOpacity={0.7}
-				onPress={() =>
-					navigation.navigate("MemberDetailsScreen", {
-						memberId: item.memberUid,
-						prevScreen: "SubscriptionsScreen",
-						initialPage: 1,
-					})
-				}
-			>
-				<View style={styles.listItemLeft}>
-					<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
-					<View style={styles.listItemInfo}>
-						<ThemedText
-							style={styles.memberName}
-							numberOfLines={1}
-						>
-							{memberName}
-						</ThemedText>
-						<ThemedText style={styles.subscriptionInfo}>
-							{t(item.packageType)} · {endDate || "—"}
-						</ThemedText>
+			return (
+				<TouchableOpacity
+					style={styles.listItem}
+					activeOpacity={0.7}
+					onPress={() =>
+						navigation.navigate("MemberDetailsScreen", {
+							memberId: item.memberUid,
+							prevScreen: "SubscriptionsScreen",
+							initialPage: 1,
+						})
+					}
+				>
+					<View style={styles.listItemLeft}>
+						<View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+						<View style={styles.listItemInfo}>
+							<ThemedText
+								style={styles.memberName}
+								numberOfLines={1}
+							>
+								{memberName}
+							</ThemedText>
+							<ThemedText style={styles.subscriptionInfo}>
+								{t(item.packageType)} · {endDate || "—"}
+							</ThemedText>
+						</View>
 					</View>
-				</View>
-				<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
-					<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
-				</View>
-			</TouchableOpacity>
-		)
-	}, [darkMode])
+					<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
+						<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
+					</View>
+				</TouchableOpacity>
+			)
+		},
+		[darkMode],
+	)
 
 	const keyExtractor = useCallback((item: Subscription, index: number) => item.id || index.toString(), [])
 

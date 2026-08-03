@@ -230,5 +230,6 @@
 	"memberDeactivated": "Üyeliğiniz personel tarafından pasif hale getirilmiştir. Lütfen daha fazla bilgi için personel ile iletişime geçin",
 	"couldNotFetchSubscription": "Abonelik bilgisi alınamadı. Lütfen daha sonra tekrar deneyin",
 	"noActiveSubForLocker": "Dolap ataması yapabilmek için aktif bir aboneliğinizin olması gerekmektedir. Lütfen personel ile iletişime geçin ve aktif bir abonelik başlatın veya mevcut aboneliğinizi devam ettirin",
-	"checkin_already_checked_out": "Üye zaten çıkış yapmış"
+	"checkin_already_checked_out": "Üye zaten çıkış yapmış",
+	"checkin_already_checked_in": "Üye zaten giriş yapmış"
 }

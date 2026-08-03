@@ -117,6 +117,15 @@ export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean
 	try {
 		const checkInRef = doc(collection(db, COLLECTIONS.CHECKINS))
 
+		// Check is user checkin today
+		const isCheckedInToday = await isMemberCheckedInToday(checkInData.memberUid)
+
+		if (isCheckedInToday) {
+			console.debug("[FIRESTORE] checkInMember: Member has already checked in today for memberUid:", checkInData.memberUid)
+			toast.show(t("checkin_already_checked_in"), { type: "warning", duration: 5000 })
+			return false
+		}
+
 		const data: CheckIn = {
 			memberUid: checkInData.memberUid,
 			firstName: checkInData.firstName,
@@ -130,6 +139,9 @@ export const checkInMember = async (checkInData: CheckInQRData): Promise<boolean
 		await setDoc(checkInRef, data)
 		return true
 	} catch (e) {
+		toast.show(t("checkin_failed"), {
+			type: "danger",
+		})
 		console.debug("[FIRESTORE] checkInMember:", e)
 		return false
 	}

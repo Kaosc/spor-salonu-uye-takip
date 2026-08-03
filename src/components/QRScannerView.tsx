@@ -68,12 +68,6 @@ export default function QRScannerView({ onClose, action }: QRScannerViewProps) {
 						checkInSucces = true
 					}
 				}
-
-				if (!checkInSucces) {
-					toast.show(t("checkin_failed"), {
-						type: "danger",
-					})
-				}
 			}
 
 			if (action === "VIEW_MEMBER") {
