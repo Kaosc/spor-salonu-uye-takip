@@ -1,9 +1,10 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { useSelector } from "react-redux"
 
 import ThemedText from "./ui/ThemedText"
 import MemberAvatar from "./MemberAvatar"
+import GradientCard from "./ui/GradientCard"
 
 import { Theme } from "../utils/theme"
 import { useTranslation } from "react-i18next"
@@ -38,7 +39,7 @@ export default function MemberListCard({ member, search }: { member: Member; sea
 	}
 
 	return (
-		<TouchableOpacity
+		<GradientCard
 			style={[
 				styles.member,
 				{
@@ -63,7 +64,7 @@ export default function MemberListCard({ member, search }: { member: Member; sea
 				</View>
 			</View>
 			<View style={[styles.statusDot, { backgroundColor: memberStatusColor }]} />
-		</TouchableOpacity>
+		</GradientCard>
 	)
 }
 
@@ -75,7 +76,6 @@ const createStyles = (darkMode: boolean) => {
 			flexDirection: "row",
 			alignItems: "center",
 			paddingVertical: 15,
-			backgroundColor: theme.cardBackground,
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
 			marginBottom: 10,

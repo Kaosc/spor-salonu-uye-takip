@@ -136,7 +136,7 @@ export const resumeSubscription = async (subscriptionId: string) => {
 export const getSubscriptionsPaged = async (
 	lastSnapshot?: any,
 ): Promise<{ subscriptions: Subscription[]; lastSnapshot: any }> => {
-	const max = 8
+	const max = 20
 
 	try {
 		const subRef = collection(db, COLLECTIONS.SUBSCRIPTIONS)

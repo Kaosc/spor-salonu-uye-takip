@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import QRCode from "react-native-qrcode-svg"
 
 import ThemedButton from "./ui/ThemedButton"
+import GradientCard from "./ui/GradientCard"
 
 import { Theme } from "../utils/theme"
 import { moderateScale } from "../utils/responsive"
@@ -21,7 +22,7 @@ export default function QRCodeModal({ data, visible, onClose }: { data: any; vis
 			onRequestClose={onClose}
 		>
 			<View style={styles.modalOverlay}>
-				<View style={styles.modalContent}>
+				<GradientCard style={styles.modalContent}>
 					<View style={styles.qrContainer}>
 						{data && (
 							<QRCode
@@ -37,7 +38,7 @@ export default function QRCodeModal({ data, visible, onClose }: { data: any; vis
 						onPress={onClose}
 						text={t("close")}
 					/>
-				</View>
+				</GradientCard>
 			</View>
 		</Modal>
 	)
@@ -62,7 +63,6 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			borderWidth: 1,
 			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
 			gap: 50,
 		},
 		modalTitle: {

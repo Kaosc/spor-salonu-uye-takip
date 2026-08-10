@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next"
 
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
+import GradientCard from "../../components/ui/GradientCard"
 import CustomHeader from "../../components/CustomHeader"
 import SettingsButton from "../../components/SettingsButton"
 import QRCodeModal from "../../components/QRCodeModal"
@@ -135,7 +136,7 @@ export default function MemberHomeScreen() {
 				/>
 			</TouchableOpacity>
 		) : (
-			<TouchableOpacity
+			<GradientCard
 				style={[styles.lockerCard, styles.lockerCardEmpty]}
 				activeOpacity={0.7}
 				onPress={handleLockerPress}
@@ -150,7 +151,7 @@ export default function MemberHomeScreen() {
 				</View>
 				<ThemedText style={styles.lockerCardEmptyTitle}>{t("noActiveLocker")}</ThemedText>
 				<ThemedText style={styles.lockerCardEmptySubtitle}>{t("tapToScanLocker")}</ThemedText>
-			</TouchableOpacity>
+			</GradientCard>
 		)
 	}
 
@@ -187,11 +188,12 @@ export default function MemberHomeScreen() {
 						<ThemedText style={[styles.statusCardValue, { color: statusConfig.color }]}>{statusConfig.label}</ThemedText>
 					</View>
 				)}
-
-				<TouchableOpacity
+				
+				{/* QR Code Button */}
+				<GradientCard
 					style={styles.qrButton}
 					activeOpacity={0.7}
-					onPress={handleLockerPress}
+					onPress={() => setQrModalVisible(true)}
 				>
 					<ThemedIcon
 						name="qrcode"
@@ -202,8 +204,9 @@ export default function MemberHomeScreen() {
 						name="chevron-right"
 						size={24}
 					/>
-				</TouchableOpacity>
+				</GradientCard>
 
+				{/* Locker Card */}
 				<LockerCard />
 			</ScrollView>
 
@@ -266,7 +269,6 @@ const createStyles = (darkMode: boolean) => {
 			marginHorizontal: moderateScale(16),
 			padding: moderateScale(18),
 			borderRadius: 16,
-			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 			gap: 12,
@@ -311,7 +313,6 @@ const createStyles = (darkMode: boolean) => {
 			alignItems: "center",
 			justifyContent: "space-between",
 			padding: 15,
-			backgroundColor: theme.cardBackground,
 			borderRadius: 16,
 			marginHorizontal: moderateScale(16),
 			borderWidth: 1,
@@ -352,7 +353,6 @@ const createStyles = (darkMode: boolean) => {
 			paddingHorizontal: 15,
 			borderStyle: "dashed",
 			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
 			borderRadius: 16,
 			marginHorizontal: moderateScale(16),
 			borderWidth: 2,

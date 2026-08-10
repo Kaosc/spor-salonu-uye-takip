@@ -10,6 +10,7 @@ import CustomHeader from "../../components/CustomHeader"
 import ThemedIcon from "../../components/ui/ThemedIcon"
 import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
 import ThemedButton from "../../components/ui/ThemedButton"
+import GradientCard from "../../components/ui/GradientCard"
 import BMIDisplay from "../../components/BMIDisplay"
 import SubscriptionView from "../../components/SubscriptionView"
 import MemberAvatar from "../../components/MemberAvatar"
@@ -337,7 +338,7 @@ export default function MemberDetailsScreen() {
 
 		if (locker) {
 			return (
-				<View style={styles.lockerCard}>
+				<GradientCard style={styles.lockerCard}>
 					<View style={styles.lockerIconContainer}>
 						<ThemedIcon
 							name="locker"
@@ -355,7 +356,7 @@ export default function MemberDetailsScreen() {
 					>
 						<ThemedText style={styles.emptyLockerButtonText}>{t("remove")}</ThemedText>
 					</ThemedButton>
-				</View>
+				</GradientCard>
 			)
 		}
 
@@ -458,10 +459,10 @@ export default function MemberDetailsScreen() {
 				) : subscriptions ? (
 					<View style={{ gap: 25 }}>
 						{/* CURRENTLY ACTIVE OR PAUSED SUBSCRIPTION */}
-						<View style={styles.card}>
+						<GradientCard style={styles.card}>
 							{activeSubscription && <SubscriptionView subscription={activeSubscription} />}
 							<ActionButtonsView />
-						</View>
+						</GradientCard>
 
 						{/* PREVIOUS SUBSCRIPTIONS (CANCELED OR EXPIRED) */}
 						{subscriptions.length > 0 ? (
@@ -475,7 +476,7 @@ export default function MemberDetailsScreen() {
 									<ThemedText style={styles.sectionTitle}>{t("previousSubscriptions")}</ThemedText>
 								</View>
 								{subscriptions.map((sub) => (
-									<View
+									<GradientCard
 										style={styles.card}
 										key={sub.id}
 									>
@@ -483,7 +484,7 @@ export default function MemberDetailsScreen() {
 											key={sub.id}
 											subscription={sub}
 										/>
-									</View>
+									</GradientCard>
 								))}
 							</>
 						) : (
@@ -513,7 +514,7 @@ export default function MemberDetailsScreen() {
 	const MemberDetails = useCallback(
 		({ member }: { member: Member }) => {
 			return (
-				<View style={styles.card}>
+				<GradientCard style={styles.card}>
 					<View style={styles.actionRow}>
 						<View style={{ flexDirection: "row", gap: 20 }}>
 							{member.isActive ? (
@@ -585,7 +586,7 @@ export default function MemberDetailsScreen() {
 					/>
 
 					{/* Body Metrics Card */}
-					<View style={styles.bodyMetricsContainer}>
+					<GradientCard style={styles.bodyMetricsContainer}>
 						<View style={styles.bodyMetricsRow}>
 							<View style={styles.bodyMetricItem}>
 								<ThemedIcon
@@ -611,7 +612,7 @@ export default function MemberDetailsScreen() {
 								height={member.height}
 							/>
 						)}
-					</View>
+					</GradientCard>
 
 					<DetailsRow
 						label={t("address")}
@@ -651,7 +652,7 @@ export default function MemberDetailsScreen() {
 						value={member.emergencyContact?.phone || "-"}
 						iconName="phone"
 					/>
-				</View>
+				</GradientCard>
 			)
 		},
 		[member, darkMode],
@@ -761,7 +762,7 @@ export default function MemberDetailsScreen() {
 							contentContainerStyle={styles.pageContent}
 							showsVerticalScrollIndicator={false}
 						>
-							<View style={styles.memberInfoCard}>
+							<GradientCard style={styles.memberInfoCard}>
 								<ThemedIcon
 									name="account"
 									size={20}
@@ -773,7 +774,7 @@ export default function MemberDetailsScreen() {
 									</ThemedText>
 									<ThemedText style={styles.memberInfoPhone}>{member?.phoneNumber}</ThemedText>
 								</View>
-							</View>
+							</GradientCard>
 							<LockerView />
 						</ScrollView>
 					</PagerView>
@@ -831,7 +832,6 @@ const createStyles = (darkMode: boolean) => {
 			paddingHorizontal: 9,
 		},
 		card: {
-			backgroundColor: theme.cardBackground,
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
 			borderRadius: 12,
@@ -921,7 +921,6 @@ const createStyles = (darkMode: boolean) => {
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
 			borderRadius: 8,
-			backgroundColor: darkMode ? "#111" : "#f8f8f8",
 		},
 		bodyMetricsRow: {
 			flexDirection: "row",
@@ -954,7 +953,6 @@ const createStyles = (darkMode: boolean) => {
 		},
 		// Locker styles
 		lockerCard: {
-			backgroundColor: theme.cardBackground,
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
 			borderRadius: 12,
@@ -1015,7 +1013,6 @@ const createStyles = (darkMode: boolean) => {
 		avatarContainer: { alignItems: "center", justifyContent: "center", marginBottom: 15 },
 		// Member info card (locker page)
 		memberInfoCard: {
-			backgroundColor: theme.cardBackground,
 			borderWidth: StyleSheet.hairlineWidth,
 			borderColor: theme.border,
 			borderRadius: 12,

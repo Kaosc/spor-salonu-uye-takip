@@ -10,6 +10,7 @@ import ThemedText from "../components/ui/ThemedText"
 import CustomHeader from "../components/CustomHeader"
 import ThemedIcon from "../components/ui/ThemedIcon"
 import ThemedButton from "../components/ui/ThemedButton"
+import GradientCard from "../components/ui/GradientCard"
 
 import { addSubscription, cancelSubscription } from "../lib/firebase/firestore/subscriptions"
 import { Theme } from "../utils/theme"
@@ -136,7 +137,7 @@ export default function SubscriptionFormScreen() {
 
 	const UserInfoView = () => {
 		return (
-			<View style={styles.userInfoContainer}>
+			<GradientCard style={styles.userInfoContainer}>
 				<View style={styles.row}>
 					<ThemedIcon
 						name="account"
@@ -163,7 +164,7 @@ export default function SubscriptionFormScreen() {
 					/>
 					<ThemedText style={styles.userInfoText}>{member.phoneNumber}</ThemedText>
 				</View>
-			</View>
+			</GradientCard>
 		)
 	}
 
@@ -349,7 +350,6 @@ const createStyles = (darkMode: boolean) => {
 		},
 		userInfoContainer: {
 			marginTop: 16,
-			backgroundColor: theme.cardBackground,
 			padding: 12,
 			borderRadius: 8,
 			gap: 4,

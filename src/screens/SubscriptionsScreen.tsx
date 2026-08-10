@@ -1,13 +1,14 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import { View, TouchableOpacity, StyleSheet, BackHandler, FlatList } from "react-native"
 import { useSelector } from "react-redux"
-import { useNavigation, NavigationProp, useFocusEffect } from "@react-navigation/native"
+import { useNavigation, NavigationProp } from "@react-navigation/native"
 import { useTranslation } from "react-i18next"
 
 import ThemedText from "../components/ui/ThemedText"
 import ThemedActivityIndicator from "../components/ui/ThemedActivityIndicator"
+import GradientCard from "../components/ui/GradientCard"
 
-import { daysUntil, isThisMonth, safeTimestampToDateString, toDate } from "../utils/date"
+import { daysUntil, safeTimestampToDateString, toDate } from "../utils/date"
 import { Theme } from "../utils/theme"
 import { moderateScale } from "../utils/responsive"
 import { getSubscriptionsPaged } from "../lib/firebase/firestore/subscriptions"
@@ -51,6 +52,8 @@ export default function SubscriptionsScreen() {
 		if (isRefresh) {
 			setRefreshing(true)
 			lastDocRef.current = null
+		} else {
+			setLoading(true)
 		}
 
 		try {
@@ -72,20 +75,25 @@ export default function SubscriptionsScreen() {
 			console.error("[SubscriptionsScreen] fetchData:", e)
 		} finally {
 			setLoading(false)
+
 			if (isRefresh) {
 				setRefreshing(false)
 			}
 		}
 	}, [])
 
-	useFocusEffect(
-		useCallback(() => {
-			setLoading(true)
-			lastDocRef.current = null
-			setSubscriptions([])
-			fetchData()
-		}, [fetchData]),
-	)
+	useEffect(() => {
+		fetchData(true)
+	}, [fetchData])
+
+	// useFocusEffect(
+	// 	useCallback(() => {
+	// 		setLoading(true)
+	// 		lastDocRef.current = null
+	// 		setSubscriptions([])
+	// 		fetchData()
+	// 	}, [fetchData]),
+	// )
 
 	const onEndReached = () => {
 		if (isLoadingMoreRef.current) return
@@ -104,20 +112,25 @@ export default function SubscriptionsScreen() {
 
 	const activeSubscriptionsCount = subscriptions.filter((s) => s.status === "ACTIVE").length
 
-	const filteredSubscriptions = subscriptions.filter((sub: Subscription) => {
-		const endDate = toDate(sub.endDate)
+	const filteredSubscriptions = subscriptions
+		.filter((sub: Subscription) => {
+			const endDate = toDate(sub.endDate)
 
-		switch (filter) {
-			case "EXPIRING_SOON":
-				return sub.status === "ACTIVE" && endDate && daysUntil(endDate) >= 0 && daysUntil(endDate) <= 7
-			case "RECENTLY_EXPIRED":
-				return sub.status === "EXPIRED"
-			case "PAUSED":
-				return sub.status === "PAUSED"
-			default:
-				return true
-		}
-	}).filter((sub) => sub?.memberUid)
+			switch (filter) {
+				case "EXPIRING_SOON":
+					return sub.status === "ACTIVE" && endDate && daysUntil(endDate) >= 0 && daysUntil(endDate) <= 7
+				case "RECENTLY_EXPIRED":
+					return sub.status === "EXPIRED"
+				case "PAUSED":
+					return sub.status === "PAUSED"
+				default:
+					return true
+			}
+		})
+		// ----------
+		// Filter out subscriptions without a memberUid to avoid navigation issues
+		// ----------
+		.filter((sub) => sub?.memberUid)
 
 	const renderItem = useCallback(
 		({ item }: { item: Subscription }) => {
@@ -138,7 +151,7 @@ export default function SubscriptionsScreen() {
 							: t("cancelled")
 
 			return (
-				<TouchableOpacity
+				<GradientCard
 					style={styles.listItem}
 					activeOpacity={0.7}
 					onPress={() =>
@@ -166,7 +179,7 @@ export default function SubscriptionsScreen() {
 					<View style={[styles.statusBadge, { backgroundColor: statusColor + "20" }]}>
 						<ThemedText style={[styles.statusBadgeText, { color: statusColor }]}>{statusLabel}</ThemedText>
 					</View>
-				</TouchableOpacity>
+				</GradientCard>
 			)
 		},
 		[darkMode],
@@ -178,7 +191,7 @@ export default function SubscriptionsScreen() {
 		() => (
 			<>
 				{/* Summary Card */}
-				<View style={styles.summaryCard}>
+				<GradientCard style={styles.summaryCard}>
 					<View style={styles.summaryColumn}>
 						<ThemedText style={styles.summaryLabel}>{t("totalRevenueThisMonth")}</ThemedText>
 						<ThemedText style={styles.summaryValue}>{totalRevenueThisMonth.toLocaleString("tr-TR")} ₺</ThemedText>
@@ -188,7 +201,7 @@ export default function SubscriptionsScreen() {
 						<ThemedText style={styles.summaryLabel}>{t("activeSubscriptions")}</ThemedText>
 						<ThemedText style={styles.summaryValue}>{activeSubscriptionsCount}</ThemedText>
 					</View>
-				</View>
+				</GradientCard>
 
 				{/* Filter Bar */}
 				<View style={styles.filterBar}>
@@ -256,7 +269,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			marginTop: moderateScale(16),
 			padding: moderateScale(20),
 			borderRadius: 16,
-			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 		},
@@ -318,7 +330,6 @@ const createStyles = (darkMode: boolean, theme: any) => {
 			borderRadius: 12,
 			marginBottom: 8,
 			marginHorizontal: moderateScale(16),
-			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 		},

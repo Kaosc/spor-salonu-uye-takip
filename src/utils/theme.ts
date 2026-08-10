@@ -1,4 +1,5 @@
 import { DarkTheme, DefaultTheme } from "@react-navigation/native"
+import { ColorValue } from "react-native"
 
 export const NavigatorLight: ReactNavigation.Theme = {
 	...DefaultTheme,
@@ -32,6 +33,7 @@ export const Theme = {
 		cardBackground: __DEV__ ? "#111111" : "#0c0c0c",
 		text: "#ffffff",
 		border: "#333333",
+		gradient: ["#1f1f22", "#000000"] as [ColorValue, ColorValue],
 		green: {
 			background: "#1f492d",
 			foreground: "#27f08b",
@@ -50,6 +52,7 @@ export const Theme = {
 		cardBackground: "#f1f1f1",
 		text: "#000000",
 		border: "#c9c9c9",
+		gradient: ["#e4e4e4", "#ffffff"] as [ColorValue, ColorValue],
 		green: {
 			background: "#b5ffb3",
 			foreground: "#0b8b4b",

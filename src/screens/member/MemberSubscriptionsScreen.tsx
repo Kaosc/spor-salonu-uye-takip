@@ -8,6 +8,7 @@ import ThemedIcon from "../../components/ui/ThemedIcon"
 import CustomHeader from "../../components/CustomHeader"
 import SubscriptionView from "../../components/SubscriptionView"
 import ThemedActivityIndicator from "../../components/ui/ThemedActivityIndicator"
+import GradientCard from "../../components/ui/GradientCard"
 
 import { getSubscriptionsByMemberId } from "../../lib/firebase/firestore/subscriptions"
 
@@ -72,7 +73,7 @@ export default function MemberSubscriptionsScreen() {
 			>
 				{subscriptions.length > 0 ? (
 					<>
-						<View style={styles.activePlanCard}>
+						<GradientCard style={styles.activePlanCard}>
 							{/* Active Plan Card */}
 							{activeSubscription ? (
 								<SubscriptionView subscription={activeSubscription} />
@@ -86,7 +87,7 @@ export default function MemberSubscriptionsScreen() {
 									<ThemedText style={styles.placeholderText}>{t("noActiveSubscription")}</ThemedText>
 								</View>
 							)}
-						</View>
+						</GradientCard>
 
 						{subscriptions.length > 0 ? (
 							<>
@@ -99,7 +100,7 @@ export default function MemberSubscriptionsScreen() {
 									<ThemedText style={styles.sectionTitle}>{t("previousSubscriptions")}</ThemedText>
 								</View>
 								{subscriptions.map((sub) => (
-									<View
+									<GradientCard
 										style={styles.activePlanCard}
 										key={sub.id}
 									>
@@ -107,7 +108,7 @@ export default function MemberSubscriptionsScreen() {
 											key={sub.id}
 											subscription={sub}
 										/>
-									</View>
+									</GradientCard>
 								))}
 							</>
 						) : (
@@ -149,7 +150,6 @@ const createStyles = (darkMode: boolean) => {
 			padding: moderateScale(24),
 			borderRadius: 16,
 			borderWidth: 1,
-			backgroundColor: theme.cardBackground,
 			borderColor: theme.border,
 		},
 		placeholderContainer: {

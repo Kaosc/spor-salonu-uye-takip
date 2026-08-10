@@ -91,7 +91,7 @@ export default function LockerScreen() {
 					style={[
 						styles.lockerCard,
 						{
-							backgroundColor: isOccupied ? theme.red.background : theme.green.background,
+							backgroundColor: isOccupied ? theme.red.background : "#82e0a2",
 							borderColor: isOccupied ? theme.red.foreground : theme.green.foreground,
 						},
 					]}

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import ThemedText from "../../components/ui/ThemedText"
 import ThemedIcon from "../../components/ui/ThemedIcon"
 import ThemedButton from "../../components/ui/ThemedButton"
+import GradientCard from "../../components/ui/GradientCard"
 import CustomHeader from "../../components/CustomHeader"
 import MemberAvatar from "../../components/MemberAvatar"
 import BMIDisplay from "../../components/BMIDisplay"
@@ -121,7 +122,7 @@ export default function MemberProfileScreen() {
 				showsVerticalScrollIndicator={false}
 			>
 				{/* Profile Card */}
-				<View style={styles.card}>
+				<GradientCard style={styles.card}>
 					<View style={styles.avatarSection}>
 						<MemberAvatar
 							gender={member?.gender}
@@ -189,12 +190,12 @@ export default function MemberProfileScreen() {
 						value={member.emergencyContact?.phone || "-"}
 						iconName="phone-forward"
 					/>
-				</View>
+				</GradientCard>
 
 				{/* Body Metrics Card */}
 				<ThemedText style={styles.sectionTitle}>{t("bodyMetrics")}</ThemedText>
 
-				<View style={styles.card}>
+				<GradientCard style={styles.card}>
 					<View style={styles.bodyMetricsRow}>
 						<View style={styles.bodyMetricItem}>
 							<ThemedIcon
@@ -221,7 +222,7 @@ export default function MemberProfileScreen() {
 							height={member.height}
 						/>
 					)}
-				</View>
+				</GradientCard>
 
 				{/* Sign Out Button */}
 				<ThemedText style={styles.sectionTitle}>{t("logout")}</ThemedText>
@@ -260,7 +261,6 @@ const createStyles = (darkMode: boolean) => {
 			marginHorizontal: 13,
 			padding: 20,
 			borderRadius: 16,
-			backgroundColor: theme.cardBackground,
 			borderWidth: 1,
 			borderColor: theme.border,
 		},

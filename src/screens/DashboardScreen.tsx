@@ -12,6 +12,7 @@ import CustomHeader from "../components/CustomHeader"
 import QRScannerView from "../components/QRScannerView"
 import SettingsButton from "../components/SettingsButton"
 import QRCodeModal from "../components/QRCodeModal"
+import GradientCard from "../components/ui/GradientCard"
 
 import { logout } from "../store/features/authSlice"
 
@@ -134,8 +135,8 @@ export default function DashboardScreen() {
 					</View>
 				</View>
 
-				<TouchableOpacity
-					style={[styles.staffQrCard, {}]}
+				<GradientCard
+					style={styles.staffQrCard}
 					activeOpacity={0.7}
 					onPress={() => setQrModalVisible(true)}
 				>
@@ -144,9 +145,9 @@ export default function DashboardScreen() {
 						value={staffUser.uid}
 						size={moderateScale(35)}
 					/>
-				</TouchableOpacity>
+				</GradientCard>
 
-				<View style={styles.infoCard}>
+				<GradientCard style={styles.infoCard}>
 					<View style={styles.infoRow}>
 						<ThemedIcon
 							name="email-outline"
@@ -202,7 +203,7 @@ export default function DashboardScreen() {
 							color={theme.red.foreground}
 						/>
 					</TouchableOpacity>
-				</View>
+				</GradientCard>
 
 				<View style={styles.qrActionsContainer}>
 					<TouchableOpacity
@@ -250,7 +251,7 @@ export default function DashboardScreen() {
 						</View>
 					</TouchableOpacity>
 				</View>
-				<TouchableOpacity
+				<GradientCard
 					style={styles.qrCard}
 					activeOpacity={0.7}
 					onPress={() => {
@@ -269,7 +270,7 @@ export default function DashboardScreen() {
 						name="qrcode-scan"
 						size={40}
 					/>
-				</TouchableOpacity>
+				</GradientCard>
 
 				<View style={styles.qrActionsContainer}>
 					<TouchableOpacity
@@ -361,7 +362,6 @@ const createStyles = (darkMode: boolean) => {
 			padding: 20,
 			borderWidth: 1,
 			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
 		},
 		infoRow: {
 			flexDirection: "row",
@@ -384,7 +384,6 @@ const createStyles = (darkMode: boolean) => {
 			paddingVertical: 15,
 			borderWidth: 1,
 			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
 			flexDirection: "row",
 			alignItems: "center",
 			justifyContent: "space-between",
@@ -399,7 +398,6 @@ const createStyles = (darkMode: boolean) => {
 			paddingVertical: 20,
 			borderWidth: 1,
 			borderColor: theme.border,
-			backgroundColor: theme.cardBackground,
 		},
 		qrCardContent: {
 			gap: 10,
