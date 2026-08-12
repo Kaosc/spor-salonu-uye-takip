@@ -91,8 +91,8 @@ export default function LockerScreen() {
 					style={[
 						styles.lockerCard,
 						{
-							backgroundColor: isOccupied ? theme.red.background : "#82e0a2",
-							borderColor: isOccupied ? theme.red.foreground : theme.green.foreground,
+							backgroundColor: isOccupied ? theme.red.background : darkMode ? "#303030" : "#cfcfcf",
+							borderColor: isOccupied ? theme.red.foreground : theme.green.background,
 						},
 					]}
 					onPress={() => handleLockerPress(item)}
